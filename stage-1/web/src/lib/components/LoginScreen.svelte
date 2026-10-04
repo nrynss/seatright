@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { authMessage } from '../auth';
+  import { loginFailureMessage } from '../auth';
 
   let {
     error = null,
@@ -20,7 +20,7 @@
     try {
       await onAccount(form);
     } catch (failure) {
-      localError = authMessage(failure);
+      localError = loginFailureMessage(failure);
     }
   }
 </script>

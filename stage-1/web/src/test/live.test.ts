@@ -1,6 +1,7 @@
 import { ApiError } from '@nrynss/chaaya/keel';
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { CREDENTIAL_REFUSAL } from '../lib/auth';
 import App from '../App.svelte';
 import FloorPlan from '../lib/components/FloorPlan.svelte';
 import LiveSearch from '../lib/components/LiveSearch.svelte';
@@ -430,9 +431,10 @@ describe('live shell', () => {
         );
       }
       if (path === '/auth/login') {
-        return new Response(JSON.stringify({ error: { code: 'unauthenticated', message: 'Those details were not accepted.' } }), {
-          status: 401,
-        });
+        return new Response(
+          JSON.stringify({ error: { code: 'unauthenticated', message: 'missing or invalid bearer token' } }),
+          { status: 401 },
+        );
       }
       return new Response(JSON.stringify({ error: { code: 'not_found', message: 'missing' } }), { status: 404 });
     });
@@ -476,7 +478,10 @@ describe('live shell', () => {
     setControl(view.target.querySelector('[data-testid="login-password"]') as HTMLInputElement, 'wrong horse');
     (view.target.querySelector('[data-testid="login-submit"]') as HTMLButtonElement).click();
     await settle();
-    expect(view.target.querySelector('[data-testid="auth-error"]')?.textContent).toContain('not accepted');
+    const loginError = view.target.querySelector('[data-testid="auth-error"]')?.textContent ?? '';
+    expect(loginError).toBe(CREDENTIAL_REFUSAL);
+    expect(loginError.toLowerCase()).not.toContain('bearer');
+    expect(loginError.toLowerCase()).not.toContain('token');
     expect(view.target.querySelector('[data-testid="current-user"]')).toBeNull();
     expect(calls.some((call) => String(call.path).includes('/reservations'))).toBe(false);
     await view.cleanup();
