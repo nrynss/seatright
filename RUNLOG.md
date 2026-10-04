@@ -1,6 +1,6 @@
 # Tablekeeper2 run log
 
-Stage 1: in progress. Stages 2–4: pending acceptance/copy of preceding stage.
+Stage 1: completed and accepted. Stage 2: in progress (S2-M and S2-G implementation; S2-D correction and verification pending). Stages 3–4: pending acceptance/copy of preceding stage.
 
 2026-10-04T17:19:33Z — Codex — blocker — Runtime TaskCreate rejected: MCP tool call requires approval, but approval policy is never. Using PLAN.md/RUNLOG.md fallback; no task IDs/history. Usage not exposed for this call.
 
