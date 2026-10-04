@@ -3,16 +3,29 @@
   import { fade } from 'svelte/transition';
   import AvailabilityGrid from './AvailabilityGrid.svelte';
   import BookingForm from './BookingForm.svelte';
+  import Confirmation from './Confirmation.svelte';
   import FloorPlan from './FloorPlan.svelte';
+  import {
+    attemptFor,
+    newIdempotencyKey,
+    sameBooking,
+    submitBooking,
+    UNCERTAIN_MESSAGE,
+    type BookingAttempt,
+    type BookingBody,
+    type ReservationRecord,
+  } from '../booking';
   import { rememberHold, rememberSearch, type HeldSelection } from '../hold';
   import { bookingSummary, formatLongDate, timezoneLabel } from '../format';
   import { motionDuration } from '../motion';
   import { go } from '../nav';
   import type { PreviewSlot } from '../preview';
   import {
+    availabilityPath,
     DEFAULT_SEARCH_DATE,
     errorText,
     loadSearch,
+    parseAvailability,
     parsePartySize,
     parseRestaurants,
     parseSearchDate,
@@ -27,9 +40,11 @@
   let {
     transport = liveTransport,
     signedIn = false,
+    token = null,
   }: {
     transport?: Transport;
     signedIn?: boolean;
+    token?: string | null;
   } = $props();
 
   let restaurants = $state<RestaurantSummary[]>([]);
@@ -46,7 +61,14 @@
   let searchError = $state<string | null>(null);
   let authError = $state<string | null>(null);
   let held = $state<HeldSelection | null>(null);
+  let pending = $state<BookingAttempt | null>(null);
+  let receipt = $state<ReservationRecord | null>(null);
+  let bookingError = $state<string | null>(null);
+  let uncertain = $state(false);
+  let sending = $state(false);
   let generation = 0;
+  let attemptSeq = 0;
+  let refreshSeq = 0;
 
   $effect(() => {
     const attempt = catalogTick;
@@ -132,6 +154,7 @@
     const mine = generation;
     held = null;
     rememberHold(null);
+    retireAttempt();
     result = null;
     rememberSearch(null);
     searchError = null;
@@ -158,6 +181,8 @@
     }
     const table = result.detail.tables.find((item) => item.id === tableId);
     if (!table) return;
+    if (held && held.table_id === tableId && held.starts_at_local === slot.starts_at_local) return;
+    retireAttempt();
     const next: HeldSelection = {
       restaurant_id: result.query.restaurantId,
       table_id: tableId,
@@ -178,6 +203,116 @@
   function onPlanSelect(tableId: string): void {
     if (!activeSlot || !shownTime) return;
     selectCell(tableId, shownTime, activeSlot.availableTableIds.includes(tableId));
+  }
+
+  function draftBody(size: number): BookingBody | null {
+    if (!held) return null;
+    try {
+      return {
+        restaurant_id: held.restaurant_id,
+        table_id: held.table_id,
+        starts_at_local: held.starts_at_local,
+        party_size: parsePartySize(partyText(size)),
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  const typedBody = $derived(draftBody(partyDraft));
+  const attemptMatchesForm = $derived(Boolean(pending && typedBody && sameBooking(pending.body, typedBody)));
+  const confirmedAttempt = $derived(
+    Boolean(
+      receipt &&
+        pending &&
+        held &&
+        sameBooking(pending.body, {
+          restaurant_id: receipt.restaurant_id,
+          table_id: receipt.table_id,
+          starts_at_local: receipt.starts_at_local,
+          party_size: receipt.party_size,
+        }) &&
+        held.table_id === receipt.table_id &&
+        held.starts_at_local === receipt.starts_at_local,
+    ),
+  );
+
+  function retireAttempt(): void {
+    attemptSeq += 1;
+    pending = null;
+    receipt = null;
+    bookingError = null;
+    uncertain = false;
+    sending = false;
+  }
+
+  async function refreshAvailability(searchGeneration: number, query: SearchQuery): Promise<void> {
+    refreshSeq += 1;
+    const mine = refreshSeq;
+    try {
+      const body = await transport(availabilityPath(query));
+      if (mine !== refreshSeq || searchGeneration !== generation || !result) return;
+      if (
+        result.query.restaurantId !== query.restaurantId ||
+        result.query.date !== query.date ||
+        result.query.partySize !== query.partySize
+      ) {
+        return;
+      }
+      const availability = parseAvailability(body);
+      if (mine !== refreshSeq || searchGeneration !== generation || !result) return;
+      result = { ...result, availability, availabilityBody: body };
+      rememberSearch(result);
+    } catch {
+      // The refusal is already on screen. A failed refresh leaves the previous grid in place.
+    }
+  }
+
+  async function onBook(size: number): Promise<void> {
+    partyDraft = size;
+    if (!held || !signedIn || !token) {
+      bookingError = 'Sign in to request this table.';
+      uncertain = false;
+      return;
+    }
+    const body = draftBody(size);
+    if (!body) {
+      bookingError = 'Party size must be a whole number.';
+      return;
+    }
+    const next = attemptFor(pending, body, newIdempotencyKey());
+    const replaced = !pending || next.key !== pending.key;
+    pending = next;
+    if (replaced) {
+      receipt = null;
+      uncertain = false;
+    }
+    bookingError = null;
+    attemptSeq += 1;
+    const mine = attemptSeq;
+    const searchGeneration = generation;
+    const query = result?.query;
+    sending = true;
+    const outcome = await submitBooking(transport, token, next);
+    if (mine !== attemptSeq) return;
+    sending = false;
+    if (outcome.kind === 'confirmed') {
+      receipt = outcome.reservation;
+      bookingError = null;
+      uncertain = false;
+      return;
+    }
+    if (outcome.kind === 'uncertain') {
+      bookingError = null;
+      if (!receipt) uncertain = true;
+      return;
+    }
+    uncertain = false;
+    bookingError = outcome.message;
+    receipt = null;
+    if (outcome.code === 'table_unavailable' && query) {
+      void refreshAvailability(searchGeneration, query);
+    }
   }
 </script>
 
@@ -296,7 +431,28 @@
         </p>
       {/if}
       {#if held && summary}
-        <BookingForm {summary} bind:partySize={partyDraft} />
+        <BookingForm {summary} bind:partySize={partyDraft} busy={sending} onRequest={(size) => void onBook(size)} />
+        {#if sending}
+          <p class="booking-note" role="status">Sending your request.</p>
+        {/if}
+        {#if uncertain && attemptMatchesForm}
+          <p class="state state-uncertain" data-testid="booking-uncertain" role="status">{UNCERTAIN_MESSAGE}</p>
+        {/if}
+        {#if bookingError}
+          <p class="state state-refused" data-testid="booking-error" role="alert">{bookingError}</p>
+        {/if}
+        {#if confirmedAttempt && receipt && held}
+          <Confirmation
+            details={bookingSummary(
+              held.display.restaurantName,
+              held.display.tableLabel,
+              receipt.starts_at_local.slice(0, 10),
+              slotClock(receipt.starts_at_local),
+            )}
+            tables={`Table ${held.display.tableLabel}`}
+            reference={receipt.reference}
+          />
+        {/if}
       {/if}
     {/if}
   {/if}

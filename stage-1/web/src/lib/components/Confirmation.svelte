@@ -32,7 +32,7 @@
       <p data-testid="confirmation-details">{details}</p>
       <p data-testid="confirmation-tables">{tables}</p>
       {#if reference}
-        <p data-testid="confirmation-reference">{reference}</p>
+        <p class="reference" data-testid="confirmation-reference">{reference}</p>
       {/if}
     </div>
   </div>
