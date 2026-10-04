@@ -210,13 +210,39 @@ describe('account client', () => {
     });
     await liveTransport('/restaurants');
     await liveTransport('/reservations', { token: 'opaque-session' });
+    await liveTransport('/reservations', {
+      method: 'POST',
+      token: 'opaque-session',
+      idempotencyKey: 'attempt-1',
+      body: {
+        restaurant_id: 'r_anker',
+        table_id: 't_1',
+        starts_at_local: '2027-06-17T18:00',
+        party_size: 2,
+      },
+    });
     expect(calls[0].path).toBe('/restaurants');
     expect(new Headers(calls[0].init.headers).get('Authorization')).toBeNull();
+    expect(new Headers(calls[0].init.headers).get('Idempotency-Key')).toBeNull();
     expect(calls[0].init.method).toBe('GET');
     const signed = new Headers(calls[1].init.headers);
     expect(signed.get('Authorization')).toBe('Bearer opaque-session');
     expect(signed.get('Accept')).toBe('application/json');
+    expect(signed.get('Idempotency-Key')).toBeNull();
     expect(calls[1].init.body).toBeUndefined();
+    const booked = new Headers(calls[2].init.headers);
+    expect(calls[2].init.method).toBe('POST');
+    expect(booked.get('Authorization')).toBe('Bearer opaque-session');
+    expect(booked.get('Idempotency-Key')).toBe('attempt-1');
+    expect(booked.get('Content-Type')).toBe('application/json; charset=utf-8');
+    expect(calls[2].init.body).toBe(
+      JSON.stringify({
+        restaurant_id: 'r_anker',
+        table_id: 't_1',
+        starts_at_local: '2027-06-17T18:00',
+        party_size: 2,
+      }),
+    );
   });
 });
 

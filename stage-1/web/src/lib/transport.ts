@@ -5,6 +5,7 @@ export interface TransportRequest {
   method?: string;
   token?: string | null;
   body?: unknown;
+  idempotencyKey?: string | null;
   signal?: AbortSignal;
 }
 
@@ -20,6 +21,9 @@ export const liveTransport: Transport = async (path, init = {}) => {
   }
   if (init.token) {
     headers.Authorization = `Bearer ${init.token}`;
+  }
+  if (init.idempotencyKey) {
+    headers['Idempotency-Key'] = init.idempotencyKey;
   }
   return api(path, {
     method: init.method ?? (init.body !== undefined ? 'POST' : 'GET'),

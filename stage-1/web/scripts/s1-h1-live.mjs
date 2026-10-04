@@ -442,7 +442,8 @@ async function behavior(page) {
   }
   if ((await page.locator('[data-testid="confirmation"]').count()) !== 0) throw new Error('form claimed a confirmation');
   const pending = await page.locator('[data-testid="booking-form"]').innerText();
-  if (!pending.includes('Booking submission is pending.')) throw new Error('pending copy missing');
+  if (pending.includes('Booking submission is pending.')) throw new Error('placeholder booking copy is still shown');
+  if ((await page.locator('[data-testid="booking-error"]').count()) !== 0) throw new Error('opening the form showed an error');
   await page.locator('[data-testid="plan-t_2"]').focus();
   await page.keyboard.press('Enter');
   await page.locator('[data-testid="booking-summary"]').waitFor();

@@ -320,9 +320,10 @@ describe('live search', () => {
     expect(member.target.querySelector('[data-testid="booking-summary"]')?.textContent).toContain('18:00');
     expect(member.target.querySelector('[data-testid="booking-summary"]')?.textContent).toContain('6:00 PM');
     expect((member.target.querySelector('[data-testid="booking-party-size"]') as HTMLInputElement).value).toBe('2');
-    expect(member.target.querySelector('[data-testid="booking-form"]')?.textContent).toContain('Booking submission is pending.');
+    expect(member.target.querySelector('[data-testid="booking-form"]')?.textContent).not.toContain('Booking submission is pending.');
     expect(member.target.querySelector('[data-testid="confirmation"]')).toBeNull();
     expect(member.target.querySelector('[data-testid="booking-error"]')).toBeNull();
+    expect(member.target.querySelector('[data-testid="booking-uncertain"]')).toBeNull();
     expect(currentHold()).toMatchObject({
       restaurant_id: 'r_anker',
       table_id: 't_1',

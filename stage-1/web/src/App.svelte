@@ -78,9 +78,9 @@
       {:else if path === '/login'}
         <LoginScreen onAccount={signIn} />
       {:else if path === '/lookup'}
-        <LookupScreen />
+        <LookupScreen transport={liveTransport} token={session ? session.token : null} />
       {:else}
-        <LiveSearch signedIn={session !== null} />
+        <LiveSearch signedIn={session !== null} token={session ? session.token : null} />
       {/if}
     </div>
   {/key}
