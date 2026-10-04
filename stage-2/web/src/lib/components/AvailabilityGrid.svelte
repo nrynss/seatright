@@ -62,7 +62,7 @@
           data-available={available ? 'true' : 'false'}
           data-selected={selected ? 'true' : 'false'}
           aria-label={`Table ${table.label} at ${formatClock(slot.time)} (${slot.time}), ${word}`}
-          in:fly={{ y: 8, opacity: 1, duration: motionDuration(240), delay: staggerDelay(row * slots.length + column) }}
+          in:fly={{ y: 8, opacity: 1, duration: motionDuration(240), delay: Math.min(staggerDelay(row * slots.length + column), motionDuration(480)) }}
           onclick={() => onSelect(table.id, slot.time, available)}
         >
           <span class="when">
@@ -92,7 +92,7 @@
           data-available={available ? 'true' : 'false'}
           data-selected={selected ? 'true' : 'false'}
           aria-label={`${names} together at ${formatClock(slot.time)} (${slot.time}), ${word}`}
-          in:fly={{ y: 8, opacity: 1, duration: motionDuration(240), delay: staggerDelay((tables.length + row) * slots.length + column) }}
+          in:fly={{ y: 8, opacity: 1, duration: motionDuration(240), delay: Math.min(staggerDelay((tables.length + row) * slots.length + column), motionDuration(480)) }}
           onclick={() => onSelectPair?.(pair.ids, slot.time, available)}
         >
           <span class="when">

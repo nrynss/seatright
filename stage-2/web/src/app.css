@@ -459,8 +459,8 @@ select {
 
 .matrix {
   display: grid;
-  /* Eight dinner slots need a stable name column and equal time tracks.
-     A narrow side panel made "Taken" wider than the cell. */
+  /* The name column stays fixed so long pair labels wrap. Time tracks share
+     whatever width is left, and grow when few slots are returned. */
   grid-template-columns: 10.75rem repeat(var(--cols), minmax(0, 1fr));
   gap: 0.55rem 0.45rem;
   width: 100%;
@@ -715,8 +715,52 @@ select {
     justify-self: center;
   }
 
+  .matrix-wrap {
+    overflow-x: auto;
+    padding-left: 0;
+    scroll-padding-inline: 0.75rem;
+  }
+
+  .grid-caption {
+    padding-left: var(--space-4);
+  }
+
+  .matrix {
+    /* Each time keeps the width of its clock and state word. Extra slots
+       scroll inside the panel instead of squeezing the words. The name
+       track includes the panel inset so sticky labels cover the scrolled cells. */
+    grid-template-columns: 11.75rem repeat(var(--cols), minmax(max-content, 1fr));
+    width: max-content;
+    min-width: 100%;
+    max-width: none;
+  }
+
+  .colhead,
+  .cell {
+    min-width: max-content;
+  }
+
+  .corner,
+  .rowhead {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    padding-left: var(--space-4);
+    background: var(--surface);
+    box-shadow: 0.45rem 0 0 var(--surface);
+  }
+
+  .corner {
+    z-index: 3;
+  }
+
+  .rowhead.together {
+    padding-left: calc(var(--space-4) + 0.45rem);
+  }
+
   .rowhead {
     line-height: 1.25;
+    padding-block: 0.35rem;
   }
 }
 
