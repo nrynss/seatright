@@ -1,0 +1,4 @@
+?   	tablekeeper/cmd/tablekeeper	[no test files]
+ok  	tablekeeper/internal/clock	(cached)
+ok  	tablekeeper/internal/service	(cached)
+?   	tablekeeper/probes/pclient	[no test files]

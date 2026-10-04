@@ -1,0 +1,216 @@
+
+===== 1 health/headers/public =====
+PASS health-200: 200 b'{"status":"ok"}'
+PASS health-json-ct: application/json; charset=utf-8
+PASS restaurants-public-200: 200
+PASS availability-public-200: 200
+PASS list-noauth-401: code=unauthenticated
+PASS reset-204: 204
+
+===== 2 reset semantics =====
+PASS reset-empty-204: 204
+PASS reset-empty-list: b'{"restaurants":[]}'
+PASS reset-wrong-type-400: code=malformed_request
+PASS failed-reset-keeps-state: state intact after failed reset
+PASS reset-id-65-422: code=validation_failed
+PASS reset-restore: 204
+PASS detail-shape: b'{"cancellation_cutoff_minutes":120,"id":"r_anker","name":"Zum Anker","opening_hours":[{"closes":"23:00","opens":"18:00","weekday":"thu"},{"closes":"23:30","opens":"18:00","weekday":"fri"}],"reservatio'
+PASS detail-unknown-404: code=not_found
+
+===== 3 auth =====
+PASS seed-login: b'{"display_name":"Ada","token":"[REDACTED]","user_id":"u_ada"}'
+PASS bad-pw-401: code=unauthenticated
+PASS unknown-email-401: code=unauthenticated
+PASS login-wrong-type-400: code=malformed_request
+PASS unicode-pw-signup: 201 b'{"display_name":"\xc3\x9cnicode","token":"[REDACTED]","user_id":"[REDACTED_OPAQUE_ID]"}'
+PASS unicode-pw-login: 200
+PASS unicode-pw-7-runes-label: 7 runes
+PASS unicode-pw-7-runes-422: code=validation_failed
+PASS long-pw-signup: 201
+PASS long-pw-login: 200
+PASS double-at-422: 422 b'{"error":{"code":"validation_failed","message":"email must have the form local@domain"}}'
+PASS nodomain-422: 422
+PASS nolocal-422: 422
+PASS space-email-422: 422
+PASS missing-display-422: 422
+PASS empty-display-ok: 201
+PASS dup-email-409: code=email_taken
+PASS multi-tokens: distinct tokens
+PASS all-tokens-work: 3 tokens valid
+PASS bad-token-401: code=unauthenticated
+PASS non-bearer-401: code=unauthenticated
+PASS empty-bearer-401: code=unauthenticated
+
+===== 4 errors/strictness =====
+PASS envelope-malformed: 400 b'{"error":{"code":"malformed_request","message":"unparseable body or wrong field type"}}'
+PASS unparseable-400: code=malformed_request
+PASS trailing-data-400: code=malformed_request
+PASS non-object-400: code=malformed_request
+PASS empty-body-400: code=malformed_request
+PASS null-body-400: code=malformed_request
+PASS restaurant-id-num-400: code=malformed_request
+PASS table-id-null-400: code=malformed_request
+PASS seconds-422: code=validation_failed
+PASS offset-422: code=validation_failed
+PASS zulu-422: code=validation_failed
+PASS space-sep-422: code=validation_failed
+PASS party-string-422: code=validation_failed
+PASS party-bool-422: code=validation_failed
+PASS party-frac-422: code=validation_failed
+PASS party-zero-422: code=validation_failed
+PASS party-missing-422: code=validation_failed
+PASS party-4point0-integer-accepted: got 201 b'{"created_at":"2026-10-04T21:39:08+00:00","ends_at":"2026-10-08T20:30:00+02:00","party_size":4,"reference":"WXM6B2LM","r'
+PASS query-4point0-422: code=validation_failed
+PASS query-plus4-422: code=validation_failed
+PASS query-1e9-422: code=validation_failed
+PASS query-neg-422: code=validation_failed
+PASS query-missing-party-422: code=validation_failed
+PASS query-missing-date-422: code=validation_failed
+PASS query-missing-rest-422: code=validation_failed
+PASS availability-unknown-rest-404: code=not_found
+PASS availability-bad-date-422: code=validation_failed
+PASS unknown-query-ignored: 200
+PASS query-leading-zero-digits-ok: 200
+
+===== 5 availability =====
+PASS slots-grid: ['2026-10-08T18:00', '2026-10-08T18:30', '2026-10-08T19:00', '2026-10-08T19:30', '2026-10-08T20:00', '2026-10-08T20:30', '2026-10-08T21:00', '2026-10-08T21:30']
+PASS slots-offset: 2026-10-08T18:00:00+02:00
+PASS slots-order-fixture: {'available_table_ids': ['t_1', 't_2'], 'starts_at': '2026-10-08T18:00:00+02:00', 'starts_at_local': '2026-10-08T18:00'}
+PASS fri-grid-to-2200-last: ['2026-10-09T18:00', '2026-10-09T18:30', '2026-10-09T19:00', '2026-10-09T19:30', '2026-10-09T20:00', '2026-10-09T20:30', '2026-10-09T21:00', '2026-10-09T21:30', '2026-10-09T22:00']
+PASS closed-day-empty: sat closed
+PASS party5-empty-lists-slots-present: all empty
+PASS party4-only-t2: {'available_table_ids': ['t_2'], 'starts_at': '2026-10-08T18:00:00+02:00', 'starts_at_local': '2026-10-08T18:00'}
+
+===== 6 reservations =====
+PASS create-201-shape: b'{"created_at":"2026-10-04T21:39:09+00:00","ends_at":"2026-10-08T20:30:00+02:00","party_size":4,"reference":"NUS12Y7X","reservation_id":"[REDACTED_OPAQUE_ID]","restaurant_id":"r_anker","starts_at":"2026-10-08T19:00:00+02:00","starts_at_local":"2026-10-08T19:00","status":"confirmed","table'
+PASS reference-format: NUS12Y7X
+PASS created-at-offset: 2026-10-04T21:39:09+00:00
+PASS overlap-409: code=table_unavailable
+PASS adjacent-201: 201 b'{"created_at":"2026-10-04T21:39:09+00:00","ends_at":"2026-10-08T22:00:00+02:00","party_size":4,"reference":"HPR2TTZZ","reservation_id":"8c62ccd7e5bb94'
+PASS party-exceeds-cap-422: code=party_exceeds_capacity
+PASS offgrid-422: code=not_on_slot_grid
+PASS before-opens-422: code=outside_opening_hours
+PASS end-after-closes-422: code=outside_opening_hours
+PASS end-exactly-closes-201: 201 b'{"created_at":"2026-10-04T21:39:09+00:00","ends_at":"2026-10-08T23:00:00+02:00","party_size":2,"reference":"LNPPSPSB","reservation_id":"ff7d9bf936e5ea'
+PASS unknown-table-404: code=not_found
+PASS cross-rest-table-404: code=not_found
+PASS unknown-rest-404: code=not_found
+PASS past-date-201: 201 b'{"created_at":"2026-10-04T21:39:09+00:00","ends_at":"2020-01-02T20:30:00+01:00","party_size":2,"reference":"EQ83TWEM","reservation_id":"f835bddb5d856c'
+PASS avail-excludes-booked: {'available_table_ids': [], 'starts_at': '2026-10-08T19:00:00+02:00', 'starts_at_local': '2026-10-08T19:00'}
+PASS list-has-both: ['LNPPSPSB', 'HPR2TTZZ', 'NUS12Y7X', 'EQ83TWEM']
+PASS list-desc: ['2026-10-08T20:30:00+02:00', '2026-10-08T19:00:00+02:00']
+PASS get-own: 200
+PASS get-foreign-404: code=not_found
+PASS get-unknown-404: code=not_found
+PASS patch-party: 200 b'{"created_at":"2026-10-04T21:39:09+00:00","ends_at":"2026-10-08T20:30:00+02:00","party_size":2,"reference":"NUS12Y7X","reservation_id":"0b33186f5ad429'
+PASS patch-table-time: b'{"created_at":"2026-10-04T21:39:09+00:00","ends_at":"2026-10-08T19:30:00+02:00","party_size":2,"reference":"NUS12Y7X","reservation_id":"[REDACTED_OPAQUE_ID]","restaurant_id":"r_anker","starts_at":"2026-10-08T18:00:00+02:00","starts_at_loc'
+PASS patch-conflict-blocker-201: 201 b'{"created_at":"2026-10-04T21:39:09+00:00","ends_at":"2026-10-08T19:30:00+02:00","party_size":2,"reference":"NVBS8QV4","r'
+PASS patch-conflict-409: 409 b'{"error":{"code":"table_unavailable","message":"the table is taken for that interval"}}'
+PASS avail-postpatch-taken: {'available_table_ids': [], 'starts_at': '2026-10-08T18:00:00+02:00', 'starts_at_local': '2026-10-08T18:00'}
+PASS avail-adjacent-t1-free-1930: {'available_table_ids': ['t_1'], 'starts_at': '2026-10-08T19:30:00+02:00', 'starts_at_local': '2026-10-08T19:30'}
+PASS patch-fail-keeps: unchanged after failed patch
+PASS patch-past-cutoff-409: code=cutoff_passed
+PASS cancel-200: 200 b'{"created_at":"2026-10-04T21:39:09+00:00","ends_at":"2026-10-08T22:00:00+02:00","party_size":4,"reference":"HPR2TTZZ","reservation_id":"8c62ccd7e5bb94'
+PASS cancel-frees: {'available_table_ids': ['t_2'], 'starts_at': '2026-10-08T20:30:00+02:00', 'starts_at_local': '2026-10-08T20:30'}
+PASS recancel-200: 200
+PASS patch-cancelled-409: code=reservation_cancelled
+PASS cancel-foreign-404: code=not_found
+PASS list-includes-cancelled: cancelled listed
+
+===== 7 cutoff =====
+PASS cutoff-reset: 204
+PASS cutoff-60min-cancel-409: code=cutoff_passed
+PASS cutoff-60min-patch-409: code=cutoff_passed
+PASS cutoff-119min-inclusive-409: code=cutoff_passed
+PASS cutoff-125min-cancel-ok: 200 b'{"created_at":"2026-10-04T21:39:09+00:00","ends_at":"2026-10-05T03:14:00+02:00","party_size":2,"reference":"EDGEOUT1","reservation_id":"res_edgeout","'
+PASS amend-into-cutoff: 200 b'{"created_at":"2026-10-04T21:39:09+00:00","ends_at":"2026-10-05T01:30:00+02:00","party_size":2,"reference":"FAR0001","reservation_id":"res_far","resta'
+PASS cancel-after-amend-uses-new-start: code=cutoff_passed
+
+===== 8 DST =====
+PASS berlin-spring-skip-gone: ['2026-03-29T01:00', '2026-03-29T01:30', '2026-03-29T03:00', '2026-03-29T03:30', '2026-03-29T04:00', '2026-03-29T04:30', '2026-03-29T05:00', '2026-03-29T05:30', '2026-03-29T06:00', '2026-03-29T06:30', '2026-03-29T07:00', '2026-03-29T07:30', '2026-03-29T08:00', '2026-03-29T08:30', '2026-03-29T09:00', '2026-03-29T09:30', '2026-03-29T10:00', '2026-03-29T10:30', '2026-03-29T11:00', '2026-03-29T11:30', '2026-03-29T12:00', '2026-03-29T12:30', '2026-03-29T13:00', '2026-03-29T13:30', '2026-03-29T14:00', '2026-03-29T14:30', '2026-03-29T15:00', '2026-03-29T15:30', '2026-03-29T16:00', '2026-03-29T16:30', '2026-03-29T17:00', '2026-03-29T17:30', '2026-03-29T18:00', '2026-03-29T18:30', '2026-03-29T19:00', '2026-03-29T19:30', '2026-03-29T20:00', '2026-03-29T20:30', '2026-03-29T21:00', '2026-03-29T21:30']
+PASS berlin-spring-kept: ['2026-03-29T01:00', '2026-03-29T01:30', '2026-03-29T03:00', '2026-03-29T03:30', '2026-03-29T04:00', '2026-03-29T04:30', '2026-03-29T05:00', '2026-03-29T05:30', '2026-03-29T06:00', '2026-03-29T06:30', '2026-03-29T07:00', '2026-03-29T07:30', '2026-03-29T08:00', '2026-03-29T08:30', '2026-03-29T09:00', '2026-03-29T09:30', '2026-03-29T10:00', '2026-03-29T10:30', '2026-03-29T11:00', '2026-03-29T11:30', '2026-03-29T12:00', '2026-03-29T12:30', '2026-03-29T13:00', '2026-03-29T13:30', '2026-03-29T14:00', '2026-03-29T14:30', '2026-03-29T15:00', '2026-03-29T15:30', '2026-03-29T16:00', '2026-03-29T16:30', '2026-03-29T17:00', '2026-03-29T17:30', '2026-03-29T18:00', '2026-03-29T18:30', '2026-03-29T19:00', '2026-03-29T19:30', '2026-03-29T20:00', '2026-03-29T20:30', '2026-03-29T21:00', '2026-03-29T21:30']
+PASS berlin-spring-skip-422: code=invalid_local_time
+PASS berlin-spring-absolute-end: 201 start=2026-03-29T01:30:00+01:00 end=2026-03-29T04:00:00+02:00
+PASS nonexistent-precedence-invalid-local: code=invalid_local_time
+PASS berlin-fall-once: ['2026-10-25T02:00']
+PASS berlin-fall-0100-absolute-end: 201 start=2026-10-25T01:00:00+02:00 end=2026-10-25T02:00:00+02:00
+PASS berlin-fall-first-occurrence: 201 2026-10-25T02:00:00+02:00
+PASS berlin-fall-absolute-end: 2026-10-25T02:00:00+01:00
+PASS berlin-fall-second-not-bookable: code=table_unavailable
+PASS berlin-fall-avail-excluded-tb: {'available_table_ids': ['t_a'], 'starts_at': '2026-10-25T02:00:00+02:00', 'starts_at_local': '2026-10-25T02:00'}
+PASS ny-spring-skip-gone: ['2026-03-08T00:00', '2026-03-08T00:30', '2026-03-08T01:00', '2026-03-08T01:30', '2026-03-08T03:00', '2026-03-08T03:30', '2026-03-08T04:00', '2026-03-08T04:30', '2026-03-08T05:00', '2026-03-08T05:30', '2026-03-08T06:00', '2026-03-08T06:30', '2026-03-08T07:00', '2026-03-08T07:30', '2026-03-08T08:00', '2026-03-08T08:30', '2026-03-08T09:00', '2026-03-08T09:30', '2026-03-08T10:00', '2026-03-08T10:30', '2026-03-08T11:00', '2026-03-08T11:30', '2026-03-08T12:00', '2026-03-08T12:30', '2026-03-08T13:00', '2026-03-08T13:30', '2026-03-08T14:00', '2026-03-08T14:30', '2026-03-08T15:00', '2026-03-08T15:30', '2026-03-08T16:00', '2026-03-08T16:30', '2026-03-08T17:00', '2026-03-08T17:30', '2026-03-08T18:00', '2026-03-08T18:30', '2026-03-08T19:00', '2026-03-08T19:30', '2026-03-08T20:00', '2026-03-08T20:30', '2026-03-08T21:00', '2026-03-08T21:30', '2026-03-08T22:00']
+PASS ny-spring-422: code=invalid_local_time
+PASS ny-spring-offset: 201 2026-03-08T01:30:00-05:00
+PASS ny-fall-first-occurrence: 201 2026-11-01T01:30:00-04:00
+PASS ny-fall-second-blocked: code=table_unavailable
+PASS lordhowe-fall-first-occurrence: 201 start=2026-04-05T01:30:00+11:00 end=2026-04-05T02:00:00+10:30
+PASS utc-plus00-offset: 201 2026-10-12T19:00:00+00:00
+
+===== 9 idempotency =====
+PASS no-key-400: code=missing_idempotency_key
+PASS empty-key-400: code=missing_idempotency_key
+PASS key-255-ok: 201 b'{"created_at":"2026-10-04T21:39:10+00:00","ends_at":"2026-10-08T20:30:00+02:00","party_size":2,"refe'
+PASS key-256-422: code=validation_failed
+PASS idem-first-201: 201
+PASS idem-replay-200-same: 200 b'{"created_at":"2026-10-04T21:39:10+00:00","ends_at":"2026-10-08T20:30:00+02:00","party_size":2,"reference":"MB94AP0N","reservation_id":"7cbe17d91fbf31'
+PASS cancel-for-replay: 200
+PASS idem-replay-after-cancel: 200
+PASS replay-no-state-change: single record
+PASS idem-diff-body-409: code=idempotency_key_reuse
+PASS idem-diff-invalid-body-409: code=idempotency_key_reuse
+PASS blocker-booked: 201 b'{"created_at":"2026-10-04T21:39:10+00:00","ends_at":"2026-10-08T21:30:00+02:00","party_size":2,"reference":"U2T9JL58","r'
+PASS failed-conflict-key: code=table_unavailable
+PASS failed-key-reusable: 201 b'{"created_at":"2026-10-04T21:39:10+00:00","ends_at":"2026-10-08T19:30:00+02:00","party_size":2,"reference":"50WEO7UY","r'
+PASS unauth-key-not-consumed: code=unauthenticated
+PASS key-after-unauth-201: 201 b'{"created_at":"2026-10-04T21:39:10+00:00","ends_at":"2026-10-08T20:30:00+02:00","party_size":2,"reference":"X0EQGEQN","r'
+PASS same-key-other-user-201: 201 b'{"created_at":"2026-10-04T21:39:10+00:00","ends_at":"2026-10-09T19:30:00+02:00","party_size":2,"reference":"1QRPEBTX","r'
+PASS otherpath-prep-201: 201 b'{"created_at":"2026-10-04T21:39:10+00:00","ends_at":"2026-10-09T20:30:00+02:00","party_size":2,"reference":"JIHDOEA9","r'
+PASS same-key-other-path-ok: 201 b'{"reservations":[{"created_at":"2026-10-04T21:39:10+00:00","ends_at":"2026-10-09T20:30:00+02:00","party_size":1,"reference":"JIHDOEA9","reservation_id'
+PASS conc-samekey-one-201: 201x1 200x49 others:[]
+PASS conc-samekey-identical-bodies: 1 distinct bodies
+PASS conc-samekey-one-booking: 1
+PASS conc-distinct-one-201: 201x1 409x19
+
+===== 10 moves =====
+PASS swap-201-order: 201 b'{"reservations":[{"created_at":"2026-10-04T21:39:11+00:00","ends_at":"2026-10-08T20:30:00+02:00","party_size":2,"reference":"MOVE001","reservation_id":"m1","restaurant_id":"r_anker","starts_at":"2026-'
+PASS swap-applied: t_2
+PASS identity-stable: id/created kept
+PASS move-onto-listed-conflict-409: code=table_unavailable
+PASS move-back-rollback: t_2
+PASS noop-201-retains: b'{"reservations":[{"created_at":"2026-10-04T21:39:11+00:00","ends_at":"2026-10-08T20:30:00+02:00","party_size":2,"reference":"MOVE001","reservation_id":"m1","restaurant_id":"r_anker","starts_at":"2026-'
+PASS move-unknown-ignored-order: 201 b'{"reservations":[{"created_at":"2026-10-04T21:39:11+00:00","ends_at":"2026-10-08T20:30:00+02:00","party_size":2,"reference":"MOVE002","reservation_id":"m2","restaurant_id":"r_anker","starts_at":"2026-10-08T19:00:00+02:00","starts_at_local":"2026-10-0'
+PASS move-overlap-unlisted-409: code=table_unavailable
+PASS move-rollback: unchanged after failed batch
+PASS moves-missing: code=validation_failed
+PASS moves-empty: code=validation_failed
+PASS moves-9: code=validation_failed
+PASS moves-dup: code=validation_failed
+PASS moves-item-not-obj: code=validation_failed
+PASS moves-ref-missing: code=validation_failed
+PASS moves-ref-num: code=validation_failed
+PASS moves-unknown-ref-404: code=not_found
+PASS moves-foreign-ref-404: code=not_found
+PASS moves-mixed-restaurants-422: code=validation_failed
+PASS moves-noauth-401: code=unauthenticated
+PASS moves-nokey-400: code=missing_idempotency_key
+PASS moves-cancelled-409: code=reservation_cancelled
+PASS cutoff-before-field: code=cutoff_passed
+PASS input-order-field-first: code=validation_failed
+PASS input-order-cutoff-first: code=cutoff_passed
+PASS mv-first-201: 201
+PASS mv-replay-200-original: 200
+PASS mv-replay-no-change: still cancelled
+
+===== 11 load/fuzz =====
+PASS 50-inflight-all-200: 0.05s codes=[200]
+PASS 50-inflight-under-5s: 0.05s
+fuzz deep-nest: 400 b'{"error":{"code":"malformed_request","message":"unparseable body or wrong field type"}}'
+fuzz big-body: 400 b'{"error":{"code":"malformed_request","message":"unparseable body or wrong field type"}}'
+fuzz num-overflow: 400 b'{"error":{"code":"malformed_request","message":"unparseable body or wrong field type"}}'
+fuzz unicode-ref: 404 b'{"error":{"code":"not_found","message":"unknown reservation"}}'
+fuzz weird-method: 404 b'{"error":{"code":"not_found","message":"unknown path"}}'
+fuzz null-byte: 201 b'{"display_name":"N","token":"[REDACTED]","user_id":"227ebd4de4ba574355c5a68a1e'
+PASS fuzz-no-5xx: []
+PASS healthy-after-fuzz: 200
+
+RESULT pass=186 fail=0

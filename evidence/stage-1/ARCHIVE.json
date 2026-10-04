@@ -1,0 +1,469 @@
+{
+  "reviewed_revision": "b298700f790c166cf7ce8d98d731c80093ecb9af",
+  "source_root": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2",
+  "note": "Accepted review/check/probe/design results. No export objects or session artifacts copied; credentials and opaque 32-hex ids in probe logs redacted. Raw originals remain private evidence. Stage-1 tree unchanged.",
+  "files": [
+    {
+      "path": "REVIEW.md",
+      "source_sha256": "dd590d36f2ff8fb7c2c3206f8dee0aee5be5cf8db8f0fc552af609af56f0469c",
+      "archived_sha256": "dd590d36f2ff8fb7c2c3206f8dee0aee5be5cf8db8f0fc552af609af56f0469c",
+      "redacted": false
+    },
+    {
+      "path": "checks/report.json",
+      "source_sha256": "3a6d45be5d4af9b766b5833409de2cb510da0717449639a1a875a99de135aee9",
+      "archived_sha256": "3a6d45be5d4af9b766b5833409de2cb510da0717449639a1a875a99de135aee9",
+      "redacted": false
+    },
+    {
+      "path": "checks/stage-1.counts.json",
+      "source_sha256": "b18fabdbadab8f1094c6b47d09dd89a3e3215cb6c471340343c5f8787e30b77b",
+      "archived_sha256": "b18fabdbadab8f1094c6b47d09dd89a3e3215cb6c471340343c5f8787e30b77b",
+      "redacted": false
+    },
+    {
+      "path": "checks/stage-1.log",
+      "source_sha256": "a165c1e686ca72df6fc1525a48ddf951b421a4677d2a76b4772c85b12cb4ac59",
+      "archived_sha256": "a165c1e686ca72df6fc1525a48ddf951b421a4677d2a76b4772c85b12cb4ac59",
+      "redacted": false
+    },
+    {
+      "path": "checks/stage-2.counts.json",
+      "source_sha256": "625e334ade7375552f4226ef28eea17a1afdfc801b0ad3fde4511457a417011a",
+      "archived_sha256": "625e334ade7375552f4226ef28eea17a1afdfc801b0ad3fde4511457a417011a",
+      "redacted": false
+    },
+    {
+      "path": "checks/stage-2.log",
+      "source_sha256": "c6086373956c3c3fc3f499b5550f92e12c116047246599a90b64c0e701a3b367",
+      "archived_sha256": "c6086373956c3c3fc3f499b5550f92e12c116047246599a90b64c0e701a3b367",
+      "redacted": false
+    },
+    {
+      "path": "checks-harness-stdout.log",
+      "source_sha256": "c178327af0b57e9b5ab060900dc6a117fb12c6a53d87d892eb11dc2a2eac8b15",
+      "archived_sha256": "c178327af0b57e9b5ab060900dc6a117fb12c6a53d87d892eb11dc2a2eac8b15",
+      "redacted": false
+    },
+    {
+      "path": "checks-harness-stderr.log",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "archived_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redacted": false
+    },
+    {
+      "path": "probes/cand-api.log",
+      "source_sha256": "43485ce0ca625ccdf4fed838bbba077d5a996188c81e09eb04e37b38ce92769d",
+      "archived_sha256": "43485ce0ca625ccdf4fed838bbba077d5a996188c81e09eb04e37b38ce92769d",
+      "redacted": false
+    },
+    {
+      "path": "probes/cand-html.log",
+      "source_sha256": "4bb4ce426b13400744f2bb4d02059553ce41ff5fa2b228815bc5f1b63e1195a8",
+      "archived_sha256": "4bb4ce426b13400744f2bb4d02059553ce41ff5fa2b228815bc5f1b63e1195a8",
+      "redacted": false
+    },
+    {
+      "path": "probes/cand-exp.log",
+      "source_sha256": "bff331c6f515c34c997bcf86372d8d7c245a6e29f186a6e1860fbf4ae9e83319",
+      "archived_sha256": "bff331c6f515c34c997bcf86372d8d7c245a6e29f186a6e1860fbf4ae9e83319",
+      "redacted": false
+    },
+    {
+      "path": "probes/probe_api.log",
+      "source_sha256": "49ed6798483cfc927e79a8dd2403c6b6aca9cff42899efd0bc8900f3d5f1dfea",
+      "archived_sha256": "449232a495d421097c8d00bb9096844b4ae5aa3fcaf9c4843bc0a5f12573cc57",
+      "redacted": true
+    },
+    {
+      "path": "probes/probe_export.log",
+      "source_sha256": "35c2cd4ede2ab176ada8ff8f3f01d664d5a54345f3735f3791b5703a1697b353",
+      "archived_sha256": "aa75d4898b3ba0d1827e92c7b4b3527552aafb1a3b6218d84c914ba5ba21d6c6",
+      "redacted": true
+    },
+    {
+      "path": "probes/resource.log",
+      "source_sha256": "076bb73b86e3831876f4fac42aff3ba86eab1993a6775f3b1d00da38d3e80e76",
+      "archived_sha256": "076bb73b86e3831876f4fac42aff3ba86eab1993a6775f3b1d00da38d3e80e76",
+      "redacted": false
+    },
+    {
+      "path": "probes/go-test.log",
+      "source_sha256": "885cc2e05c88748371914056bef7c94954038721afdfed11c22d91265fc02636",
+      "archived_sha256": "885cc2e05c88748371914056bef7c94954038721afdfed11c22d91265fc02636",
+      "redacted": false
+    },
+    {
+      "path": "design/design-pass.log",
+      "source_sha256": "a123dec2aa3407023a4da7d8cad6efd32e42bda4a14a25f9923944cc5b71efc3",
+      "archived_sha256": "a123dec2aa3407023a4da7d8cad6efd32e42bda4a14a25f9923944cc5b71efc3",
+      "redacted": false
+    },
+    {
+      "path": "design/design-assertions.json",
+      "source_sha256": "2b3e7f5fd69c0f6e54496bcd90d931d10abad4c37981a214e6de587c98cfa063",
+      "archived_sha256": "2b3e7f5fd69c0f6e54496bcd90d931d10abad4c37981a214e6de587c98cfa063",
+      "redacted": false
+    },
+    {
+      "path": "design/dark-pass.log",
+      "source_sha256": "a33a00b0abfd4b2b04a69419f5476a20f0d0bd5eb37cfd0b540ad8a80957f476",
+      "archived_sha256": "a33a00b0abfd4b2b04a69419f5476a20f0d0bd5eb37cfd0b540ad8a80957f476",
+      "redacted": false
+    },
+    {
+      "path": "design/design-critic-output.txt",
+      "source_sha256": "7076b0147eab29f8042698536df65552dfce178314a7052a529d0e7ccea18e0b",
+      "archived_sha256": "7076b0147eab29f8042698536df65552dfce178314a7052a529d0e7ccea18e0b",
+      "redacted": false
+    },
+    {
+      "path": "staging/ui-check.log",
+      "source_sha256": "eb72f50316b95e6691b1cd25672c98e3e06f71b5f243bb77908aabb42dca73e4",
+      "archived_sha256": "eb72f50316b95e6691b1cd25672c98e3e06f71b5f243bb77908aabb42dca73e4",
+      "redacted": false
+    },
+    {
+      "path": "staging/ui-test.log",
+      "source_sha256": "1df60615f428b3f91141293832cfae29cffb20ee9059099ca1246fcf80a15ac2",
+      "archived_sha256": "1df60615f428b3f91141293832cfae29cffb20ee9059099ca1246fcf80a15ac2",
+      "redacted": false
+    },
+    {
+      "path": "staging/ui-build.log",
+      "source_sha256": "8d69ea05c74cd8347b46b5d7ea121284ce7c1af54bd363fbf75191206727da73",
+      "archived_sha256": "8d69ea05c74cd8347b46b5d7ea121284ce7c1af54bd363fbf75191206727da73",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-light-search-results.png",
+      "source_sha256": "b92c98938b8147b952a6d415f9755934b130d89a7459f35c3e2694720d0bc21d",
+      "archived_sha256": "b92c98938b8147b952a6d415f9755934b130d89a7459f35c3e2694720d0bc21d",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-search-results.png",
+      "source_sha256": "702b7444e161c5f7e67e74ec5c2e5225aef9a38ec9ea4dd2598bcf5b9eec371e",
+      "archived_sha256": "702b7444e161c5f7e67e74ec5c2e5225aef9a38ec9ea4dd2598bcf5b9eec371e",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-light-no-slots.png",
+      "source_sha256": "ca12707ccefa77287210b2b98a6558a8da77b189ae847c2349ddcdf471294ec3",
+      "archived_sha256": "ca12707ccefa77287210b2b98a6558a8da77b189ae847c2349ddcdf471294ec3",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-light-zero-available.png",
+      "source_sha256": "579b6eb58bca1bcd1fea7e560cfce470a4c5360976df19daf7acb495b8213491",
+      "archived_sha256": "579b6eb58bca1bcd1fea7e560cfce470a4c5360976df19daf7acb495b8213491",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-light-search-error.png",
+      "source_sha256": "bad47c265bef7ff8d9f505fecc8a01ac7e80e9c68fc12b4e6ee87127ebae096e",
+      "archived_sha256": "bad47c265bef7ff8d9f505fecc8a01ac7e80e9c68fc12b4e6ee87127ebae096e",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-light-signedout-refused.png",
+      "source_sha256": "090879f14147721d0ba74c1bb94d79e874f0cd7169eaa810b975f73f11bd04ec",
+      "archived_sha256": "090879f14147721d0ba74c1bb94d79e874f0cd7169eaa810b975f73f11bd04ec",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-light-search-results.png",
+      "source_sha256": "44206dbcd80b9157fd2373990bd34ddf594ae5edf33f471ddae4a132a10cad75",
+      "archived_sha256": "44206dbcd80b9157fd2373990bd34ddf594ae5edf33f471ddae4a132a10cad75",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-search-results.png",
+      "source_sha256": "1421bd63a2ccf59a9188e04ca2dd55b5ea38c82f924e7e9bf0aca6bf07fa466d",
+      "archived_sha256": "1421bd63a2ccf59a9188e04ca2dd55b5ea38c82f924e7e9bf0aca6bf07fa466d",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-light-no-slots.png",
+      "source_sha256": "ce8c340876e2f33567da1a31ac7447254869403d5824420514ea11d86a673776",
+      "archived_sha256": "ce8c340876e2f33567da1a31ac7447254869403d5824420514ea11d86a673776",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-light-zero-available.png",
+      "source_sha256": "73cc5f25550f5986bc55e43a7286487a34a27d78ef2a6cbeb03021c6c201b7eb",
+      "archived_sha256": "73cc5f25550f5986bc55e43a7286487a34a27d78ef2a6cbeb03021c6c201b7eb",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-light-search-error.png",
+      "source_sha256": "620c0490181582efb6cc690064cf14925894fa5a642bae410a7d1cad156e36fc",
+      "archived_sha256": "620c0490181582efb6cc690064cf14925894fa5a642bae410a7d1cad156e36fc",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-light-signedout-refused.png",
+      "source_sha256": "ea341d81c84251f8d946075532596730fc0fb656de5d56af66317a099ea85b1d",
+      "archived_sha256": "ea341d81c84251f8d946075532596730fc0fb656de5d56af66317a099ea85b1d",
+      "redacted": false
+    },
+    {
+      "path": "design/1280-light-signup-error.png",
+      "source_sha256": "915ac4256c76346dc565bd53e58ec8e12761a387c531abf018f52324b8f08763",
+      "archived_sha256": "915ac4256c76346dc565bd53e58ec8e12761a387c531abf018f52324b8f08763",
+      "redacted": false
+    },
+    {
+      "path": "design/1280-light-signedup-home.png",
+      "source_sha256": "b06a675236fe9d1aa62e87211fa0d56ea663ac5904aa942b838076c1dce5c0e7",
+      "archived_sha256": "b06a675236fe9d1aa62e87211fa0d56ea663ac5904aa942b838076c1dce5c0e7",
+      "redacted": false
+    },
+    {
+      "path": "design/375-light-login-error.png",
+      "source_sha256": "255dc47f02199053ef02b589345f8dc050ffb10f0740c1566db1603100d9b0d2",
+      "archived_sha256": "255dc47f02199053ef02b589345f8dc050ffb10f0740c1566db1603100d9b0d2",
+      "redacted": false
+    },
+    {
+      "path": "design/375-dark-home-signedin.png",
+      "source_sha256": "d6941fe1d5ca6d5db0703b44e12dbe38c27e71e185a5cd29a62bf10ce5440477",
+      "archived_sha256": "d6941fe1d5ca6d5db0703b44e12dbe38c27e71e185a5cd29a62bf10ce5440477",
+      "redacted": false
+    },
+    {
+      "path": "design/375-dark-lookup-signedin.png",
+      "source_sha256": "d6941fe1d5ca6d5db0703b44e12dbe38c27e71e185a5cd29a62bf10ce5440477",
+      "archived_sha256": "d6941fe1d5ca6d5db0703b44e12dbe38c27e71e185a5cd29a62bf10ce5440477",
+      "redacted": false
+    },
+    {
+      "path": "design/1280-light-search-race-B.png",
+      "source_sha256": "5afce702101768b802fe7ed3d0f2098be7dc945f5abfb4cecc56b40ae96cd493",
+      "archived_sha256": "5afce702101768b802fe7ed3d0f2098be7dc945f5abfb4cecc56b40ae96cd493",
+      "redacted": false
+    },
+    {
+      "path": "design/1280-light-booking-form.png",
+      "source_sha256": "c2a2e581ba381e1e3c76d6952b051ca0516ac75ccde09faf639e4788958f45e5",
+      "archived_sha256": "c2a2e581ba381e1e3c76d6952b051ca0516ac75ccde09faf639e4788958f45e5",
+      "redacted": false
+    },
+    {
+      "path": "design/1280-light-confirmation.png",
+      "source_sha256": "491fcc44bc3d479f39a4b794970ca13aafa54c1fec826f4e9eb1395a5041e262",
+      "archived_sha256": "491fcc44bc3d479f39a4b794970ca13aafa54c1fec826f4e9eb1395a5041e262",
+      "redacted": false
+    },
+    {
+      "path": "design/375-light-booking-409.png",
+      "source_sha256": "a035df0e6a4a23868080b33718001cfbe4705fa9af2bb3c7ee203a30cca0485e",
+      "archived_sha256": "a035df0e6a4a23868080b33718001cfbe4705fa9af2bb3c7ee203a30cca0485e",
+      "redacted": false
+    },
+    {
+      "path": "design/375-light-booking-uncertain.png",
+      "source_sha256": "525405411da60ca386146184b249061370888504acaaebfdc11938b0692837c1",
+      "archived_sha256": "525405411da60ca386146184b249061370888504acaaebfdc11938b0692837c1",
+      "redacted": false
+    },
+    {
+      "path": "design/375-light-booking-recovered.png",
+      "source_sha256": "a4542600734f825c92b19201b31aeeb5fb04bb7332ffc920222db4d6ac2dad43",
+      "archived_sha256": "a4542600734f825c92b19201b31aeeb5fb04bb7332ffc920222db4d6ac2dad43",
+      "redacted": false
+    },
+    {
+      "path": "design/1280-light-booking-upgrade-recovered.png",
+      "source_sha256": "aa8fc4742e11fe5681388fa2c2bfeef3f6655512ea38fa857a9247191eaae24a",
+      "archived_sha256": "aa8fc4742e11fe5681388fa2c2bfeef3f6655512ea38fa857a9247191eaae24a",
+      "redacted": false
+    },
+    {
+      "path": "design/375-light-lookup-error.png",
+      "source_sha256": "79b85657a0ab699321599b4421ac71c335a75b8c48ed7fcb01ff6d571e337ab8",
+      "archived_sha256": "79b85657a0ab699321599b4421ac71c335a75b8c48ed7fcb01ff6d571e337ab8",
+      "redacted": false
+    },
+    {
+      "path": "design/375-light-lookup-cutoff-refused.png",
+      "source_sha256": "ef718bf1a45d4a7656e8c6045f24c070b4c299d59acca866d00925d8ea156070",
+      "archived_sha256": "ef718bf1a45d4a7656e8c6045f24c070b4c299d59acca866d00925d8ea156070",
+      "redacted": false
+    },
+    {
+      "path": "design/375-light-lookup-cancelled.png",
+      "source_sha256": "1718f1ccc12d379fd63216a1a456ea232d7945fbf9531f0a5041be3a163e64bd",
+      "archived_sha256": "1718f1ccc12d379fd63216a1a456ea232d7945fbf9531f0a5041be3a163e64bd",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-signup-error.png",
+      "source_sha256": "ad33c5eb6f059da7c8a11da4f88dcce8714179ae01e2dfe2e0348a15dfdb1725",
+      "archived_sha256": "ad33c5eb6f059da7c8a11da4f88dcce8714179ae01e2dfe2e0348a15dfdb1725",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-login-error.png",
+      "source_sha256": "97efc299fba9b4fb5f858b0309473ce60cd2e80ab2a1c0c9bda8498aea02b6ef",
+      "archived_sha256": "97efc299fba9b4fb5f858b0309473ce60cd2e80ab2a1c0c9bda8498aea02b6ef",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-signedout-refused.png",
+      "source_sha256": "3ad47e59027d6bcdf4e24f3db943faf247845432d46c9f9b78251131e8b4bde0",
+      "archived_sha256": "3ad47e59027d6bcdf4e24f3db943faf247845432d46c9f9b78251131e8b4bde0",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-no-slots.png",
+      "source_sha256": "a04a15e3f17d7c87c2bc8d2fe9100ab34046280b4b8efa6b1c6f1cb16f9642ae",
+      "archived_sha256": "a04a15e3f17d7c87c2bc8d2fe9100ab34046280b4b8efa6b1c6f1cb16f9642ae",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-zero-available.png",
+      "source_sha256": "8ab50d3118838827e034c87f1440a55ae5f3a1629aa898b3eb8040985c7df1db",
+      "archived_sha256": "8ab50d3118838827e034c87f1440a55ae5f3a1629aa898b3eb8040985c7df1db",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-search-error.png",
+      "source_sha256": "2e891a726213e1e2846a29231407705af9f08252c6933faf07024d5fcca53070",
+      "archived_sha256": "2e891a726213e1e2846a29231407705af9f08252c6933faf07024d5fcca53070",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-booking-form.png",
+      "source_sha256": "8ca8207811bd534973480e7df919a3dd8133779db25ec9570374395faf56f5e6",
+      "archived_sha256": "8ca8207811bd534973480e7df919a3dd8133779db25ec9570374395faf56f5e6",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-confirmation.png",
+      "source_sha256": "2f80f0e66b8be5096fe12f0d19b8c7320af0bff8f9835185da259e2477f6fbf3",
+      "archived_sha256": "2f80f0e66b8be5096fe12f0d19b8c7320af0bff8f9835185da259e2477f6fbf3",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-booking-409.png",
+      "source_sha256": "e3f26c435654feab70e4c6bd83e090ace0bd941e9a7a42b91b0fa65709da7b14",
+      "archived_sha256": "e3f26c435654feab70e4c6bd83e090ace0bd941e9a7a42b91b0fa65709da7b14",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-booking-uncertain.png",
+      "source_sha256": "6283771d9ecf5d6bb83dcaf2f49dfbecbab6beb5f2eb05b8fe5afcbb2e678d27",
+      "archived_sha256": "6283771d9ecf5d6bb83dcaf2f49dfbecbab6beb5f2eb05b8fe5afcbb2e678d27",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-lookup-error.png",
+      "source_sha256": "30a97db0d8aa1f97ddea26cee1ae9d5feaeb4e8fd99f5b86cb34fd6c5cdae84e",
+      "archived_sha256": "30a97db0d8aa1f97ddea26cee1ae9d5feaeb4e8fd99f5b86cb34fd6c5cdae84e",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-lookup-cutoff-refused.png",
+      "source_sha256": "afb6e24c0329a987f7cb5256a1a0ef8c770da32cd602b6a1ae3c53fff4414212",
+      "archived_sha256": "afb6e24c0329a987f7cb5256a1a0ef8c770da32cd602b6a1ae3c53fff4414212",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-lookup-cancelled.png",
+      "source_sha256": "16a0efb769b2c45d7fc68f4ff89eaa1982e42a571829b8857926d21e64857504",
+      "archived_sha256": "16a0efb769b2c45d7fc68f4ff89eaa1982e42a571829b8857926d21e64857504",
+      "redacted": false
+    },
+    {
+      "path": "design/w1280-dark-home-signedin.png",
+      "source_sha256": "3ecb4a5cb0b99559bc14e5e7bbef2f0024f00e618d978b2143773ea7c136a894",
+      "archived_sha256": "3ecb4a5cb0b99559bc14e5e7bbef2f0024f00e618d978b2143773ea7c136a894",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-signup-error.png",
+      "source_sha256": "cce9497afbb811424f270f27b59b0a60996a84948a44440c206bf6b070546e11",
+      "archived_sha256": "cce9497afbb811424f270f27b59b0a60996a84948a44440c206bf6b070546e11",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-login-error.png",
+      "source_sha256": "10c9533d803141670ac8bf40de91eb6436699e3c17e99bb507783ec13b327870",
+      "archived_sha256": "10c9533d803141670ac8bf40de91eb6436699e3c17e99bb507783ec13b327870",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-signedout-refused.png",
+      "source_sha256": "41d25500a24b3f9ec036e3807b3a3194fb20b1a8fd049721b6ecbccdc8e54408",
+      "archived_sha256": "41d25500a24b3f9ec036e3807b3a3194fb20b1a8fd049721b6ecbccdc8e54408",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-no-slots.png",
+      "source_sha256": "7a545057f918c860afed48b9bc3c8385f179a5f4ec93497a522487950c5192fe",
+      "archived_sha256": "7a545057f918c860afed48b9bc3c8385f179a5f4ec93497a522487950c5192fe",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-zero-available.png",
+      "source_sha256": "ab7317276efbf61da74e935ef8f0960397b2c627140b86db2435b668c342ca1a",
+      "archived_sha256": "ab7317276efbf61da74e935ef8f0960397b2c627140b86db2435b668c342ca1a",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-search-error.png",
+      "source_sha256": "61889a54257a011155beff7497c5aaeb986aa53dc50fa523adc2a83db14b0bf3",
+      "archived_sha256": "61889a54257a011155beff7497c5aaeb986aa53dc50fa523adc2a83db14b0bf3",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-booking-form.png",
+      "source_sha256": "355092c8406ff6c6cf9e9650548e178ac4f9b2c9f96ed9948a66983efaf39866",
+      "archived_sha256": "355092c8406ff6c6cf9e9650548e178ac4f9b2c9f96ed9948a66983efaf39866",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-confirmation.png",
+      "source_sha256": "66d05fec9482541e22a85e6026e20b094201dc945bbfb213a6e2a2441b8c9c91",
+      "archived_sha256": "66d05fec9482541e22a85e6026e20b094201dc945bbfb213a6e2a2441b8c9c91",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-booking-409.png",
+      "source_sha256": "720700203ca8eca7fda487457f20adb504b4833ea2dc9a51a81e291f6e492465",
+      "archived_sha256": "720700203ca8eca7fda487457f20adb504b4833ea2dc9a51a81e291f6e492465",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-booking-uncertain.png",
+      "source_sha256": "05fe86016b146d31b21156013540a2dd48c2afbec536ef795fbab97e7a6798b5",
+      "archived_sha256": "05fe86016b146d31b21156013540a2dd48c2afbec536ef795fbab97e7a6798b5",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-lookup-error.png",
+      "source_sha256": "3d582f5324a9ef34a83e900ad4b975054f26454d85c84003b442c1065c85eb02",
+      "archived_sha256": "3d582f5324a9ef34a83e900ad4b975054f26454d85c84003b442c1065c85eb02",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-lookup-cutoff-refused.png",
+      "source_sha256": "d0cdb81777ff048a7ecff426faae8f3136a18d4ca3cc4992cb784fb095519933",
+      "archived_sha256": "d0cdb81777ff048a7ecff426faae8f3136a18d4ca3cc4992cb784fb095519933",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-lookup-cancelled.png",
+      "source_sha256": "ff627e75a75361edc5808bacc65def6344b6ec6e24b74dc262ed895a93c5ddfa",
+      "archived_sha256": "ff627e75a75361edc5808bacc65def6344b6ec6e24b74dc262ed895a93c5ddfa",
+      "redacted": false
+    },
+    {
+      "path": "design/w375-dark-home-signedin.png",
+      "source_sha256": "dc6217842104300e223472df6938f6b70ee0c73f618651d5c2a555e48b9dc7a7",
+      "archived_sha256": "dc6217842104300e223472df6938f6b70ee0c73f618651d5c2a555e48b9dc7a7",
+      "redacted": false
+    }
+  ]
+}

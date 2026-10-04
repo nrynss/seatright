@@ -1,0 +1,34 @@
+PASS A-reset: 
+PASS A-amend: 200
+PASS A-failed-key: 409
+PASS A-batch: 201 b'{"reservations":[{"created_at":"2026-10-04T21:39:34+00:00","ends_at":"2026-10-08T23:00:00+02:00","party_size":2,"reference":"3M23SO8H","reservation_id'
+PASS export-shape: 200
+PASS A-post-export-write: 201
+PASS B-reset-other: 
+PASS B-prior-booking: 201
+PASS import-204: 204 b''
+PASS B-old-creds-wiped: 401
+PASS B-old-token-invalid: 401
+PASS B-seed-login: 200
+PASS B-newuser-login: 200
+PASS B-token-preserved: 200
+PASS B-reservations-preserved: ['3M23SO8H', '9Q4BPBYO']
+PASS B-amended-values: {'created_at': '2026-10-04T21:39:34+00:00', 'ends_at': '2026-10-08T23:00:00+02:00', 'party_size': 2, 'reference': '3M23SO8H', 'reservation_id': '0da1f
+PASS B-postexport-write-absent: import is replacement
+PASS B-config-preserved: 200
+PASS B-receipt-K1-original: 200 b'{"created_at":"2026-10-04T21:39:34+00:00","ends_at":"2026-10-08T20:30:00+02:00","party_size":4,"reference":"3M23SO8H","reservation_id":"[REDACTED_OPAQUE_ID]","restaurant_id":"r_anker","sta'
+PASS B-receipt-K4-original: 200 b'{"reservations":[{"created_at":"2026-10-04T21:39:34+00:00","ends_at":"2026-10-08T23:00:00+02:00","party_size":2,"reference":"3M23SO8H","reservation_id":"[REDACTED_OPAQUE_ID]","restaurant_i'
+PASS B-failed-key-reusable: 201 b'{"created_at":"2026-10-04T21:39:34+00:00","ends_at":"2026-10-08T19:30:00+02:00","party_size":2,"reference":"4N3U0SBL","reservation_id":"f4d0696b2cd53f'
+PASS B-reimport-204: 204
+PASS B-reimport-no-dup: 2
+PASS B-import-badjson-400: 400 b'{"error":{"code":"malformed_request","message":"unparseable body or wrong field type"}}'
+PASS B-import-track-422: 422
+PASS B-import-version-422: 422
+PASS B-import-nostate-422: 422
+PASS B-import-corrupt-422: 422 b'{"error":{"code":"validation_failed","message":"invalid reservation owner"}}'
+PASS B-state-intact-after-failures: 200
+PASS B-reset-after-import: 204
+PASS B-reset-clears-imported-tokens: 401
+PASS B-reset-restores-fixture: b'{"restaurants":[{"id":"r_anker","name":"Zum Anker","timezone":"Europe/Berlin"}]}'
+
+RESULT pass=32 fail=0

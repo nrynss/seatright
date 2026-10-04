@@ -1,0 +1,382 @@
+[
+ {
+  "name": "s1-w1280-select-options",
+  "ok": true,
+  "detail": "select option values"
+ },
+ {
+  "name": "s1-w1280-grid-shown",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s1-w1280-cell-testid",
+  "ok": true,
+  "detail": "true"
+ },
+ {
+  "name": "s1-w1280-cell-t2-1900",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s1-w1280-floor-plan",
+  "ok": true,
+  "detail": "floor plan present"
+ },
+ {
+  "name": "s1-w1280-plan-capacity",
+  "ok": true,
+  "detail": "plan-t_1:2:true plan-t_2:4:true"
+ },
+ {
+  "name": "s1-w1280-no-hscroll",
+  "ok": true,
+  "detail": "scrollWidth=1280"
+ },
+ {
+  "name": "s1-w1280-no-slots",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s1-w1280-party5-unavailable",
+  "ok": true,
+  "detail": "false"
+ },
+ {
+  "name": "s1-w1280-search-error",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s1-w1280-signedout-click-refused",
+  "ok": true,
+  "detail": "authError=true url=http://localhost:9051/"
+ },
+ {
+  "name": "s1-w1280-unavailable-click-inert",
+  "ok": true,
+  "detail": "no booking form"
+ },
+ {
+  "name": "s1-w375-select-options",
+  "ok": true,
+  "detail": "select option values"
+ },
+ {
+  "name": "s1-w375-grid-shown",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s1-w375-cell-testid",
+  "ok": true,
+  "detail": "true"
+ },
+ {
+  "name": "s1-w375-cell-t2-1900",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s1-w375-floor-plan",
+  "ok": true,
+  "detail": "floor plan present"
+ },
+ {
+  "name": "s1-w375-plan-capacity",
+  "ok": true,
+  "detail": "plan-t_1:2:true plan-t_2:4:true"
+ },
+ {
+  "name": "s1-w375-no-hscroll",
+  "ok": true,
+  "detail": "scrollWidth=375"
+ },
+ {
+  "name": "s1-w375-no-slots",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s1-w375-party5-unavailable",
+  "ok": true,
+  "detail": "false"
+ },
+ {
+  "name": "s1-w375-search-error",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s1-w375-signedout-click-refused",
+  "ok": true,
+  "detail": "authError=true url=http://localhost:9051/"
+ },
+ {
+  "name": "s1-w375-unavailable-click-inert",
+  "ok": true,
+  "detail": "no booking form"
+ },
+ {
+  "name": "s2-signup-shortpw-auth-error",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s2-signup-current-user",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s2-logout-clears-user",
+  "ok": true,
+  "detail": "current-user gone"
+ },
+ {
+  "name": "s3-login-wrong-pw-diner-copy",
+  "ok": true,
+  "detail": "Email or password is incorrect."
+ },
+ {
+  "name": "s3-login-wrong-pw-no-jargon",
+  "ok": true,
+  "detail": "Email or password is incorrect."
+ },
+ {
+  "name": "s3-login-unknown-email-same-copy",
+  "ok": true,
+  "detail": "Email or password is incorrect."
+ },
+ {
+  "name": "s3-login-network-not-credential",
+  "ok": true,
+  "detail": "The request could not reach the server."
+ },
+ {
+  "name": "s3-login-current-user",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s3-valid-login-clears-error",
+  "ok": true,
+  "detail": "auth-error gone"
+ },
+ {
+  "name": "s3-current-user-on-/",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s3-current-user-on-/lookup",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s4-grid-shows-B",
+  "ok": true,
+  "detail": "Friday 9 October 2026"
+ },
+ {
+  "name": "s4-late-A-not-restored",
+  "ok": true,
+  "detail": "Friday 9 October 2026 vs Friday 9 October 2026"
+ },
+ {
+  "name": "s4-cells-still-B-truth",
+  "ok": true,
+  "detail": "true"
+ },
+ {
+  "name": "s5-summary-table-label-time",
+  "ok": true,
+  "detail": "Zum Anker · Table 2 · Thursday 8 October 2026 at 7:00 PM (19:00)"
+ },
+ {
+  "name": "s5-party-prefilled",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s5-plan-selected",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s5-confirmation-reference-exact",
+  "ok": true,
+  "detail": "Y746N67V"
+ },
+ {
+  "name": "s5-confirmation-details",
+  "ok": true,
+  "detail": "Zum Anker · Table 2 · Thursday 8 October 2026 at 7:00 PM (19:00)"
+ },
+ {
+  "name": "s5-resubmit-same-reference",
+  "ok": true,
+  "detail": "Y746N67V vs Y746N67V"
+ },
+ {
+  "name": "s5-resubmit-no-error",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s5-resubmit-one-booking",
+  "ok": true,
+  "detail": "1"
+ },
+ {
+  "name": "s5-changed-field-new-request",
+  "ok": true,
+  "detail": "1"
+ },
+ {
+  "name": "s5-second-selection-books",
+  "ok": true,
+  "detail": "2"
+ },
+ {
+  "name": "s6-booking-error-shown",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s6-no-confirmation",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s6-form-still-there",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s6-party-preserved",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s6-selection-preserved",
+  "ok": true,
+  "detail": "Zum Anker · Table 1 · Thursday 8 October 2026 at 6:00 PM (18:00)"
+ },
+ {
+  "name": "s6-availability-refreshed",
+  "ok": true,
+  "detail": "false"
+ },
+ {
+  "name": "s7-uncertain-nonempty",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s7-no-booking-error",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s7-no-confirmation",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s7-server-committed",
+  "ok": true,
+  "detail": "1"
+ },
+ {
+  "name": "s7-retry-original-reference",
+  "ok": true,
+  "detail": "3SBWJN0D vs 3SBWJN0D"
+ },
+ {
+  "name": "s7-uncertainty-cleared",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s7-error-cleared",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s8-pending-committed",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s8-import-204",
+  "ok": true,
+  "detail": "204"
+ },
+ {
+  "name": "s8-upgraded-retry-original-reference",
+  "ok": true,
+  "detail": "GCDU2VA3 vs GCDU2VA3"
+ },
+ {
+  "name": "s8-uncertainty-cleared",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s8-B-has-exactly-original",
+  "ok": true,
+  "detail": "1"
+ },
+ {
+  "name": "s9-lookup-unknown-error",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s9-status-confirmed-exact",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s9-cutoff-refused-error",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s9-still-confirmed-after-refusal",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s9-cancel-button-still-there",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s9-cancelled-exact",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s9-cancel-button-gone",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s10-reduced-motion-full-flow",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s10-no-off-origin-requests",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "s10-theme-system-control",
+  "ok": true,
+  "detail": ""
+ }
+]

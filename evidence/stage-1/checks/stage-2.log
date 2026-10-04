@@ -1,0 +1,37 @@
+$ docker run --rm --network df-run-b94ecc791cec4614b9959b51e750d86e -v /home/nryn/work/dark-factory-wearedevs:/work:ro -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/checks:/out -e PYTHONDONTWRITEBYTECODE=1 -e PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 -e COLUMNS=200 -w /work df-harness-runner python -m pytest tablekeeper/test/stage_2 --base-url http://df-svc-b07ae428f2c1:8080 -p harness.plugin --rootdir tablekeeper/test -q -x --previous-base-url http://df-svc-b07ae428f2c1:8080 --harness-summary /out/stage-2.counts.json
+
+.......F
+=============================================================================================== FAILURES ===============================================================================================
+_______________________________________________________________________________ test_a_combination_occupies_both_tables ________________________________________________________________________________
+
+reset = <function reset.<locals>._reset at 0x7fa66651f1a0>, api = <function api.<locals>._api at 0x7fa665e677e0>
+
+    def test_a_combination_occupies_both_tables(reset, api):
+        from harness.http import new_key
+        restaurant = fx.restaurant()
+        restaurant['combinable'] = [['t_1', 't_2']]
+        reset(fx.fixture(restaurants=[restaurant]))
+        ada = api().authenticate(fx.ADA['email'], fx.ADA['password'])
+        result = ada.post('/reservations', json=dict(restaurant_id='r_anker',
+            table_ids=['t_1', 't_2'], party_size=6, starts_at_local=fx.local(fx.booking_date())),
+            idempotency_key=new_key())
+>       assert result.status_code == 201
+E       assert 422 == 201
+E        +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+
+tablekeeper/test/stage_2/test_sample.py:104: AssertionError
+=========================================================================================== warnings summary ===========================================================================================
+../usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:469
+  /usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:469: PytestCacheWarning: could not create cache path /work/tablekeeper/test/.pytest_cache/v/cache/nodeids: [Errno 30] Read-only file system: '/work/tablekeeper/test/pytest-cache-files-8vlgtbu3'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+../usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:423
+  /usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:423: PytestCacheWarning: could not create cache path /work/tablekeeper/test/.pytest_cache/v/cache/lastfailed: [Errno 30] Read-only file system: '/work/tablekeeper/test/pytest-cache-files-1e0q0d2r'
+    config.cache.set("cache/lastfailed", self.lastfailed)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================================================================================= short test summary info ========================================================================================
+FAILED tablekeeper/test/stage_2/test_sample.py::test_a_combination_occupies_both_tables - assert 422 == 201
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 7 passed, 2 warnings in 7.59s
+
