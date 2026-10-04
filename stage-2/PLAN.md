@@ -1,6 +1,6 @@
 # Tablekeeper stage 2
 
-Status: stage1 accepted delivery38d5fd6deb3a4f4e4474a02ebb153edb24a6d69c, reviewedb298700f790c166cf7ce8d98d731c80093ecb9af, immutable tree8b8b28da1d7772bbc443ed4fccb57d8e5ed8530c. Exact copy7593c881c798ef9d24765dcb3cfa7066cd739f96 committed before extensions. S2-M/G in progress; S2-D completed at92d0f53de6221ff8dc15e44ab2dc1b1a0e55e08c merged13763212db959b296047686d4718921a8a91644c. Stage3/4 pending acceptance/copy.
+Status: stage1 accepted delivery38d5fd6deb3a4f4e4474a02ebb153edb24a6d69c, reviewedb298700f790c166cf7ce8d98d731c80093ecb9af, immutable tree8b8b28da1d7772bbc443ed4fccb57d8e5ed8530c. Exact copy7593c881c798ef9d24765dcb3cfa7066cd739f96 committed before extensions. S2-M in progress; S2-G completed d0f11fe0572ae01a33b06c26832dcf7036f20f42 merged42c80bcb0e5356133ffd8a52f28fb6bc9cc120d7; S2-G2 in progress; S2-D completed at92d0f53de6221ff8dc15e44ab2dc1b1a0e55e08c merged13763212db959b296047686d4718921a8a91644c. Stage3/4 pending acceptance/copy.
 
 ## Requirements ledger
 
@@ -230,7 +230,7 @@ Backend OpenCode:
 - S2-P (after B+I+H): final packaging/RUN/probes. Own stage-2/RUN.md/.dockerignore/Dockerfile only if real change needed; probes/stage2-api.sh/stage2-export.sh only (donor/import scripts retain owners). Build single image, update startup/docs, full1+2 API/browser/upgrade probes; no reviewer acceptance claim.
 
 Frontend Grok:
-- S2-G (first/in progress): stage-2/web/** only. Covers R125–R160,R187–R191,R196–R199,R107–R118. Combination visual/data source foundation against explicit fixture Transport below; real accepted singles continue working. Parse options/combinable, canonical pair selection, pair-aware requests/receipt fallback, grid/oneSVG connected two-table selection, all-label summaries/confirmation/lookup. No fake production pair backend/fallback. npmci/check/test/build with Chaaya gates, controlled fixture interactions/replay/uncertain and componentcaptures375/1280lightdark; single live regression. Real paired image flow waits for B.
+- S2-G (completed source foundation; real pair acceptance pending S2-H): stage-2/web/** only. Covers R125–R160,R187–R191,R196–R199,R107–R118. Combination visual/data source foundation against explicit fixture Transport below; real accepted singles continue working. Parse options/combinable, canonical pair selection, pair-aware requests/receipt fallback, grid/oneSVG connected two-table selection, all-label summaries/confirmation/lookup. No fake production pair backend/fallback. npmci/check/test/build with Chaaya gates, controlled fixture interactions/replay/uncertain and componentcaptures375/1280lightdark; single live regression. Real paired image flow waits for B.
 - S2-H (after B new base): stage-2/web/** only. Pair real booking/409/lostresponse/lookup/cancel and real stage1→2 browser upgrade between requests. Covers R125–R136,R161–R165,R187–R199. Pending body/key immutable incl arrays; original stage1 receipt lackingtable_ids parsed via table_id; old browser token/form/key preserved. Full actualimages/probes/screens allstates/theme/width+mainflow/reducedmotionrecordings.
 - S2-R (ZCode, pending final candidate): read-only exactSHA isolated suites1+2, stage3 expectedfail, independent everyU/API/browser/upgrade/design+critic. Max3rounds. No acceptance without corroborated exactSHA/mode/verdict.
 
@@ -268,3 +268,9 @@ Expected1+2pass/claimedstage2/highest2/stage3fail. Source gates aren't acceptanc
 ## Private progress fallback
 
 Native private task creation failed under approval_policy=never earlier. PLAN/RUNLOG remain lossy private fallback (no native ids/dependency/history); shared cards coordinate actual delegated work only. Stage1 folder never changes.
+
+
+## Coordinator integration updates
+
+- S2-M continuation: same e25f41e base/dirty worktree retained. Narrow authorized consequential files: reservations_test.go complete structural no-op comparison; state.go deep-copy Combinable inner arrays and Reservation.TableIDs; http.go GetRestaurant combinable rendering only, narrow http_test regression if needed. Restore all inherited control.go duplicate-restaurant/receipt/timestamp/restaurant-membership validation calls accidentally removed; preserve legacy producer-valid snapshots and original receipt JSON. Full race suite must compile and pass before foundation acceptance. Handoff a420d48a-0bb1-4b0d-b4fb-77efa5e5dc6d.
+- S2-G2 (Grok, in progress): measure complete Free/Taken/Held state-word bounds within grid cells at375/1280 both themes, including long table labels; desktop pair fixture appears crowded. If actual overflow exists, refine layout while retaining all authoritative cells/testids, no horizontal page scroll, state-before-motion and existing retry/confirmation behavior. Own stage-2/web/src/app.css, AvailabilityGrid.svelte and narrowly related tests/capture script only; no transport/API changes. npm ci/check/test/build plus fixture capture and numeric word/cell bounds proof. Real paired browser/upgrade acceptance remains S2-H after S2-B.
