@@ -1,0 +1,112 @@
+/* Tablekeeper theme. Four Chaaya blocks, each with every role as a literal value.
+   Soft state colours are hex so the contrast gate can measure them. */
+
+:root {
+  color-scheme: light;
+  --ground: #F3E6D4;
+  --surface: #FFF8F0;
+  --raised: #FFF1E2;
+  --sunken: #E6D0B8;
+  --line: #CDB59A;
+  --line-soft: #E4D2BC;
+  --text: #2A160F;
+  --dim: #5C3B28;
+  --faint: #6E4E38;
+  --accent: #8C3418;
+  --accent-soft: #F4D3C4;
+  --on-accent: #FFF8F0;
+  --ok: #1B5E34;
+  --ok-soft: #D3ECDC;
+  --warn: #8A4E09;
+  --warn-soft: #F6E4C6;
+  --stop: #9C2E26;
+  --stop-soft: #F6D6D2;
+  --radius-control: 12px;
+  --radius-panel: 20px;
+  --font-ui: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-numeric: "Source Code Pro", ui-monospace, Menlo, Consolas, monospace;
+  --focus-ring: 2px solid var(--accent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --ground: #1A120E;
+    --surface: #271910;
+    --raised: #342218;
+    --sunken: #100C09;
+    --line: #5C4636;
+    --line-soft: #3A2A20;
+    --text: #F8F0E6;
+    --dim: #E0CDB8;
+    --faint: #CDB498;
+    --accent: #F0B088;
+    --accent-soft: #4A2E22;
+    --on-accent: #1A120E;
+    --ok: #8FDBA8;
+    --ok-soft: #163528;
+    --warn: #F0C27A;
+    --warn-soft: #3D2A12;
+    --stop: #F3A8A2;
+    --stop-soft: #4A221E;
+    --radius-control: 12px;
+    --radius-panel: 20px;
+    --font-ui: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, "Times New Roman", serif;
+    --font-numeric: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+    --focus-ring: 2px solid var(--accent);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #1A120E;
+  --surface: #271910;
+  --raised: #342218;
+  --sunken: #100C09;
+  --line: #5C4636;
+  --line-soft: #3A2A20;
+  --text: #F8F0E6;
+  --dim: #E0CDB8;
+  --faint: #CDB498;
+  --accent: #F0B088;
+  --accent-soft: #4A2E22;
+  --on-accent: #1A120E;
+  --ok: #8FDBA8;
+  --ok-soft: #163528;
+  --warn: #F0C27A;
+  --warn-soft: #3D2A12;
+  --stop: #F3A8A2;
+  --stop-soft: #4A221E;
+  --radius-control: 12px;
+  --radius-panel: 20px;
+  --font-ui: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-numeric: "Source Code Pro", ui-monospace, Menlo, Consolas, monospace;
+  --focus-ring: 2px solid var(--accent);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --ground: #F3E6D4;
+  --surface: #FFF8F0;
+  --raised: #FFF1E2;
+  --sunken: #E6D0B8;
+  --line: #CDB59A;
+  --line-soft: #E4D2BC;
+  --text: #2A160F;
+  --dim: #5C3B28;
+  --faint: #6E4E38;
+  --accent: #8C3418;
+  --accent-soft: #F4D3C4;
+  --on-accent: #FFF8F0;
+  --ok: #1B5E34;
+  --ok-soft: #D3ECDC;
+  --warn: #8A4E09;
+  --warn-soft: #F6E4C6;
+  --stop: #9C2E26;
+  --stop-soft: #F6D6D2;
+  --radius-control: 12px;
+  --radius-panel: 20px;
+  --font-ui: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-numeric: "Source Code Pro", ui-monospace, Menlo, Consolas, monospace;
+  --focus-ring: 2px solid var(--accent);
+}
