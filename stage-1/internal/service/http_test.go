@@ -107,10 +107,11 @@ func TestHealth(t *testing.T) {
 	}
 }
 
-func TestStubRoutesNeedAuthThenNotFound(t *testing.T) {
+func TestIdempotentWritesNeedAuthThenKey(t *testing.T) {
 	s := newFoundation(t)
 	token := signup(t, s, "stub@example.com", "correct horse", "Stub")["token"].(string)
-	// POST /reservations and POST /reservation-moves stay stubs until S1-D2.
+	// POST /reservations and POST /reservation-moves are live idempotent
+	// writes: 401 without a valid token, 400 without a key.
 	for _, tc := range []struct{ method, path string }{
 		{"POST", "/reservations"},
 		{"POST", "/reservation-moves"},
@@ -124,8 +125,8 @@ func TestStubRoutesNeedAuthThenNotFound(t *testing.T) {
 			t.Errorf("%s %s bogus token: got %d %s", tc.method, tc.path, status, code)
 		}
 		rec = serveRequest(s, tc.method, tc.path, []byte(`{}`), authHeader(token))
-		if status, code := errorCode(t, rec); status != 404 || code != "not_found" {
-			t.Errorf("%s %s authed stub: got %d %s", tc.method, tc.path, status, code)
+		if status, code := errorCode(t, rec); status != 400 || code != "missing_idempotency_key" {
+			t.Errorf("%s %s authed without key: got %d %s", tc.method, tc.path, status, code)
 		}
 	}
 	// Live reservation reads authenticate, then report unknown references.
