@@ -1,4 +1,11 @@
 .git
-tablekeeper
+/tablekeeper
 evidence/
 *.log
+web/node_modules/
+web/dist/
+web/.vite/
+web/playwright-report/
+web/test-results/
+web/*.tsbuildinfo
+probes/pclient/probe
