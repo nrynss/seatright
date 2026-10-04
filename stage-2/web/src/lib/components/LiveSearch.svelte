@@ -7,6 +7,7 @@
   import FloorPlan from './FloorPlan.svelte';
   import {
     attemptFor,
+    bodyFromRecord,
     newIdempotencyKey,
     sameBooking,
     submitBooking,
@@ -16,7 +17,7 @@
     type ReservationRecord,
   } from '../booking';
   import { rememberHold, rememberSearch, type HeldSelection } from '../hold';
-  import { bookingSummary, formatLongDate, timezoneLabel } from '../format';
+  import { bookingSummary, formatLongDate, tablePhrase, timezoneLabel } from '../format';
   import { motionDuration } from '../motion';
   import { go } from '../nav';
   import type { PreviewSlot } from '../preview';
@@ -35,6 +36,7 @@
     type RestaurantSummary,
     type SearchQuery,
   } from '../search';
+  import { canonicalTableIds, copyIds, listedPairAvailable, pairKey, sameIds, sameMembers } from '../seating';
   import { liveTransport, type Transport } from '../transport';
 
   let {
@@ -98,6 +100,7 @@
     return result.availability.slots.map((slot) => ({
       time: slotClock(slot.starts_at_local),
       availableTableIds: slot.availableTableIds,
+      options: slot.options.map((option) => ({ tableIds: copyIds(option.tableIds), capacity: option.capacity })),
     }));
   });
 
@@ -113,13 +116,42 @@
     held
       ? bookingSummary(
           held.display.restaurantName,
-          held.display.tableLabel,
+          held.display.tableLabels,
           held.starts_at_local.slice(0, 10),
           slotClock(held.starts_at_local),
         )
       : '',
   );
-  const anyAvailable = $derived(shownSlots.some((slot) => slot.availableTableIds.length > 0));
+  const anyAvailable = $derived(
+    shownSlots.some(
+      (slot) =>
+        slot.availableTableIds.length > 0 || (slot.options ?? []).some((option) => option.tableIds.length > 1),
+    ),
+  );
+  const gridPairs = $derived.by(() => {
+    const detail = result?.detail;
+    if (!detail) return [];
+    return detail.combinable.flatMap((ids) => {
+      const members = ids.map((id) => detail.tables.find((table) => table.id === id));
+      if (members.some((table) => !table)) return [];
+      const tables = members.filter((table): table is (typeof detail.tables)[number] => table != null);
+      return [
+        {
+          ids: copyIds(ids),
+          labels: tables.map((table) => table.label),
+          capacity: tables.reduce((sum, table) => sum + table.capacity, 0),
+        },
+      ];
+    });
+  });
+  const floorPairs = $derived.by(() => {
+    if (!activeSlot) return [];
+    return gridPairs.map((pair) => ({
+      ...pair,
+      available: listedPairAvailable(activeSlot.options, pair.ids),
+    }));
+  });
+  const pairHold = $derived(Boolean(held && held.tableIds.length > 1));
 
   function retryCatalog(): void {
     catalogTick += 1;
@@ -171,26 +203,36 @@
     phase = loaded.search.availability.slots.length === 0 ? 'empty' : 'ready';
   }
 
-  function selectCell(tableId: string, time: string, available: boolean): void {
+  function selectSeating(rawIds: readonly string[], time: string, available: boolean): void {
     if (!available || !result) return;
+    const ids = canonicalTableIds(result.detail.combinable, rawIds);
     const slot = result.availability.slots.find((item) => slotClock(item.starts_at_local) === time);
-    if (!slot || !slot.availableTableIds.includes(tableId)) return;
+    if (!slot) return;
+    const allowed =
+      ids.length === 1
+        ? slot.availableTableIds.includes(ids[0])
+        : listedPairAvailable(slot.options, ids);
+    if (!allowed) return;
     if (!signedIn) {
       authError = 'Sign in to hold a table.';
       return;
     }
-    const table = result.detail.tables.find((item) => item.id === tableId);
-    if (!table) return;
-    if (held && held.table_id === tableId && held.starts_at_local === slot.starts_at_local) return;
+    const detail = result.detail;
+    const members = ids.map((id) => detail.tables.find((item) => item.id === id));
+    if (members.some((table) => !table)) return;
+    const labels = members.flatMap((table) => (table ? [table.label] : []));
+    if (held && sameIds(held.tableIds, ids) && held.starts_at_local === slot.starts_at_local) return;
     retireAttempt();
     const next: HeldSelection = {
       restaurant_id: result.query.restaurantId,
-      table_id: tableId,
+      table_id: ids.length === 1 ? ids[0] : '',
+      tableIds: copyIds(ids),
       starts_at_local: slot.starts_at_local,
       party_size: result.query.partySize,
       display: {
         restaurantName: result.detail.name,
-        tableLabel: table.label,
+        tableLabel: labels.length === 1 ? labels[0] : labels.join(' and '),
+        tableLabels: [...labels],
         timezone: result.detail.timezone,
       },
     };
@@ -200,20 +242,32 @@
     authError = null;
   }
 
+  function selectCell(tableId: string, time: string, available: boolean): void {
+    selectSeating([tableId], time, available);
+  }
+
   function onPlanSelect(tableId: string): void {
     if (!activeSlot || !shownTime) return;
-    selectCell(tableId, shownTime, activeSlot.availableTableIds.includes(tableId));
+    selectSeating([tableId], shownTime, activeSlot.availableTableIds.includes(tableId));
+  }
+
+  function onPlanPair(ids: readonly string[]): void {
+    if (!shownTime) return;
+    const pair = floorPairs.find((item) => sameMembers(item.ids, ids));
+    selectSeating(ids, shownTime, Boolean(pair?.available));
   }
 
   function draftBody(size: number): BookingBody | null {
     if (!held) return null;
     try {
-      return {
+      const body: BookingBody = {
         restaurant_id: held.restaurant_id,
-        table_id: held.table_id,
         starts_at_local: held.starts_at_local,
         party_size: parsePartySize(partyText(size)),
       };
+      if (held.tableIds.length > 1) body.table_ids = copyIds(held.tableIds);
+      else body.table_id = held.table_id;
+      return body;
     } catch {
       return null;
     }
@@ -226,13 +280,8 @@
       receipt &&
         pending &&
         held &&
-        sameBooking(pending.body, {
-          restaurant_id: receipt.restaurant_id,
-          table_id: receipt.table_id,
-          starts_at_local: receipt.starts_at_local,
-          party_size: receipt.party_size,
-        }) &&
-        held.table_id === receipt.table_id &&
+        sameBooking(pending.body, bodyFromRecord(receipt)) &&
+        sameMembers(held.tableIds, receipt.tableIds) &&
         held.starts_at_local === receipt.starts_at_local,
     ),
   );
@@ -412,17 +461,22 @@
         <FloorPlan
           tables={result.detail.tables}
           availableIds={activeSlot.availableTableIds}
-          selectedId={held?.table_id ?? null}
+          selectedIds={held ? held.tableIds : null}
           time={shownTime}
+          pairs={floorPairs}
           onSelect={onPlanSelect}
+          onSelectPair={onPlanPair}
         />
         <AvailabilityGrid
           tables={result.detail.tables}
           slots={shownSlots}
           date={result.query.date}
-          selectedId={held?.table_id ?? null}
+          selectedId={held && held.tableIds.length === 1 ? held.table_id : null}
+          selectedKey={pairHold && held ? pairKey(held.tableIds) : null}
           selectedTime={held ? slotClock(held.starts_at_local) : null}
+          pairs={gridPairs}
           onSelect={selectCell}
+          onSelectPair={selectSeating}
         />
       </div>
       {#if !anyAvailable}
@@ -431,7 +485,14 @@
         </p>
       {/if}
       {#if held && summary}
-        <BookingForm {summary} bind:partySize={partyDraft} busy={sending} onRequest={(size) => void onBook(size)} />
+        <BookingForm
+          {summary}
+          heading={pairHold ? 'Hold these tables' : 'Hold this table'}
+          action={pairHold ? 'Request these tables' : 'Request this table'}
+          bind:partySize={partyDraft}
+          busy={sending}
+          onRequest={(size) => void onBook(size)}
+        />
         {#if sending}
           <p class="booking-note" role="status">Sending your request.</p>
         {/if}
@@ -445,11 +506,12 @@
           <Confirmation
             details={bookingSummary(
               held.display.restaurantName,
-              held.display.tableLabel,
+              held.display.tableLabels,
               receipt.starts_at_local.slice(0, 10),
               slotClock(receipt.starts_at_local),
             )}
-            tables={`Table ${held.display.tableLabel}`}
+            tables={tablePhrase(held.display.tableLabels)}
+            heading={pairHold ? 'Your tables are confirmed' : 'Your table is confirmed'}
             reference={receipt.reference}
           />
         {/if}

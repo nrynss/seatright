@@ -7,9 +7,15 @@ export interface PreviewTable {
   capacity: number;
 }
 
+export interface PreviewOption {
+  tableIds: readonly string[];
+  capacity: number;
+}
+
 export interface PreviewSlot {
   time: string;
   availableTableIds: readonly string[];
+  options?: readonly PreviewOption[];
 }
 
 export interface PreviewFixture {

@@ -1,10 +1,16 @@
 import { ApiError } from './client';
+import { copyIds, sameIds } from './seating';
 import type { Transport } from './transport';
 
-/** Fields submitted to create one table booking. Copied at send time and then left unchanged. */
+/**
+ * Fields submitted to create a booking. Copied at send time and then left unchanged.
+ * A single table keeps the legacy `table_id` field so an older pending request still matches.
+ * A pair sends `table_ids` only.
+ */
 export interface BookingBody {
   restaurant_id: string;
-  table_id: string;
+  table_id?: string;
+  table_ids?: string[];
   starts_at_local: string;
   party_size: number;
 }
@@ -19,7 +25,10 @@ export interface ReservationRecord {
   reservation_id: string;
   reference: string;
   restaurant_id: string;
+  /** Set for a single table. Empty when the reservation holds a pair. */
   table_id: string;
+  /** Copy of the reserved set. One id for a legacy receipt that only named `table_id`. */
+  tableIds: string[];
   party_size: number;
   status: 'confirmed' | 'cancelled';
   starts_at_local: string;
@@ -36,22 +45,43 @@ export type BookingOutcome =
 export const UNCERTAIN_MESSAGE =
   'We could not confirm that request. It may have reached the restaurant. Submit this same table, time and party size again to recover the original confirmation.';
 
+function pairIds(body: BookingBody): string[] {
+  if (!body.table_ids || body.table_ids.length < 2) return [];
+  return copyIds(body.table_ids);
+}
+
 export function sameBooking(left: BookingBody, right: BookingBody): boolean {
   return (
     left.restaurant_id === right.restaurant_id &&
-    left.table_id === right.table_id &&
+    (left.table_id ?? '') === (right.table_id ?? '') &&
+    sameIds(pairIds(left), pairIds(right)) &&
     left.starts_at_local === right.starts_at_local &&
     left.party_size === right.party_size
   );
 }
 
 function snapshot(body: BookingBody): BookingBody {
-  return {
+  const next: BookingBody = {
     restaurant_id: body.restaurant_id,
-    table_id: body.table_id,
     starts_at_local: body.starts_at_local,
     party_size: body.party_size,
   };
+  const ids = pairIds(body);
+  if (ids.length > 1) next.table_ids = ids;
+  else if (body.table_id) next.table_id = body.table_id;
+  return next;
+}
+
+/** The request shape of a receipt, without rewriting the server's reference or times. */
+export function bodyFromRecord(record: ReservationRecord): BookingBody {
+  const body: BookingBody = {
+    restaurant_id: record.restaurant_id,
+    starts_at_local: record.starts_at_local,
+    party_size: record.party_size,
+  };
+  if (record.tableIds.length > 1) body.table_ids = copyIds(record.tableIds);
+  else body.table_id = record.table_id || record.tableIds[0];
+  return body;
 }
 
 /**
@@ -94,11 +124,31 @@ export function parseReservation(body: unknown): ReservationRecord {
   if (typeof party !== 'number' || !Number.isInteger(party)) {
     throw new ApiError('The reservation response was not usable.', 'validation_failed', 200);
   }
+  const listed = root.table_ids;
+  let tableIds: string[];
+  if (Array.isArray(listed)) {
+    if (listed.length === 0 || listed.length > 2) {
+      throw new ApiError('The reservation response was not usable.', 'validation_failed', 200);
+    }
+    tableIds = listed.map((id) => {
+      if (typeof id !== 'string' || id === '') {
+        throw new ApiError('The reservation response was not usable.', 'validation_failed', 200);
+      }
+      return id;
+    });
+    if (tableIds.length === 2 && tableIds[0] === tableIds[1]) {
+      throw new ApiError('The reservation response was not usable.', 'validation_failed', 200);
+    }
+  } else {
+    tableIds = [requiredText(root, 'table_id', 'The reservation response was not usable.')];
+  }
+  const single = tableIds.length === 1 ? tableIds[0] : '';
   return {
     reservation_id: requiredText(root, 'reservation_id', 'The reservation response was not usable.'),
     reference: requiredText(root, 'reference', 'The reservation response was not usable.'),
     restaurant_id: requiredText(root, 'restaurant_id', 'The reservation response was not usable.'),
-    table_id: requiredText(root, 'table_id', 'The reservation response was not usable.'),
+    table_id: single,
+    tableIds: copyIds(tableIds),
     party_size: party,
     status,
     starts_at_local: requiredText(root, 'starts_at_local', 'The reservation response was not usable.'),

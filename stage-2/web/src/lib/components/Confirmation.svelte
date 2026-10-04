@@ -7,10 +7,12 @@
     details,
     tables,
     reference = null,
+    heading = 'Your table is confirmed',
   }: {
     details: string;
     tables: string;
     reference?: string | null;
+    heading?: string;
   } = $props();
 
   const reduced = prefersReducedMotion();
@@ -28,7 +30,7 @@
       <path d="M22 37 l10 10 l20 -22" />
     </svg>
     <div>
-      <h2>Your table is confirmed</h2>
+      <h2>{heading}</h2>
       <p data-testid="confirmation-details">{details}</p>
       <p data-testid="confirmation-tables">{tables}</p>
       {#if reference}

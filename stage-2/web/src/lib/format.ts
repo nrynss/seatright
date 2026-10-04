@@ -112,6 +112,12 @@ export function timezoneLabel(isoDate: string, hhmm: string, timeZone: string): 
   return name;
 }
 
-export function bookingSummary(restaurant: string, label: string, isoDate: string, hhmm: string): string {
-  return `${restaurant} · Table ${label} · ${formatLongDate(isoDate)} at ${formatClock(hhmm)} (${hhmm})`;
+/** Every selected table, in order, as a diner would say it. */
+export function tablePhrase(labels: readonly string[]): string {
+  return labels.map((label) => `Table ${label}`).join(' and ');
+}
+
+export function bookingSummary(restaurant: string, label: string | readonly string[], isoDate: string, hhmm: string): string {
+  const labels = typeof label === 'string' ? [label] : label;
+  return `${restaurant} · ${tablePhrase(labels)} · ${formatLongDate(isoDate)} at ${formatClock(hhmm)} (${hhmm})`;
 }
