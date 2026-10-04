@@ -68,6 +68,47 @@ func TestSignupValidationMatrix(t *testing.T) {
 	}
 }
 
+func TestSignupPasswordCountsCharacters(t *testing.T) {
+	cases := []struct {
+		name     string
+		password string
+		ok       bool
+	}{
+		{"seven ascii rejected", "1234567", false},
+		{"eight ascii accepted", "12345678", true},
+		{"seven multibyte rejected", "ééééééé", false},
+		{"eight multibyte accepted", "éééééééé", true},
+		{"seven mixed rejected", "abééééé", false},
+		{"eight mixed accepted", "abéééééé", true},
+		{"seven emojis rejected", "🍜🍜🍜🍜🍜🍜🍜", false},
+		{"eight emojis accepted", "🍜🍜🍜🍜🍜🍜🍜🍜", true},
+	}
+	for i, tc := range cases {
+		s := New()
+		body, _ := json.Marshal(map[string]any{
+			"email":        "unicode" + string(rune('a'+i)) + "@example.com",
+			"password":     tc.password,
+			"display_name": "U",
+		})
+		rec := serveRequest(s, http.MethodPost, "/auth/signup", body, nil)
+		if tc.ok {
+			if rec.Code != 201 {
+				t.Errorf("%s: got %d %q, want 201", tc.name, rec.Code, rec.Body.String())
+				continue
+			}
+			// The accepted password logs in with the same characters.
+			login, _ := json.Marshal(map[string]any{"email": "unicode" + string(rune('a'+i)) + "@example.com", "password": tc.password})
+			if rec := serveRequest(s, http.MethodPost, "/auth/login", login, nil); rec.Code != 200 {
+				t.Errorf("%s: login after signup: %d", tc.name, rec.Code)
+			}
+			continue
+		}
+		if status, code := errorCode(t, rec); status != 422 || code != "validation_failed" {
+			t.Errorf("%s: got %d %s, want 422 validation_failed", tc.name, status, code)
+		}
+	}
+}
+
 func TestSignupIgnoresUnknownFields(t *testing.T) {
 	s := New()
 	rec := serveRequest(s, http.MethodPost, "/auth/signup",

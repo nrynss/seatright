@@ -311,8 +311,8 @@ func TestIdemExportImport(t *testing.T) {
 	tok := idemToken(t, s)
 
 	first := s.Idempotent(tok, "POST", "/reservations", "ship", []byte(`{"v":1}`), func(st *State, uid string, obj map[string]any) Result {
-		st.Reservations["ORIG"] = Reservation{ReservationID: "res_9", Reference: "ORIG", UserID: uid, RestaurantID: "r_anker", Status: StatusConfirmed, CreatedAt: "2026-09-21T11:04:03+00:00"}
-		return created(map[string]any{"reference": "ORIG", "status": StatusConfirmed, "created_at": "2026-09-21T11:04:03+00:00"})
+		st.Reservations["ORIG01"] = Reservation{ReservationID: "res_9", Reference: "ORIG01", UserID: uid, RestaurantID: "r_anker", TableID: "t_2", PartySize: 2, Status: StatusConfirmed, StartsAtLocal: "2026-09-24T19:00", StartsAt: "2026-09-24T19:00:00+02:00", EndsAt: "2026-09-24T20:30:00+02:00", CreatedAt: "2026-09-21T11:04:03+00:00"}
+		return created(map[string]any{"reference": "ORIG01", "status": StatusConfirmed, "created_at": "2026-09-21T11:04:03+00:00"})
 	})
 	if first.Status != 201 {
 		t.Fatalf("first = %d", first.Status)
