@@ -62,6 +62,7 @@ func cloneState(st *State) State {
 		out.Restaurants[i] = cloneRestaurant(r)
 	}
 	for k, v := range st.Reservations {
+		v.TableIDs = append([]string(nil), v.TableIDs...)
 		out.Reservations[k] = v
 	}
 	for k, v := range st.Receipts {
@@ -74,6 +75,10 @@ func cloneRestaurant(r Restaurant) Restaurant {
 	out := r
 	out.OpeningHours = append([]OpeningHour(nil), r.OpeningHours...)
 	out.Tables = append([]Table(nil), r.Tables...)
+	out.Combinable = append([][]string(nil), r.Combinable...)
+	for i, p := range r.Combinable {
+		out.Combinable[i] = append([]string(nil), p...)
+	}
 	return out
 }
 

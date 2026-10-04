@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"reflect"
 	"strings"
 	"sync"
 	"testing"
@@ -275,7 +276,7 @@ func TestPrepareAmendmentAndConflict(t *testing.T) {
 		if cerr != nil {
 			t.Fatalf("noop prepare: %v", cerr)
 		}
-		if prepared != cur {
+		if !reflect.DeepEqual(prepared, cur) {
 			t.Fatalf("noop changed values: %+v vs %+v", prepared, cur)
 		}
 	})

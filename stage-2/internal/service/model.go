@@ -54,8 +54,9 @@ type Table struct {
 	Capacity int    `json:"capacity"`
 }
 
-// Restaurant is the stage-1 restaurant configuration. Field names and order
-// mirror the reset fixture; stage-1 stores only stage-1 configuration.
+// Restaurant is the stage-2 restaurant configuration. Field names and order
+// mirror the reset fixture. Combinable holds the declared unordered table
+// pairs; absent means no pairs.
 type Restaurant struct {
 	ID                         string        `json:"id"`
 	Name                       string        `json:"name"`
@@ -65,6 +66,7 @@ type Restaurant struct {
 	CancellationCutoffMinutes  int           `json:"cancellation_cutoff_minutes"`
 	OpeningHours               []OpeningHour `json:"opening_hours"`
 	Tables                     []Table       `json:"tables"`
+	Combinable                 [][]string    `json:"combinable"`
 }
 
 // User is an account. PasswordHash is a bcrypt hash; plaintext passwords are
@@ -79,28 +81,33 @@ type User struct {
 
 // Reservation is a booking. UserID identifies the owner in state and export
 // but is excluded from ordinary JSON responses; use Public to render those.
+// TableIDs holds the canonical stored set; legacy TableID is retained for
+// stage-1 records and equals the single member iff the set has one member.
 type Reservation struct {
-	ReservationID string `json:"reservation_id"`
-	Reference     string `json:"reference"`
-	UserID        string `json:"user_id"`
-	RestaurantID  string `json:"restaurant_id"`
-	TableID       string `json:"table_id"`
-	PartySize     int    `json:"party_size"`
-	Status        string `json:"status"`
-	StartsAtLocal string `json:"starts_at_local"`
-	StartsAt      string `json:"starts_at"`
-	EndsAt        string `json:"ends_at"`
-	CreatedAt     string `json:"created_at"`
+	ReservationID string   `json:"reservation_id"`
+	Reference     string   `json:"reference"`
+	UserID        string   `json:"user_id"`
+	RestaurantID  string   `json:"restaurant_id"`
+	TableID       string   `json:"table_id"`
+	TableIDs      []string `json:"table_ids"`
+	PartySize     int      `json:"party_size"`
+	Status        string   `json:"status"`
+	StartsAtLocal string   `json:"starts_at_local"`
+	StartsAt      string   `json:"starts_at"`
+	EndsAt        string   `json:"ends_at"`
+	CreatedAt     string   `json:"created_at"`
 }
 
 // Public renders the reservation exactly as ordinary API responses carry it:
-// the same fields minus the owner UserID.
+// the same fields minus the owner UserID. Responses always carry table_ids,
+// and carry table_id only when the set has exactly one member.
 func (r Reservation) Public() map[string]any {
-	return map[string]any{
+	ids := append([]string(nil), reservationTableIDs(r)...)
+	out := map[string]any{
 		"reservation_id":  r.ReservationID,
 		"reference":       r.Reference,
 		"restaurant_id":   r.RestaurantID,
-		"table_id":        r.TableID,
+		"table_ids":       ids,
 		"party_size":      r.PartySize,
 		"status":          r.Status,
 		"starts_at_local": r.StartsAtLocal,
@@ -108,6 +115,10 @@ func (r Reservation) Public() map[string]any {
 		"ends_at":         r.EndsAt,
 		"created_at":      r.CreatedAt,
 	}
+	if len(ids) == 1 {
+		out["table_id"] = ids[0]
+	}
+	return out
 }
 
 // Receipt is one successful idempotent write: who called, where, under which

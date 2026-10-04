@@ -73,7 +73,9 @@ func seededSource(t *testing.T) (*Service, string) {
 		t.Fatalf("blank signup: %d %q", rec.Code, rec.Body.String())
 	}
 	first := s.Idempotent(tok, "POST", "/reservations", "ship", []byte(`{"v":1}`), func(st *State, uid string, obj map[string]any) Result {
-		st.Reservations["ORIG01"] = Reservation{ReservationID: "res_9", Reference: "ORIG01", UserID: uid, RestaurantID: "r1", TableID: "t1", PartySize: 2, Status: StatusConfirmed, StartsAtLocal: "2026-09-24T19:00", StartsAt: "2026-09-24T19:00:00+02:00", EndsAt: "2026-09-24T20:30:00+02:00", CreatedAt: "2026-09-21T11:04:03+00:00"}
+		rec01 := Reservation{ReservationID: "res_9", Reference: "ORIG01", UserID: uid, RestaurantID: "r1", PartySize: 2, Status: StatusConfirmed, StartsAtLocal: "2026-09-24T19:00", StartsAt: "2026-09-24T19:00:00+02:00", EndsAt: "2026-09-24T20:30:00+02:00", CreatedAt: "2026-09-21T11:04:03+00:00"}
+		setReservationTables(&rec01, []string{"t1"})
+		st.Reservations["ORIG01"] = rec01
 		return created(map[string]any{"reference": "ORIG01", "status": StatusConfirmed, "created_at": "2026-09-21T11:04:03+00:00"})
 	})
 	if first.Status != 201 {
@@ -295,6 +297,25 @@ func TestImportRejectsCorruptConfigAndRecords(t *testing.T) {
 		}},
 		{"reservation bad created", func(v map[string]any) {
 			firstReservation(t, stateOf(v))["created_at"] = "not-a-time"
+		}},
+		{"reservation empty table set", func(v map[string]any) {
+			res := firstReservation(t, stateOf(v))
+			res["table_id"] = ""
+			res["table_ids"] = []any{}
+		}},
+		{"reservation three tables", func(v map[string]any) {
+			res := firstReservation(t, stateOf(v))
+			res["table_id"] = ""
+			res["table_ids"] = []any{"t1", "t1", "t1"}
+		}},
+		{"reservation mixed table fields", func(v map[string]any) {
+			res := firstReservation(t, stateOf(v))
+			res["table_ids"] = []any{"t_ghost"}
+		}},
+		{"reservation duplicate pair", func(v map[string]any) {
+			res := firstReservation(t, stateOf(v))
+			res["table_id"] = ""
+			res["table_ids"] = []any{"t1", "t1"}
 		}},
 		{"reservation skipped local", func(v map[string]any) {
 			res := firstReservation(t, stateOf(v))

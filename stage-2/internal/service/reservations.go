@@ -231,6 +231,7 @@ func (s *Service) createReservationLocked(st *State, userID string, obj map[stri
 		UserID:        userID,
 		RestaurantID:  vb.restaurant.ID,
 		TableID:       vb.table.ID,
+		TableIDs:      []string{vb.table.ID},
 		PartySize:     vb.party,
 		Status:        StatusConfirmed,
 		StartsAtLocal: vb.slot.Local,
@@ -284,7 +285,7 @@ func prepareAmendment(st *State, current Reservation, changes map[string]any) (R
 		return Reservation{}, cerr
 	}
 	prepared := current
-	prepared.TableID = vb.table.ID
+	setReservationTables(&prepared, []string{vb.table.ID})
 	prepared.PartySize = vb.party
 	prepared.StartsAtLocal = vb.slot.Local
 	prepared.StartsAt = formatTimestamp(vb.slot.Start)

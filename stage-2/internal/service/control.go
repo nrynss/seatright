@@ -56,6 +56,17 @@ func (s *Service) Import(raw []byte) Result {
 	if err := json.Unmarshal(encoded, &st); err != nil {
 		return validationFailed("invalid state")
 	}
+	// Legacy normalization: stage-1 records carry only TableID. After the
+	// offside parse and before validation, give each such singleton its
+	// canonical ids=[TableID]; pairs already carry canonical TableIDs.
+	// Receipt bodies/responses, ids, refs, times, hashes and tokens are
+	// never rewritten.
+	for ref, res := range st.Reservations {
+		if len(res.TableIDs) == 0 && res.TableID != "" {
+			res.TableIDs = []string{res.TableID}
+			st.Reservations[ref] = res
+		}
+	}
 	if err := validateState(&st); err != nil {
 		return validationFailed(err.Error())
 	}
@@ -137,6 +148,9 @@ func validateState(st *State) error {
 			return err
 		}
 		restTables[r.ID] = tables
+		if err := validateCombinable(r.Combinable, tables); err != nil {
+			return err
+		}
 	}
 	if err := validateReservations(st, restIDs, restTables); err != nil {
 		return err
@@ -186,8 +200,28 @@ func validateTables(ts []Table) (map[string]Table, error) {
 	return out, nil
 }
 
+// validateCombinable checks declared pairs: each holds exactly two known
+// distinct tables. Declared order is retained; duplicates of the same
+// unordered pair are preserved (spec is silent, producer order wins).
+func validateCombinable(pairs [][]string, tables map[string]Table) error {
+	for _, p := range pairs {
+		if len(p) != 2 {
+			return errInvalid("invalid combinable pair")
+		}
+		if p[0] == "" || p[1] == "" || p[0] == p[1] {
+			return errInvalid("invalid combinable pair")
+		}
+		if _, ok := tables[p[0]]; !ok {
+			return errInvalid("invalid combinable pair")
+		}
+		if _, ok := tables[p[1]]; !ok {
+			return errInvalid("invalid combinable pair")
+		}
+	}
+	return nil
+}
+
 // validateReservations checks reservation identity, ownership, configuration
-// membership and producer-consistent timestamps. Past and cancelled
 // reservations remain valid; times are checked for the consistency the seed
 // producer guarantees (resolvable local, absolute duration, RFC 3339
 // instants). Reset enforces only positive party size and a known table, so
@@ -213,7 +247,30 @@ func validateReservations(st *State, restIDs map[string]bool, restTables map[str
 			return errInvalid("invalid reservation restaurant")
 		}
 		tables := restTables[res.RestaurantID]
-		if _, ok := tables[res.TableID]; !ok {
+		ids := reservationTableIDs(res)
+		// Stored singleton fields must agree: a record carrying both a
+		// legacy TableID and TableIDs must name the same table, so corrupt
+		// mixed fields cannot silently refer to different tables.
+		if res.TableID != "" && len(res.TableIDs) > 0 {
+			if len(res.TableIDs) != 1 || res.TableIDs[0] != res.TableID {
+				return errInvalid("invalid reservation table")
+			}
+		}
+		if len(ids) == 0 || len(ids) > 2 {
+			return errInvalid("invalid reservation table")
+		}
+		if len(ids) == 2 && ids[0] == ids[1] {
+			return errInvalid("invalid reservation table")
+		}
+		for _, id := range ids {
+			if _, ok := tables[id]; !ok {
+				return errInvalid("invalid reservation table")
+			}
+		}
+		if len(ids) == 2 && !pairDeclared(st, res.RestaurantID, ids) {
+			return errInvalid("invalid reservation table")
+		}
+		if len(ids) == 2 && !isCanonicalPairOrder(st, res.RestaurantID, ids) {
 			return errInvalid("invalid reservation table")
 		}
 		if res.PartySize < 1 {
@@ -229,8 +286,36 @@ func validateReservations(st *State, restIDs map[string]bool, restTables map[str
 	return nil
 }
 
+// pairDeclared reports whether ids names a declared combinable pair of the
+// restaurant, in either order. Singletons never reach here.
+func isCanonicalPairOrder(st *State, restaurantID string, ids []string) bool {
+	if len(ids) != 2 {
+		return false
+	}
+	for _, r := range st.Restaurants {
+		if r.ID != restaurantID {
+			continue
+		}
+		ordered := canonicalPairOrder(&r, ids[0], ids[1])
+		return ordered != nil && ordered[0] == ids[0] && ordered[1] == ids[1]
+	}
+	return false
+}
+
+func pairDeclared(st *State, restaurantID string, ids []string) bool {
+	if len(ids) != 2 {
+		return false
+	}
+	for _, r := range st.Restaurants {
+		if r.ID != restaurantID {
+			continue
+		}
+		return canonicalPairOrder(&r, ids[0], ids[1]) != nil
+	}
+	return false
+}
+
 // validateReservationTimes checks the stored-record consistency the producer
-// guarantees: the bare local resolves in the restaurant zone (skipped walls
 // reject), ends_at is exactly duration absolute minutes after starts_at,
 // and all three timestamps parse as RFC 3339 with explicit offsets
 // (numeric +00:00 accepted, never rewritten). Grid, hours and
