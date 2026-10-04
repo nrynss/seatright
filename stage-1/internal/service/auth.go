@@ -3,6 +3,7 @@ package service
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"unicode/utf8"
 
 	"github.com/nrynss/keel/id"
 	"golang.org/x/crypto/bcrypt"
@@ -103,7 +104,7 @@ func (s *Service) Signup(raw []byte) Result {
 	if !validEmail(email) {
 		return validationFailed("email must have the form local@domain")
 	}
-	if len(password) < 8 {
+	if utf8.RuneCountInString(password) < 8 {
 		return validationFailed("password must be at least 8 characters")
 	}
 	hash, err := hashPassword(password)
