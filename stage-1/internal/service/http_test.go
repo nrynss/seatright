@@ -110,12 +110,9 @@ func TestHealth(t *testing.T) {
 func TestStubRoutesNeedAuthThenNotFound(t *testing.T) {
 	s := newFoundation(t)
 	token := signup(t, s, "stub@example.com", "correct horse", "Stub")["token"].(string)
+	// POST /reservations and POST /reservation-moves stay stubs until S1-D2.
 	for _, tc := range []struct{ method, path string }{
 		{"POST", "/reservations"},
-		{"GET", "/reservations"},
-		{"GET", "/reservations/K3P7QW"},
-		{"POST", "/reservations/K3P7QW/cancel"},
-		{"PATCH", "/reservations/K3P7QW"},
 		{"POST", "/reservation-moves"},
 	} {
 		rec := serveRequest(s, tc.method, tc.path, []byte(`{}`), nil)
@@ -131,13 +128,21 @@ func TestStubRoutesNeedAuthThenNotFound(t *testing.T) {
 			t.Errorf("%s %s authed stub: got %d %s", tc.method, tc.path, status, code)
 		}
 	}
-}
-
-func TestAvailabilityStubIsPublicNotFound(t *testing.T) {
-	s := newFoundation(t)
-	rec := serveRequest(s, http.MethodGet, "/availability?restaurant_id=r_anker&date=2026-09-24&party_size=2", nil, nil)
-	if status, code := errorCode(t, rec); status != 404 || code != "not_found" {
-		t.Fatalf("availability stub: got %d %s", status, code)
+	// Live reservation reads authenticate, then report unknown references.
+	for _, tc := range []struct{ method, path string }{
+		{"GET", "/reservations"},
+		{"GET", "/reservations/K3P7QW"},
+		{"POST", "/reservations/K3P7QW/cancel"},
+		{"PATCH", "/reservations/K3P7QW"},
+	} {
+		rec := serveRequest(s, tc.method, tc.path, []byte(`{}`), nil)
+		if status, code := errorCode(t, rec); status != 401 || code != "unauthenticated" {
+			t.Errorf("%s %s without token: got %d %s", tc.method, tc.path, status, code)
+		}
+	}
+	rec := serveRequest(s, http.MethodGet, "/reservations", nil, authHeader(token))
+	if rec.Code != 200 {
+		t.Fatalf("authed empty list: %d %q", rec.Code, rec.Body.String())
 	}
 }
 

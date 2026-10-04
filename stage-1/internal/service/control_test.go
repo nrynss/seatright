@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"sync"
 	"testing"
+	"time"
+
+	"tablekeeper/internal/clock"
 )
 
 func TestResetReplacesAndRepeats(t *testing.T) {
@@ -144,16 +147,20 @@ func TestSeededReservationsOccupy(t *testing.T) {
 }
 
 func TestSeedDSTFirstOccurrence(t *testing.T) {
-	loc := "Europe/Berlin"
-	start, end, err := resolveSeedInstant("2026-10-25T02:30", loc, 90)
+	start, err := clock.ResolveLocal("2026-10-25T02:30", "Europe/Berlin")
 	if err != nil {
 		t.Fatalf("resolve: %v", err)
 	}
-	if got := start.Format("2006-01-02T15:04:05-07:00"); got != "2026-10-25T02:30:00+02:00" {
+	if got := formatTimestamp(start); got != "2026-10-25T02:30:00+02:00" {
 		t.Fatalf("ambiguous local must resolve to the first occurrence, got %s", got)
 	}
-	if got := end.Format("2006-01-02T15:04:05-07:00"); got != "2026-10-25T03:00:00+01:00" {
+	if got := formatTimestamp(start.Add(90 * time.Minute)); got != "2026-10-25T03:00:00+01:00" {
 		t.Fatalf("duration is absolute across the fallback, got %s", got)
+	}
+	if _, err := clock.ResolveLocal("2026-03-29T02:30", "Europe/Berlin"); err == nil {
+		t.Fatal("skipped spring-forward wall must not resolve")
+	} else if ce, ok := err.(*clock.Error); !ok || ce.Code != "invalid_local_time" {
+		t.Fatalf("skipped wall error = %v", err)
 	}
 }
 
@@ -386,8 +393,8 @@ func TestEmptyDisplayNameExportImport(t *testing.T) {
 	if rec := serveRequest(dst, http.MethodPost, "/_test/import", export.Body.Bytes(), nil); rec.Code != 204 {
 		t.Fatalf("import of unchanged export: %d %q", rec.Code, rec.Body.String())
 	}
-	if got := serveRequest(dst, http.MethodGet, "/reservations", nil, authHeader(token)).Code; got != 404 {
-		t.Fatalf("old token after import: %d, want 404 stub (alive)", got)
+	if got := serveRequest(dst, http.MethodGet, "/reservations", nil, authHeader(token)).Code; got != 200 {
+		t.Fatalf("old token after import: %d, want 200 live list", got)
 	}
 	login, _ := json.Marshal(map[string]any{"email": "blank@example.com", "password": "correct horse"})
 	if rec := serveRequest(dst, http.MethodPost, "/auth/login", login, nil); rec.Code != 200 {

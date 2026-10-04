@@ -2,6 +2,8 @@ package service
 
 import (
 	"time"
+
+	"tablekeeper/internal/clock"
 )
 
 // Reset atomically replaces all service state with the fixture in the request
@@ -312,7 +314,6 @@ func applyFixtureReservations(obj map[string]any, next *State) *codedError {
 	if cerr != nil {
 		return cerr
 	}
-	now := time.Now().UTC().Format(time.RFC3339)
 	for _, e := range entries {
 		idRaw, ok := e["id"]
 		if !ok {
@@ -390,12 +391,12 @@ func applyFixtureReservations(obj map[string]any, next *State) *codedError {
 		if !ok {
 			return invalidErr("seeded reservation party_size is required")
 		}
+		// The endpoint-specific party_size rule takes precedence over the
+		// general wrong-type rule: every invalid value, including strings
+		// and booleans, is 422 validation_failed.
 		party, isNumber, isInteger := fixtureInt(partyRaw)
-		if !isNumber {
-			return malformedErr()
-		}
-		if !isInteger || party < 1 {
-			return invalidErr("seeded reservation party_size is out of range")
+		if !isNumber || !isInteger || party < 1 {
+			return invalidErr("seeded reservation party_size must be an integer of at least 1")
 		}
 		status := StatusConfirmed
 		if statusRaw, ok := e["status"]; ok {
@@ -408,10 +409,14 @@ func applyFixtureReservations(obj map[string]any, next *State) *codedError {
 			}
 			status = statusStr
 		}
-		start, end, err := resolveSeedInstant(startsLocal, restaurant.Timezone, restaurant.ReservationDurationMinutes)
+		start, err := clock.ResolveLocal(startsLocal, restaurant.Timezone)
 		if err != nil {
+			if ce, ok := err.(*clock.Error); ok {
+				return &codedError{status: 422, code: ce.Code, msg: ce.Code}
+			}
 			return invalidErr("seeded reservation starts_at_local is invalid")
 		}
+		end := start.Add(time.Duration(restaurant.ReservationDurationMinutes) * time.Minute)
 		if _, exists := next.Reservations[reference]; exists {
 			return invalidErr("duplicate seeded reservation reference")
 		}
@@ -424,9 +429,9 @@ func applyFixtureReservations(obj map[string]any, next *State) *codedError {
 			PartySize:     party,
 			Status:        status,
 			StartsAtLocal: startsLocal,
-			StartsAt:      start.Format(time.RFC3339),
-			EndsAt:        end.Format(time.RFC3339),
-			CreatedAt:     now,
+			StartsAt:      formatTimestamp(start),
+			EndsAt:        formatTimestamp(end),
+			CreatedAt:     formatTimestamp(time.Now().UTC()),
 		}
 	}
 	return nil

@@ -166,7 +166,7 @@ func TestAuthHeaderForms(t *testing.T) {
 	if got := protected(map[string]string{"Authorization": "bearer " + token}); got != 401 {
 		t.Errorf("lowercase scheme accepted: %d", got)
 	}
-	if got := protected(authHeader(token)); got != 404 { // authed stub
+	if got := protected(authHeader(token)); got != 200 { // live caller list
 		t.Errorf("valid token: %d", got)
 	}
 }

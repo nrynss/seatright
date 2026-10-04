@@ -38,10 +38,9 @@ func errorBody(code, msg string) any {
 	return map[string]any{"error": map[string]any{"code": code, "message": msg}}
 }
 
-// Handler returns the full HTTP router. Not-yet-implemented API paths (S1-C
-// reservation writes and availability, S1-D moves) are routed and
-// authenticated but return the documented 404 not_found until their work
-// items land; they are not accepted as complete stage 1.
+// Handler returns the full HTTP router. POST /reservations and
+// POST /reservation-moves stay marked stubs until S1-D2 binds them to the
+// receipt wrapper; every other specified route is live.
 func (s *Service) Handler() http.Handler {
 	return http.HandlerFunc(s.serve)
 }
@@ -53,29 +52,29 @@ func (s *Service) serve(w http.ResponseWriter, r *http.Request) {
 	case method == http.MethodGet && path == "/health":
 		res = okResult(map[string]any{"status": "ok"})
 	case method == http.MethodPost && path == "/_test/reset":
-		res = s.Reset(readBody(w, r))
+		res = s.Reset(readBody(r))
 	case method == http.MethodGet && path == "/_test/export":
 		res = s.Export()
 	case method == http.MethodPost && path == "/_test/import":
-		res = s.Import(readBody(w, r))
+		res = s.Import(readBody(r))
 	case method == http.MethodPost && path == "/auth/signup":
-		res = s.Signup(readBody(w, r))
+		res = s.Signup(readBody(r))
 	case method == http.MethodPost && path == "/auth/login":
-		res = s.Login(readBody(w, r))
+		res = s.Login(readBody(r))
 	case method == http.MethodGet && path == "/restaurants":
 		res = s.ListRestaurants()
 	case method == http.MethodGet && strings.HasPrefix(path, "/restaurants/"):
 		res = s.restaurantRoute(path)
 	case method == http.MethodGet && path == "/availability":
-		res = notFound("availability is not implemented in this foundation")
-	case path == "/reservations" && (method == http.MethodPost || method == http.MethodGet):
+		res = s.Availability(r.URL.Query())
+	case method == http.MethodGet && path == "/reservations":
+		res = s.ListReservations(bearerTokenString(r))
+	case method == http.MethodPost && path == "/reservations":
 		res = s.requireAuth(r, func() Result {
-			return notFound("reservations are not implemented in this foundation")
+			return notFound("reservation creation binds to idempotency in S1-D2")
 		})
 	case strings.HasPrefix(path, "/reservations/"):
-		res = s.requireAuth(r, func() Result {
-			return notFound("reservations are not implemented in this foundation")
-		})
+		res = s.reservationRoute(r, path)
 	case path == "/reservation-moves" && method == http.MethodPost:
 		res = s.requireAuth(r, func() Result {
 			return notFound("reservation moves are not implemented in this foundation")
@@ -92,6 +91,28 @@ func (s *Service) serve(w http.ResponseWriter, r *http.Request) {
 		res = notFound("unknown path")
 	}
 	writeResult(w, res)
+}
+
+// reservationRoute dispatches GET/PATCH on /reservations/{reference} and POST
+// on /reservations/{reference}/cancel. Deeper or malformed paths are 404.
+func (s *Service) reservationRoute(r *http.Request, path string) Result {
+	rest := strings.TrimPrefix(path, "/reservations/")
+	if rest == "" {
+		return notFound("unknown path")
+	}
+	parts := strings.Split(rest, "/")
+	reference := parts[0]
+	token := bearerTokenString(r)
+	switch {
+	case len(parts) == 1 && r.Method == http.MethodGet:
+		return s.GetReservation(token, reference)
+	case len(parts) == 1 && r.Method == http.MethodPatch:
+		return s.PatchReservation(token, reference, readBody(r))
+	case len(parts) == 2 && parts[1] == "cancel" && r.Method == http.MethodPost:
+		return s.CancelReservation(token, reference)
+	default:
+		return notFound("unknown path")
+	}
 }
 
 // restaurantRoute serves GET /restaurants/{id}; deeper paths belong to later
@@ -117,7 +138,13 @@ func (s *Service) requireAuth(r *http.Request, fn func() Result) Result {
 	return fn()
 }
 
-// bearerToken parses Authorization: Bearer <token>.
+// bearerTokenString extracts the raw bearer token, or "" when the header is
+// missing or malformed. Protected methods authenticate it themselves so the
+// 401 mapping stays in one place.
+func bearerTokenString(r *http.Request) string {
+	token, _ := bearerToken(r)
+	return token
+}
 func bearerToken(r *http.Request) (string, bool) {
 	header := r.Header.Get("Authorization")
 	parts := strings.SplitN(header, " ", 2)
@@ -130,7 +157,7 @@ func bearerToken(r *http.Request) (string, bool) {
 // maxBody caps request bodies so a huge payload cannot exhaust memory.
 const maxBody = 8 << 20
 
-func readBody(w http.ResponseWriter, r *http.Request) []byte {
+func readBody(r *http.Request) []byte {
 	raw, err := io.ReadAll(io.LimitReader(r.Body, maxBody+1))
 	if err != nil {
 		return nil
