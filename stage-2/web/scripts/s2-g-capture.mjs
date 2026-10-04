@@ -4,6 +4,10 @@
  *
  * Screenshots: results, selected, confirmed, uncertain, refused, lookup
  * at 375 and 1280, light and dark. Videos: selection and reduced-motion selection.
+ *
+ * Also records each Free/Taken/Held word's DOM Range against the cell's inner
+ * box and border box, after transitions settle. BOUNDS_STRICT=0 records
+ * overflow without failing. VIDEOS=0 skips the screen recordings.
  */
 import { spawn } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -18,6 +22,8 @@ const evidence =
   process.env.EVIDENCE ??
   '/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-grok/S2-G/fixture-preview';
 const chrome = process.env.CHROME ?? '/home/agent/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome';
+const strictBounds = process.env.BOUNDS_STRICT !== '0';
+const recordVideos = process.env.VIDEOS !== '0';
 
 const times = ['18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30'];
 
@@ -100,6 +106,7 @@ const proof = {
   consoleErrors: [],
   offOrigin: [],
   fontRequests: [],
+  bounds: [],
 };
 
 function log(message) {
@@ -125,7 +132,281 @@ async function waitForPreview(child) {
   throw new Error(`preview did not answer: ${stderr}`);
 }
 
+async function settle(page) {
+  await page.evaluate(async () => {
+    const deadline = performance.now() + 5000;
+    while (performance.now() < deadline) {
+      const running = document.getAnimations().filter((animation) => (
+        animation.playState === 'running' || animation.playState === 'pending'
+      ));
+      if (running.length === 0) break;
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    }
+    await new Promise((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(resolve));
+    });
+  });
+}
+
+function boundsFail(summary) {
+  if (!summary?.present) return false;
+  return (
+    summary.outsideInner > 0 ||
+    summary.outsideBorder > 0 ||
+    summary.clipped > 0 ||
+    summary.collisions > 0 ||
+    summary.whenOverlap > 0 ||
+    summary.rowheadOutside > 0 ||
+    summary.colheadOutside > 0 ||
+    summary.gridScroll === true
+  );
+}
+
+async function measureGrid(page, name) {
+  return page.evaluate((label) => {
+    const round = (value) => Math.round(value * 100) / 100;
+    const finite = (value) => (Number.isFinite(value) ? round(value) : null);
+    const rectOf = (rect) => ({
+      x: round(rect.left),
+      y: round(rect.top),
+      w: round(rect.width),
+      h: round(rect.height),
+    });
+
+    function textRect(element) {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      const rects = [...range.getClientRects()].filter((rect) => rect.width > 0.5 && rect.height > 0.5);
+      if (rects.length === 0) return null;
+      const left = Math.min(...rects.map((rect) => rect.left));
+      const right = Math.max(...rects.map((rect) => rect.right));
+      const top = Math.min(...rects.map((rect) => rect.top));
+      const bottom = Math.max(...rects.map((rect) => rect.bottom));
+      return { left, right, top, bottom, width: right - left, height: bottom - top, lines: rects.length };
+    }
+
+    function edges(element) {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      const borderLeft = parseFloat(style.borderLeftWidth) || 0;
+      const borderRight = parseFloat(style.borderRightWidth) || 0;
+      const borderTop = parseFloat(style.borderTopWidth) || 0;
+      const borderBottom = parseFloat(style.borderBottomWidth) || 0;
+      const padLeft = parseFloat(style.paddingLeft) || 0;
+      const padRight = parseFloat(style.paddingRight) || 0;
+      const padTop = parseFloat(style.paddingTop) || 0;
+      const padBottom = parseFloat(style.paddingBottom) || 0;
+      return {
+        border: rect,
+        inner: {
+          left: rect.left + borderLeft + padLeft,
+          right: rect.right - borderRight - padRight,
+          top: rect.top + borderTop + padTop,
+          bottom: rect.bottom - borderBottom - padBottom,
+        },
+        overflowX: style.overflowX,
+      };
+    }
+
+    function inset(text, bound) {
+      return {
+        l: round(text.left - bound.left),
+        r: round(bound.right - text.right),
+        t: round(text.top - bound.top),
+        b: round(bound.bottom - text.bottom),
+      };
+    }
+
+    function outside(gap) {
+      return gap.l < -0.5 || gap.r < -0.5 || gap.t < -0.5 || gap.b < -0.5;
+    }
+
+    function shown(element) {
+      const style = getComputedStyle(element);
+      if (style.display === 'none' || style.visibility === 'hidden') return false;
+      const rect = element.getBoundingClientRect();
+      return rect.width > 0.5 && rect.height > 0.5;
+    }
+
+    const root = document.querySelector('[data-testid="availability-grid"]');
+    if (!root) {
+      return {
+        summary: { name: label, present: false, fail: false },
+        cells: [],
+        rowheads: [],
+        colheads: [],
+      };
+    }
+
+    const records = [...root.querySelectorAll('.cell')].map((cell) => {
+      const word = cell.querySelector('.state-word');
+      const text = word ? textRect(word) : null;
+      const edge = edges(cell);
+      const innerInset = text ? inset(text, edge.inner) : null;
+      const borderInset = text ? inset(text, edge.border) : null;
+      const wordStyle = word ? getComputedStyle(word) : null;
+      const clipped = Boolean(
+        word &&
+          (edge.overflowX === 'hidden' || edge.overflowX === 'clip' || wordStyle.overflowX === 'hidden' || wordStyle.overflowX === 'clip') &&
+          word.scrollWidth > word.clientWidth + 1,
+      );
+      const when = cell.querySelector('.when');
+      const whenShown = when && getComputedStyle(when).display !== 'none';
+      const whenText = whenShown ? textRect(when) : null;
+      let whenGap = null;
+      if (text && whenText) {
+        whenGap = round(text.left - whenText.right);
+      }
+      return {
+        id: cell.getAttribute('data-testid'),
+        word: word ? word.textContent.trim() : '',
+        available: cell.getAttribute('data-available'),
+        selected: cell.getAttribute('data-selected'),
+        cell: rectOf(edge.border),
+        inner: {
+          x: round(edge.inner.left),
+          y: round(edge.inner.top),
+          w: round(edge.inner.right - edge.inner.left),
+          h: round(edge.inner.bottom - edge.inner.top),
+        },
+        text: text ? { x: round(text.left), y: round(text.top), w: round(text.width), h: round(text.height), lines: text.lines } : null,
+        innerInset,
+        borderInset,
+        outsideInner: innerInset ? outside(innerInset) : true,
+        outsideBorder: borderInset ? outside(borderInset) : true,
+        clipped,
+        whenGap,
+        whenOverlap: whenGap != null && whenGap < 0.5,
+      };
+    });
+
+    const rows = new Map();
+    for (const record of records) {
+      const key = Math.round((record.cell?.y ?? 0) / 2);
+      if (!rows.has(key)) rows.set(key, []);
+      rows.get(key).push(record);
+    }
+    const collisions = [];
+    let minNeighbor = Infinity;
+    for (const row of rows.values()) {
+      const visible = row.filter((record) => record.text);
+      visible.sort((left, right) => left.text.x - right.text.x);
+      for (let index = 1; index < visible.length; index += 1) {
+        const previous = visible[index - 1];
+        const current = visible[index];
+        const gap = round(current.text.x - (previous.text.x + previous.text.w));
+        current.neighborGap = gap;
+        if (gap < minNeighbor) minNeighbor = gap;
+        if (gap < 0.5) collisions.push({ left: previous.id, right: current.id, gap, words: `${previous.word}/${current.word}` });
+      }
+    }
+
+    function labelRecords(selector) {
+      return [...root.querySelectorAll(selector)].filter(shown).map((element) => {
+        const text = textRect(element);
+        const edge = edges(element);
+        const innerInset = text ? inset(text, edge.inner) : null;
+        const borderInset = text ? inset(text, edge.border) : null;
+        return {
+          text: element.innerText.replace(/\s+/g, ' ').trim(),
+          cell: rectOf(edge.border),
+          textBox: text ? { x: round(text.left), y: round(text.top), w: round(text.width), h: round(text.height), lines: text.lines } : null,
+          innerInset,
+          borderInset,
+          outsideInner: innerInset ? outside(innerInset) : true,
+          outsideBorder: borderInset ? outside(borderInset) : true,
+        };
+      });
+    }
+
+    const rowheads = labelRecords('.rowhead');
+    const colheads = labelRecords('.colhead');
+    const wrap = root.closest('.matrix-wrap') ?? root;
+    const gridScroll = wrap.scrollWidth > wrap.clientWidth + 1;
+    const minInner = records.reduce((min, record) => {
+      if (!record.innerInset) return min;
+      return Math.min(min, record.innerInset.l, record.innerInset.r, record.innerInset.t, record.innerInset.b);
+    }, Infinity);
+    const minBorder = records.reduce((min, record) => {
+      if (!record.borderInset) return min;
+      return Math.min(min, record.borderInset.l, record.borderInset.r, record.borderInset.t, record.borderInset.b);
+    }, Infinity);
+    const summary = {
+      name: label,
+      present: true,
+      cells: records.length,
+      counts: {
+        Free: records.filter((record) => record.word === 'Free').length,
+        Taken: records.filter((record) => record.word === 'Taken').length,
+        Held: records.filter((record) => record.word === 'Held').length,
+      },
+      outsideInner: records.filter((record) => record.outsideInner).length,
+      outsideBorder: records.filter((record) => record.outsideBorder).length,
+      clipped: records.filter((record) => record.clipped).length,
+      collisions: collisions.length,
+      whenOverlap: records.filter((record) => record.whenOverlap).length,
+      minNeighborGap: finite(minNeighbor),
+      minInnerClearance: finite(minInner),
+      minBorderClearance: finite(minBorder),
+      rowheadOutside: rowheads.filter((record) => record.outsideBorder).length,
+      colheadOutside: colheads.filter((record) => record.outsideBorder).length,
+      rowheadInner: rowheads.filter((record) => record.outsideInner).length,
+      colheadInner: colheads.filter((record) => record.outsideInner).length,
+      gridScroll,
+      rowheadLines: rowheads.map((record) => ({ text: record.text, lines: record.textBox?.lines ?? 0, w: record.cell.w })),
+      wordWidths: {
+        Free: finite(Math.max(...records.filter((record) => record.word === 'Free' && record.text).map((record) => record.text.w), 0)) || null,
+        Taken: finite(Math.max(...records.filter((record) => record.word === 'Taken' && record.text).map((record) => record.text.w), 0)) || null,
+        Held: finite(Math.max(...records.filter((record) => record.word === 'Held' && record.text).map((record) => record.text.w), 0)) || null,
+      },
+      worst: records
+        .filter((record) => record.outsideInner || record.outsideBorder || record.clipped || record.whenOverlap)
+        .slice(0, 8)
+        .map((record) => ({
+          id: record.id,
+          word: record.word,
+          cell: record.cell,
+          inner: record.inner,
+          text: record.text,
+          innerInset: record.innerInset,
+          borderInset: record.borderInset,
+          neighborGap: record.neighborGap ?? null,
+        })),
+      collisionSample: collisions.slice(0, 6),
+      rowheadWorst: rowheads.filter((record) => record.outsideBorder || record.outsideInner).slice(0, 4),
+      colheadWorst: colheads.filter((record) => record.outsideBorder || record.outsideInner).slice(0, 4),
+    };
+    summary.fail = (
+      summary.outsideInner > 0 ||
+      summary.outsideBorder > 0 ||
+      summary.clipped > 0 ||
+      summary.collisions > 0 ||
+      summary.whenOverlap > 0 ||
+      summary.rowheadOutside > 0 ||
+      summary.colheadOutside > 0 ||
+      summary.gridScroll
+    );
+    return { summary, cells: records, rowheads, colheads };
+  }, name);
+}
+
 async function shoot(page, name) {
+  await settle(page);
+  const measured = await measureGrid(page, name);
+  proof.bounds.push(measured);
+  const summary = measured.summary;
+  if (summary.present) {
+    log(
+      `bounds ${name} cells=${summary.cells} Free=${summary.counts.Free} Taken=${summary.counts.Taken} Held=${summary.counts.Held} ` +
+        `outsideInner=${summary.outsideInner} outsideBorder=${summary.outsideBorder} clipped=${summary.clipped} ` +
+        `collisions=${summary.collisions} whenOverlap=${summary.whenOverlap} gridScroll=${summary.gridScroll} ` +
+        `minInner=${summary.minInnerClearance} minBorder=${summary.minBorderClearance} minGap=${summary.minNeighborGap} ` +
+        `rowheadOut=${summary.rowheadOutside} colheadOut=${summary.colheadOutside} ` +
+        `widths=${JSON.stringify(summary.wordWidths)} fail=${summary.fail}`,
+    );
+  } else {
+    log(`bounds ${name} no grid`);
+  }
   const file = join(evidence, `${name}.png`);
   await page.screenshot({ path: file, fullPage: true });
   const box = await page.evaluate(() => ({
@@ -355,7 +636,9 @@ async function run() {
         viewport: { width, height: width === 375 ? 812 : 800 },
         deviceScaleFactor: 1,
         reducedMotion: 'reduce',
-        recordVideo: { dir: join(evidence, 'videos'), size: { width, height: width === 375 ? 812 : 800 } },
+        ...(recordVideos
+          ? { recordVideo: { dir: join(evidence, 'videos'), size: { width, height: width === 375 ? 812 : 800 } } }
+          : {}),
       });
       const page = await context.newPage();
       await prepare(page, 'light');
@@ -368,12 +651,12 @@ async function run() {
       }
       await shoot(page, `light-${width}-reduced-selected`);
       await page.waitForTimeout(300);
-      const video = page.video();
+      const video = recordVideos ? page.video() : null;
       await context.close();
       if (video) await video.saveAs(join(evidence, 'videos', `light-${width}-reduced-selection.webm`));
     }
 
-    for (const width of widths) {
+    if (recordVideos) for (const width of widths) {
       const context = await browser.newContext({
         viewport: { width, height: width === 375 ? 812 : 800 },
         deviceScaleFactor: 1,
@@ -403,8 +686,16 @@ async function run() {
         post.keyLength < 1,
     );
     if (badPost) throw new Error(`unexpected post ${JSON.stringify(badPost)}`);
+    const failedBounds = proof.bounds.map((entry) => entry.summary).filter((summary) => boundsFail(summary));
+    proof.boundsSummary = proof.bounds.map((entry) => entry.summary);
     await writeFile(join(evidence, 'proof.json'), JSON.stringify(proof, null, 2));
-    log(`shots ${proof.shots.length} posts ${proof.posts.length} fonts ${proof.fontRequests.length}`);
+    await writeFile(join(evidence, 'bounds-summary.json'), JSON.stringify(proof.boundsSummary, null, 2));
+    log(`shots ${proof.shots.length} posts ${proof.posts.length} fonts ${proof.fontRequests.length} boundsFail=${failedBounds.length}`);
+    if (strictBounds && failedBounds.length > 0) {
+      throw new Error(
+        `state words do not fit: ${failedBounds.map((summary) => `${summary.name} inner=${summary.outsideInner} border=${summary.outsideBorder} collisions=${summary.collisions}`).join('; ')}`,
+      );
+    }
   } finally {
     await browser.close();
     preview.kill('SIGTERM');
