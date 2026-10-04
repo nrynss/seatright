@@ -1,5 +1,11 @@
 # Tablekeeper2 run log
 
+2026-10-04T17:36:41Z — Codex, OMP — report — S1-B raw acceptance/vet evidence verified; host race tests pass, 17 top-level tests and 8 subtests. Author commit 11f811ffa2fbf01b1cf1df6f9d69b7a5b143108e merged into candidate 5eb7851f09cfe82111c64ee90450f0ba5d7e9262. Host evidence: evidence/seatright-codex/S1-B/host-test.txt. OMP reports ~45 minutes; observed dispatch-to-report interval is ~8 minutes, so reported elapsed is not corroborated. Usage unavailable.
+
+2026-10-04T17:36:41Z — Codex, OpenCode — report — S1-A raw build/race/smoke evidence inspected and host race suite passes 27 tests. Static integration inspection found long-password 500, invalid seed reference acceptance and unchanged-export rejection for an empty display name. No product commit yet.
+
+2026-10-04T17:36:41Z — Codex, OpenCode — handoff — Focused S1-A continuation fixes F1–F3 plus evidence correction F4 accepted as 07595f2c-52e3-4d3c-8c3d-b365bb8fcf9d. Complete original task/spec/ledger/ownership included. This is pre-review integration verification; formal stage review rounds remain zero.
+
 Stage 1: in progress. Stages 2–4: pending acceptance/copy of preceding stage.
 
 2026-10-04T17:19:33Z — Codex — blocker — Runtime TaskCreate rejected: MCP tool call requires approval, but approval policy is never. Using PLAN.md/RUNLOG.md fallback; no task IDs/history. Usage not exposed for this call.
