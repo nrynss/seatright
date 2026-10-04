@@ -1,4 +1,5 @@
 import { ApiError } from './client';
+import { copyIds, type SeatingOption } from './seating';
 import type { Transport } from './transport';
 
 /** A Thursday far enough ahead that a later cancellation window can still be open. */
@@ -18,12 +19,15 @@ export interface TableRecord {
 
 export interface RestaurantDetail extends RestaurantSummary {
   tables: TableRecord[];
+  /** Declared pairs in fixture order. Missing on a stage-1 detail means none. */
+  combinable: string[][];
 }
 
 export interface AvailabilitySlot {
   starts_at_local: string;
   starts_at: string;
   availableTableIds: readonly string[];
+  options: SeatingOption[];
 }
 
 export interface AvailabilityResult {
@@ -69,6 +73,27 @@ function requiredText(source: Record<string, unknown>, key: string, message: str
   const value = text(source, key, message);
   if (value === '') throw new ApiError(message, 'validation_failed', 200);
   return value;
+}
+
+function stringList(value: unknown, message: string): string[] {
+  if (!Array.isArray(value)) throw new ApiError(message, 'validation_failed', 200);
+  return value.map((item) => {
+    if (typeof item !== 'string' || item === '') throw new ApiError(message, 'validation_failed', 200);
+    return item;
+  });
+}
+
+/** Absent means no pairs. A present value must be pairs of table ids, in declared order. */
+function parseCombinable(value: unknown): string[][] {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) throw new ApiError('The restaurant detail was not usable.', 'validation_failed', 200);
+  return value.map((item) => {
+    const pair = stringList(item, 'The restaurant detail was not usable.');
+    if (pair.length !== 2 || pair[0] === pair[1]) {
+      throw new ApiError('The restaurant detail was not usable.', 'validation_failed', 200);
+    }
+    return pair;
+  });
 }
 
 /** Clock suffix HH:MM from a bare local start. */
@@ -117,6 +142,7 @@ export function parseDetail(body: unknown): RestaurantDetail {
     name: text(root, 'name', 'The restaurant detail was not usable.'),
     timezone: requiredText(root, 'timezone', 'The restaurant detail was not usable.'),
     tables,
+    combinable: parseCombinable(root.combinable),
   };
 }
 
@@ -125,21 +151,29 @@ export function parseAvailability(body: unknown): AvailabilityResult {
   if (!Array.isArray(root.slots)) {
     throw new ApiError('The availability response was not usable.', 'validation_failed', 200);
   }
-  const membershipKey = ['available', 'table', 'ids'].join('_');
   const slots = root.slots.map((item) => {
     const entry = record(item, 'A slot was not usable.');
-    const listed = entry[membershipKey];
-    if (!Array.isArray(listed)) throw new ApiError('A slot was not usable.', 'validation_failed', 200);
-    const availableTableIds = listed.map((id) => {
-      if (typeof id !== 'string') throw new ApiError('A slot was not usable.', 'validation_failed', 200);
-      return id;
-    });
+    const availableTableIds = stringList(entry.available_table_ids, 'A slot was not usable.');
     const startsAtLocal = requiredText(entry, 'starts_at_local', 'A slot was not usable.');
     slotClock(startsAtLocal);
+    let options: SeatingOption[];
+    if (Array.isArray(entry.available_options)) {
+      options = entry.available_options.map((option) => {
+        const choice = record(option, 'A slot was not usable.');
+        const capacity = choice.capacity;
+        if (typeof capacity !== 'number' || !Number.isInteger(capacity)) {
+          throw new ApiError('A slot was not usable.', 'validation_failed', 200);
+        }
+        return { tableIds: stringList(choice.table_ids, 'A slot was not usable.'), capacity };
+      });
+    } else {
+      options = availableTableIds.map((id) => ({ tableIds: [id], capacity: 0 }));
+    }
     return {
       starts_at_local: startsAtLocal,
       starts_at: requiredText(entry, 'starts_at', 'A slot was not usable.'),
-      availableTableIds,
+      availableTableIds: copyIds(availableTableIds),
+      options,
     };
   });
   return {

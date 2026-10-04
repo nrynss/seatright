@@ -260,7 +260,8 @@ describe('Chaaya contracts', () => {
     expect(html).toContain(themeScript);
     expect(app).toContain("@nrynss/chaaya/tokens/reference.css");
     expect(themeControl).toContain('@nrynss/chaaya/theme');
-    const banned = ['combinable', 'available_options', 'policy_version', 'series_id', 'replan', 'table_ids'];
+    // Stage 2 names declared pairs. Later stages stay out of this folder.
+    const banned = ['policy_version', 'series_id', 'replan'];
     const sources = walk(join(webRoot, 'src')).filter((path) => /\.(svelte|ts|css)$/.test(path));
     sources.push(join(webRoot, 'index.html'));
     for (const path of sources) {

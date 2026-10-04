@@ -376,6 +376,59 @@ select {
   fill: var(--on-accent);
 }
 
+.pair-link {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 3;
+  stroke-dasharray: 7 6;
+  pointer-events: none;
+}
+
+.pair-mark[data-available="true"] .pair-link {
+  stroke: var(--accent);
+}
+
+.pair-mark[data-selected="true"] .pair-link {
+  stroke: var(--accent);
+  stroke-width: 5;
+  stroke-dasharray: none;
+}
+
+.pair-badge {
+  cursor: pointer;
+}
+
+.pair-badge rect {
+  fill: var(--surface);
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+.pair-badge text {
+  fill: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.pair-badge[data-available="false"] rect {
+  fill: var(--sunken);
+  stroke: var(--line);
+}
+
+.pair-badge[data-available="false"] text {
+  fill: var(--dim);
+}
+
+.pair-badge[data-selected="true"] rect {
+  fill: var(--accent);
+  stroke: var(--on-accent);
+}
+
+.pair-badge[data-selected="true"] text {
+  fill: var(--on-accent);
+}
+
 .place-cards {
   display: flex;
   flex-wrap: wrap;
@@ -450,6 +503,15 @@ select {
 .rowhead .seats {
   color: var(--faint);
   font-size: 0.82rem;
+}
+
+.rowhead.together {
+  border-left: 3px solid var(--accent);
+  padding-left: 0.45rem;
+}
+
+.cell.together[data-available="true"] {
+  background: var(--accent-soft);
 }
 
 .cell {

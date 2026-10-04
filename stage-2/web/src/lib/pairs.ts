@@ -18,6 +18,8 @@ export const contrastPairs: readonly ContrastPair[] = [
   ['faint', 'raised'],
   ['accent', 'ground'],
   ['accent', 'surface'],
+  ['text', 'accent-soft'],
+  ['ok', 'accent-soft'],
   ['on-accent', 'accent'],
   ['on-accent', 'ok'],
   ['ok', 'surface'],

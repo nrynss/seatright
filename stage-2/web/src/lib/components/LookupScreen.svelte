@@ -1,6 +1,7 @@
 <script lang="ts">
   import { cancelReservation, failureMessage, loadReservation, type ReservationRecord } from '../booking';
-  import { bookingSummary } from '../format';
+  import { bookingSummary, tablePhrase } from '../format';
+  import { canonicalTableIds } from '../seating';
   import { detailPath, parseDetail, slotClock } from '../search';
   import type { Transport } from '../transport';
 
@@ -36,14 +37,14 @@
     if (live && !token) localReservation = null;
   });
 
-  function present(record: ReservationRecord, label: string, restaurantName: string): ShownReservation {
+  function present(record: ReservationRecord, labels: readonly string[], restaurantName: string): ShownReservation {
     const date = record.starts_at_local.slice(0, 10);
     const clock = slotClock(record.starts_at_local);
     return {
       reference: record.reference,
       status: record.status,
-      summary: bookingSummary(restaurantName, label, date, clock),
-      tables: `Table ${label}`,
+      summary: bookingSummary(restaurantName, labels, date, clock),
+      tables: tablePhrase(labels),
     };
   }
 
@@ -69,9 +70,14 @@
       if (mine !== lookupSeq) return;
       const detail = parseDetail(await transport(detailPath(record.restaurant_id)));
       if (mine !== lookupSeq) return;
-      const table = detail.tables.find((item) => item.id === record.table_id);
-      if (!table) throw new Error('That table is no longer listed for this restaurant.');
-      localReservation = present(record, table.label, detail.name);
+      const ids = canonicalTableIds(detail.combinable, record.tableIds);
+      const members = ids.map((id) => detail.tables.find((item) => item.id === id));
+      if (members.some((table) => !table)) throw new Error('That table is no longer listed for this restaurant.');
+      localReservation = present(
+        record,
+        members.flatMap((table) => (table ? [table.label] : [])),
+        detail.name,
+      );
       localError = null;
     } catch (failure) {
       if (mine !== lookupSeq) return;

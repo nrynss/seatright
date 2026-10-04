@@ -1,23 +1,38 @@
 <script lang="ts">
   import { flip } from 'svelte/animate';
-  import { layoutRoom } from '../floor';
-  import { formatClock } from '../format';
+  import { layoutRoom, type PlacedTable } from '../floor';
+  import { formatClock, tablePhrase } from '../format';
   import { motionDuration } from '../motion';
   import type { PreviewTable } from '../preview';
+  import { pairPlanTestId, sameMembers } from '../seating';
+  import PairMark from './PairMark.svelte';
   import PlanTable from './PlanTable.svelte';
+
+  interface FloorPair {
+    ids: readonly string[];
+    labels: readonly string[];
+    capacity: number;
+    available: boolean;
+  }
 
   let {
     tables,
     availableIds,
     selectedId = null,
+    selectedIds = null,
     time,
+    pairs = [],
     onSelect,
+    onSelectPair = null,
   }: {
     tables: readonly PreviewTable[];
     availableIds: readonly string[];
     selectedId?: string | null;
+    selectedIds?: readonly string[] | null;
     time: string;
+    pairs?: readonly FloorPair[];
     onSelect: (tableId: string) => void;
+    onSelectPair?: ((ids: readonly string[]) => void) | null;
   } = $props();
 
   const clock = $derived(formatClock(time));
@@ -42,11 +57,58 @@
   });
 
   const scene = $derived(layoutRoom(tables, { maxColumns: narrow ? 1 : 0 }));
+  const pickedIds = $derived(selectedIds != null ? [...selectedIds] : selectedId ? [selectedId] : []);
   const ordered = $derived.by(() => {
-    if (!selectedId) return [...tables];
-    const picked = tables.filter((table) => table.id === selectedId);
-    const rest = tables.filter((table) => table.id !== selectedId);
+    if (pickedIds.length === 0) return [...tables];
+    const picked = tables.filter((table) => pickedIds.includes(table.id));
+    const rest = tables.filter((table) => !pickedIds.includes(table.id));
     return [...picked, ...rest];
+  });
+  const heldTogether = $derived(pairs.find((pair) => sameMembers(pair.ids, pickedIds)) ?? null);
+
+  function center(place: PlacedTable): { x: number; y: number } {
+    return { x: place.x + place.drawing.size / 2, y: place.y + place.drawing.size / 2 };
+  }
+
+  function badgeBox(x: number, y: number, width: number, height: number): { x: number; y: number; w: number; h: number } {
+    const w = 92;
+    const h = 28;
+    return {
+      x: Math.min(Math.max(10, x - w / 2), Math.max(10, width - w - 10)),
+      y: Math.min(Math.max(10, y - h / 2), Math.max(10, height - h - 10)),
+      w,
+      h,
+    };
+  }
+
+  const marks = $derived.by(() => {
+    return pairs.flatMap((pair) => {
+      const left = scene.tables.find((place) => place.id === pair.ids[0]);
+      const right = scene.tables.find((place) => place.id === pair.ids[1]);
+      if (!left || !right) return [];
+      const a = center(left);
+      const b = center(right);
+      const midX = (a.x + b.x) / 2;
+      const midY = (a.y + b.y) / 2;
+      const names = tablePhrase(pair.labels);
+      const state = sameMembers(pair.ids, pickedIds) ? 'Selected' : pair.available ? 'Available' : 'Unavailable';
+      return [
+        {
+          key: pair.ids.join('+'),
+          ids: pair.ids,
+          x1: a.x,
+          y1: a.y,
+          x2: b.x,
+          y2: b.y,
+          badge: badgeBox(midX, midY, scene.width, scene.height),
+          caption: pair.labels.join(' · '),
+          available: pair.available,
+          selected: sameMembers(pair.ids, pickedIds),
+          testId: pairPlanTestId(pair.ids),
+          label: `${names} together, ${pair.capacity} seats, ${state.toLowerCase()} at ${clock}`,
+        },
+      ];
+    });
   });
 </script>
 
@@ -71,16 +133,34 @@
       <PlanTable
         {place}
         available={availableIds.includes(place.id)}
-        selected={selectedId === place.id}
+        selected={pickedIds.includes(place.id)}
         {clock}
         {onSelect}
       />
     {/each}
+    {#each marks as mark (mark.key)}
+      <PairMark
+        x1={mark.x1}
+        y1={mark.y1}
+        x2={mark.x2}
+        y2={mark.y2}
+        badge={mark.badge}
+        caption={mark.caption}
+        available={mark.available}
+        selected={mark.selected}
+        testId={mark.testId}
+        label={mark.label}
+        onSelect={() => onSelectPair?.(mark.ids)}
+      />
+    {/each}
   </svg>
-  <p class="floor-caption">Floor at {clock}. Tables share one room and are drawn to their number of seats.</p>
+  <p class="floor-caption">
+    Floor at {clock}. Tables share one room and are drawn to their number of seats.
+    {#if heldTogether}{tablePhrase(heldTogether.labels)} are held together.{/if}
+  </p>
   <ul class="place-cards" aria-label="Tables at this time">
     {#each ordered as table (table.id)}
-      <li animate:flip={{ duration: motionDuration(360) }} data-selected={selectedId === table.id ? 'true' : 'false'}>
+      <li animate:flip={{ duration: motionDuration(360) }} data-selected={pickedIds.includes(table.id) ? 'true' : 'false'}>
         Table {table.label} · {table.capacity} seats
       </li>
     {/each}
