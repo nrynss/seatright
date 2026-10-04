@@ -202,6 +202,10 @@ func parseFixtureRestaurant(e map[string]any) (Restaurant, *codedError) {
 	if cerr != nil {
 		return r, cerr
 	}
+	combinable, cerr := parseFixtureCombinable(e, tables)
+	if cerr != nil {
+		return r, cerr
+	}
 	r = Restaurant{
 		ID:                         id,
 		Name:                       name,
@@ -211,13 +215,50 @@ func parseFixtureRestaurant(e map[string]any) (Restaurant, *codedError) {
 		CancellationCutoffMinutes:  cutoff,
 		OpeningHours:               hours,
 		Tables:                     tables,
+		Combinable:                 combinable,
 	}
 	return r, nil
 }
 
+// parseFixtureCombinable parses the optional combinable fixture field:
+// absent means no pairs. Each entry must be an array of exactly two known
+// distinct table ids of this restaurant; declared order is retained.
+func parseFixtureCombinable(e map[string]any, tables []Table) ([][]string, *codedError) {
+	raw, ok := e["combinable"]
+	if !ok {
+		return nil, nil
+	}
+	list, ok := raw.([]any)
+	if !ok {
+		return nil, malformedErr()
+	}
+	known := map[string]bool{}
+	for _, t := range tables {
+		known[t.ID] = true
+	}
+	out := make([][]string, 0, len(list))
+	for _, item := range list {
+		pair, ok := item.([]any)
+		if !ok || len(pair) != 2 {
+			return nil, invalidErr("combinable entries must be pairs of table ids")
+		}
+		a, okA := pair[0].(string)
+		b, okB := pair[1].(string)
+		if !okA || !okB {
+			return nil, malformedErr()
+		}
+		if a == "" || b == "" || a == b || !known[a] || !known[b] {
+			return nil, invalidErr("combinable entries must be two known distinct tables")
+		}
+		out = append(out, []string{a, b})
+	}
+	if out == nil {
+		out = [][]string{}
+	}
+	return out, nil
+}
+
 // fixturePositiveInt reads a required integer field with a minimum value.
-// Wrong JSON types are malformed; missing or non-integer or too-small values
-// are validation failures.
 func fixturePositiveInt(e map[string]any, name string, min int) (int, *codedError) {
 	raw, ok := e[name]
 	if !ok {
@@ -363,22 +404,9 @@ func applyFixtureReservations(obj map[string]any, next *State) *codedError {
 		if restaurant == nil {
 			return invalidErr("seeded reservation restaurant is unknown")
 		}
-		tableID, present, wrongType := fieldString(e, "table_id")
-		if wrongType {
-			return malformedErr()
-		}
-		if !present {
-			return invalidErr("seeded reservation table_id is required")
-		}
-		known := false
-		for _, t := range restaurant.Tables {
-			if t.ID == tableID {
-				known = true
-				break
-			}
-		}
-		if !known {
-			return invalidErr("seeded reservation table is unknown")
+		ids, cerr := parseSeedTables(e, restaurant)
+		if cerr != nil {
+			return cerr
 		}
 		startsLocal, present, wrongType := fieldString(e, "starts_at_local")
 		if wrongType {
@@ -420,12 +448,11 @@ func applyFixtureReservations(obj map[string]any, next *State) *codedError {
 		if _, exists := next.Reservations[reference]; exists {
 			return invalidErr("duplicate seeded reservation reference")
 		}
-		next.Reservations[reference] = Reservation{
+		rec := Reservation{
 			ReservationID: id,
 			Reference:     reference,
 			UserID:        owner,
 			RestaurantID:  restaurantID,
-			TableID:       tableID,
 			PartySize:     party,
 			Status:        status,
 			StartsAtLocal: startsLocal,
@@ -433,6 +460,61 @@ func applyFixtureReservations(obj map[string]any, next *State) *codedError {
 			EndsAt:        formatTimestamp(end),
 			CreatedAt:     formatTimestamp(time.Now().UTC()),
 		}
+		setReservationTables(&rec, ids)
+		next.Reservations[reference] = rec
 	}
 	return nil
+}
+
+// parseSeedTables resolves a seeded table_id or table_ids to a canonical
+// stored set: singletons accept table_id; pairs require declared combinable
+// membership in declared order. Unknown fixture tables stay
+// validation_failed here (the 404 resource mapping belongs to endpoints).
+func parseSeedTables(e map[string]any, restaurant *Restaurant) ([]string, *codedError) {
+	_, hasSingle := e["table_id"]
+	_, hasMulti := e["table_ids"]
+	if hasSingle && hasMulti {
+		return nil, invalidErr("seeded table_id and table_ids are mutually exclusive")
+	}
+	if hasMulti {
+		raw, ok := e["table_ids"].([]any)
+		if !ok {
+			return nil, malformedErr()
+		}
+		if len(raw) == 0 || len(raw) > 2 {
+			return nil, invalidErr("seeded table_ids must hold one or two tables")
+		}
+		ids := make([]string, 0, len(raw))
+		for _, item := range raw {
+			id, ok := item.(string)
+			if !ok {
+				return nil, malformedErr()
+			}
+			ids = append(ids, id)
+		}
+		if len(ids) == 2 && ids[0] == ids[1] {
+			return nil, invalidErr("duplicate seeded table id")
+		}
+		if len(ids) == 1 {
+			if !tableKnown(restaurant, ids[0]) {
+				return nil, invalidErr("seeded reservation table is unknown")
+			}
+			return ids, nil
+		}
+		if ordered := canonicalPairOrder(restaurant, ids[0], ids[1]); ordered != nil {
+			return ordered, nil
+		}
+		return nil, invalidErr("seeded tables cannot be combined")
+	}
+	tableID, present, wrongType := fieldString(e, "table_id")
+	if wrongType {
+		return nil, malformedErr()
+	}
+	if !present {
+		return nil, invalidErr("seeded reservation table_id is required")
+	}
+	if !tableKnown(restaurant, tableID) {
+		return nil, invalidErr("seeded reservation table is unknown")
+	}
+	return []string{tableID}, nil
 }

@@ -212,11 +212,21 @@ func (s *Service) GetRestaurant(id string) Result {
 		"cancellation_cutoff_minutes":  r.CancellationCutoffMinutes,
 		"opening_hours":                hours,
 		"tables":                       tables,
+		"combinable":                   combinableView(r.Combinable),
 	})
 }
 
+// combinableView renders declared pairs in declared order. Absent pairs
+// render as an empty array (never null) for UI consumption.
+func combinableView(pairs [][]string) []any {
+	out := make([]any, 0, len(pairs))
+	for _, p := range pairs {
+		out = append(out, []any{p[0], p[1]})
+	}
+	return out
+}
+
 // isPageRoute reports the browser screen routes served with index.html once
-// the web build exists.
 func isPageRoute(path string) bool {
 	switch path {
 	case "/", "/signup", "/login", "/lookup":
