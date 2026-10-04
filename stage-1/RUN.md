@@ -1,9 +1,8 @@
 # Tablekeeper — stage 1 service
 
 Single-container HTTP reservation service: search availability, book/amend/cancel
-tables, atomic multi-booking moves, plus a static web build served by the same Go
-service. Stage 1 exposes the HTTP API only as required behavior; the bundled UI is
-the visual foundation and its live flows land separately.
+tables, and change several bookings together atomically. The same Go service
+serves the API and the static web build (`web/dist`, built with Node 26).
 
 ## Run with Docker (no manual setup)
 
@@ -21,40 +20,46 @@ docker run --rm -e PORT=9011 -p 9011:9011 tablekeeper:stage-1
 curl localhost:9011/health
 ```
 
-No volumes, no environment beyond `PORT` (and optional `WEB_DIR`), no outbound
-network at run time. State is ephemeral: restarts and `POST /_test/reset` replace
-everything. The image is built in stages — Node 26 (`npm ci` + `npm run build`
-with the locked `package-lock.json`) for `web/dist`, Go 1.27 for the static
-service binary — and the runtime carries only the binary, zoneinfo, `web/dist`
-and a tiny `/app/probe` HTTP client used for offline checks.
+No volumes, no environment beyond `PORT` (and optional `WEB_DIR`, default
+`web/dist`, `/app/web/dist` in the image), no outbound network at run time.
+State is ephemeral: restarts and `POST /_test/reset` replace everything. The
+image is built in stages — Node 26 (`npm ci` + `npm run build` with the locked
+`package-lock.json`) for `web/dist`, Go 1.27 for the static service binary —
+and the runtime carries only the binary, zoneinfo, `web/dist` and a tiny
+`/app/probe` HTTP client used for offline checks.
 
 ## Run from source
 
-Requires Go 1.27+ and Node >=26 <27.
+Requires Go 1.27+ and Node >=26 <27. Build the web bundle first so the served
+UI works as well as the API, then start Go:
 
 ```sh
-cd stage-1
+cd stage-1/web
+npm ci && npm run check && npm test && npm run build
+cd ..
 go test ./...
 go build -o tablekeeper ./cmd/tablekeeper
 PORT=8080 ./tablekeeper
 ```
 
-Web checks (unchanged foundation; live flows evolve separately):
-
-```sh
-cd web
-npm ci && npm run check && npm test && npm run build
-```
+An empty startup needs no fixture: the service starts with empty state and
+`POST /_test/reset` loads restaurants, tables, users and seeded bookings (see
+`## Test control`). There are no external runtime dependencies.
 
 ## API overview
 
-- JSON everywhere: requests and responses are `application/json; charset=utf-8`.
-  Unknown body fields and query parameters are ignored, never errors.
+The `application/json; charset=utf-8` convention applies to the API. Page
+routes and bundled assets below are HTML/assets, not JSON.
+
 - Errors share one envelope: `{"error": {"code": "...", "message": "..."}}`
   with the specified HTTP status and stable `code` (no string matching needed).
-- Public browsing needs no token: `GET /restaurants`, `GET /restaurants/{id}`,
-  `GET /availability`, plus `/health`, `/_test/reset` and `/auth/*`. Diners
-  browse before signing in; everything else needs `Authorization: Bearer <token>`.
+  Unknown body fields and query parameters are ignored, never errors.
+- Public endpoints needing no bearer token: `GET /health`,
+  `POST /_test/reset`, `GET /_test/export`, `POST /_test/import`,
+  `POST /auth/signup`, `POST /auth/login`, `GET /restaurants`,
+  `GET /restaurants/{id}`, `GET /availability`. The page routes `/`, `/signup`,
+  `/login`, `/lookup` and local bundled assets are likewise public (HTML/JS/CSS).
+  Everything else needs `Authorization: Bearer <token>`.
 - Auth: `POST /auth/signup` (409 `email_taken`, short passwords and bad emails
   are 422) and `POST /auth/login` (401 on wrong credentials). Tokens never
   expire; accounts hold many concurrent tokens. Passwords are stored hashed
@@ -76,6 +81,20 @@ npm ci && npm run check && npm test && npm run build
   `POST /_test/import` (204 replacement, 422 without mutation). Exports are
   opaque and private: they contain password hashes and bearer tokens, so keep
   them under `evidence/`, never committed.
+- Stage 1 schema has no pairs/policies/series/replans: single `table_id`
+  bookings only; combined tables, booking policies, recurring series and
+  seating replan endpoints arrive in later stages.
+
+## Browser routes
+
+The same service serves the UI: `/` (search and availability grid), `/signup`,
+`/login`, and `/lookup` (find a reservation by reference, cancel from its
+detail view). The single-table contract is: sign up or log in, search by
+restaurant/date/party size, pick an available grid cell, submit the booking
+form, keep the returned confirmation reference; resubmitting the unchanged
+form replays the same reference, and lookup retrieves or cancels the booking.
+Final browser verification belongs to H1/H2 and the reviewer until those items
+land; this guide makes no acceptance claim for live browser flows.
 
 ## Idempotency
 
@@ -99,9 +118,10 @@ with cutoff before field validation; resulting overlaps are 409.
 Source-controlled scripts under `probes/` exercise the packaged image (not
 implementation mirrors): `stage1-api.sh` (full API incl. 50-key concurrency,
 DST, scopes, snapshots), `stage1-html.sh` (page routes, asset types,
-off-origin scan) and `stage1-export.sh` (two-process replacement, receipt and
-token preservation, atomicity). They write no state outside their workdir;
-exports/tokens stay under `evidence/`. Example:
+off-origin scan) and `stage1-export.sh` (two-process replacement from a source
+URL to a distinct destination URL, receipt and token preservation, atomicity).
+They write no state outside their workdir; exports/tokens stay under
+`evidence/`. Example:
 
 ```sh
 docker build -t tablekeeper:s1-p .
