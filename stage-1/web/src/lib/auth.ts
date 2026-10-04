@@ -47,3 +47,16 @@ export function authMessage(error: unknown): string {
   if (error instanceof Error && error.message) return error.message;
   return 'The request could not be completed.';
 }
+
+/** Shown for a finished login credential check. The API code stays `unauthenticated`. */
+export const CREDENTIAL_REFUSAL = 'Email or password is incorrect.';
+
+/**
+ * Login presentation only. A credential refusal uses one sentence for a wrong
+ * password and an unknown email. Other codes, including a lost connection,
+ * keep their own wording. The error object is not changed.
+ */
+export function loginFailureMessage(error: unknown): string {
+  if (error instanceof ApiError && error.code === 'unauthenticated') return CREDENTIAL_REFUSAL;
+  return authMessage(error);
+}
