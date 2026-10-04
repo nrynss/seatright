@@ -1,0 +1,33 @@
+
+> tablekeeper-web@0.0.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.0.3 [39m[90m/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/staging/web[39m
+
+ [32m✓[39m src/test/booking.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 1709[2mms[22m[39m
+   [32m✓[39m live booking [2m(6)[22m
+     [33m[2m✓[22m[39m keeps the sent body when the party input changes and replays that same key[33m 324[2mms[22m[39m
+   [32m✓[39m live accessibility [2m(1)[22m
+     [33m[2m✓[22m[39m passes confirmed, uncertain, refused and lookup presentations[33m 1144[2mms[22m[39m
+ [32m✓[39m src/test/live.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 545[2mms[22m[39m
+ [32m✓[39m src/test/screens.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 529[2mms[22m[39m
+   [32m✓[39m search floor and grid [2m(2)[22m
+     [33m[2m✓[22m[39m mirrors the preview fixture and keeps state ahead of motion[33m 328[2mms[22m[39m
+ [32m✓[39m src/test/foundation.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 57[2mms[22m[39m
+ [32m✓[39m src/test/search.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m src/test/login-copy.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 85[2mms[22m[39m
+ [32m✓[39m src/test/a11y.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 3670[2mms[22m[39m
+   [32m✓[39m accessibility gate [2m(2)[22m
+     [33m[2m✓[22m[39m passes the search presentations in light and dark[33m 2672[2mms[22m[39m
+     [33m[2m✓[22m[39m passes signup, login and lookup in light and dark[33m 996[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+[2m      Tests [22m [1m[32m56 passed[39m[22m[90m (56)[39m
+[2m   Start at [22m 21:40:27
+[2m   Duration [22m 18.98s[2m (environment 42%, tests 38%, transform 14%, import 6%, setup 1%)[22m
+
+[2mEnvironment [22m [33mjsdom was created 7 times[39m[2m · 7.33s total, 42% of tracked time[22m
+[2m            [22m [2mcreate it once per worker with [22m[33mpool: 'vmThreads'[39m[2m (keeps per-file isolation) or [22m[33misolate: false[39m[2m (shares it across files)[22m
+[2m            [22m [2mlearn more: https://vitest.dev/guide/improving-performance#test-environments[22m
+

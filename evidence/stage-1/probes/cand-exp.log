@@ -1,0 +1,24 @@
+PASS src-reset-204
+PASS dst-reset-204
+PASS dst-prior-token
+PASS src-signup-token
+PASS src-write-201
+PASS export-shape
+PASS dst-import-204
+PASS dst-reimport-204
+PASS dst-token-survives
+PASS dst-booking-intact
+PASS dst-hash-login-survives
+PASS dst-receipt-replay-200
+PASS dst-receipt-complete-json
+PASS dst-prior-token-removed
+PASS dst-prior-login-removed
+PASS dst-corrupt-422
+PASS dst-atomic-unchanged
+PASS src-late-write-201
+PASS dst-snapshot-immutable
+PASS dst-reset-clears-204
+PASS dst-reset-clears-token
+PASS src-unaffected-by-dst-reset
+
+RESULT pass=22 fail=0

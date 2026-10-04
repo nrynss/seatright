@@ -1,0 +1,30 @@
+# S1-R2 resource + offline evidence (exact commands and raw outputs)
+# Image built by reviewer from frozen candidate b298700f790c166cf7ce8d98d731c80093ecb9af
+$ docker build -t tablekeeper:s1-r2 .            -> exit 0 (probes/docker-build.log), image 143MB
+$ docker images tablekeeper:s1-r2 --format '{{.Repository}}:{{.Tag}} {{.Size}}'
+tablekeeper:s1-r2 143MB
+
+# Containers (all started 2026-10-04T21:38:47Z, health within ~2s of start)
+$ docker run -d --name tk-r2-a   -e PORT=9051 -p 9051:9051 tablekeeper:s1-r2
+$ docker run -d --name tk-r2-b   -e PORT=9052 -p 9052:9052 tablekeeper:s1-r2
+$ docker run -d --name tk-r2-off --network none -e PORT=9054 tablekeeper:s1-r2
+$ docker run -d --name tk-r2-lim --cpus=2 --memory=2g -e PORT=9053 -p 9053:9053 tablekeeper:s1-r2
+
+# Offline (no network at all): health + page routes served from inside the container
+$ curl -s http://localhost:9051/health ; curl -s http://localhost:9052/health
+{"status":"ok"}{"status":"ok"}
+$ docker exec tk-r2-off /app/probe -url http://localhost:9054/health
+HTTP 200
+Content-Type: application/json; charset=utf-8
+{"status":"ok"}
+
+# Resource-limited run: container tk-r2-lim (--cpus=2 --memory=2g), PORT=9053
+reset: 204
+50 mixed (25 bcrypt signups + 25 availability reads): codes={201: 25, 200: 25} wall=0.82s
+50 concurrent reads: codes=[200] max_latency=19.5ms wall=0.06s
+health after load: 200
+booking under limits: status=201 latency=0.001s
+HTTP 200
+Content-Type: text/html; charset=utf-8
+HTTP 200
+Content-Type: text/html; charset=utf-8

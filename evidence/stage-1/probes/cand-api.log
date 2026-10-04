@@ -1,0 +1,118 @@
+== health ==
+PASS health-200
+PASS health-body
+== repeated reset ==
+PASS reset-204
+PASS reset-empty-204
+PASS reset-restore-204
+== auth + tokens ==
+PASS signup-201
+PASS dup-email-409
+PASS dup-email-code
+PASS short-pw-422
+PASS seed-login-200
+PASS bad-login-401
+PASS bad-login-code
+PASS login-again-200
+PASS tokens-distinct
+== public browsing ==
+PASS list-200
+PASS list-id
+PASS detail-200
+PASS detail-404
+PASS detail-404-code
+PASS authed-list-200
+PASS anon-list-401
+PASS anon-list-code
+== unknown fields/params ignored ==
+PASS unknown-param-200
+== malformed vs validation ==
+PASS malformed-400
+PASS malformed-code
+PASS wrong-type-400
+== idempotency key required ==
+PASS missing-key-400
+PASS missing-key-code
+== create + availability + adjacent ==
+PASS create-201
+PASS create-offset
+PASS overlap-409
+PASS overlap-code
+PASS adjacent-201
+PASS avail-200
+PASS avail-occupied
+PASS avail4-200
+PASS avail4-empty
+PASS closed-200
+PASS closed-empty
+== validation codes ==
+PASS grid-422
+PASS grid-code
+PASS hours-422
+PASS hours-code
+PASS capacity-422
+PASS capacity-code
+PASS party0-422
+PASS unknown-rest-404
+== DST spring/fall ==
+PASS dst-reset-204
+PASS dst-signup-201
+PASS skipped-422
+PASS skipped-code
+PASS spring-avail-200
+PASS spring-skip-absent
+PASS fall-avail-200
+PASS fall-once
+PASS fall-book-201
+PASS fall-absolute-end
+PASS fixture-restore-204
+PASS relogin-201
+PASS recreate-a-201
+PASS recreate-adj-201
+== list/lookup/cancel/PATCH ==
+PASS replay-200
+PASS replay-same-ref
+PASS lookup-200
+PASS lookup-anon-401
+PASS cancel-200
+PASS cancel-twice-200
+PASS patch-200
+PASS patch-party
+PASS replay-after-patch-200
+PASS replay-immutable
+PASS mk-a-201
+PASS mk-b-201
+PASS swap-201
+PASS swap-two
+PASS swap-bad-422
+PASS rollback-check-200
+PASS rollback-kept
+PASS precedence-422
+PASS batch-replay-200
+== idempotency scopes/identity ==
+PASS signup-b-201
+PASS cross-user-201
+PASS cross-path-422
+PASS canon-first-201
+PASS canon-replay-200
+PASS reuse-409
+PASS reuse-code
+PASS fail-first-422
+PASS fail-reuse-201
+== 50 identical concurrent keys: exactly one 201 ==
+PASS conc-once
+PASS conc-one-ref
+== numeric UTC export/import + seeded snapshots ==
+PASS utc-reset-204
+PASS numeric-utc
+PASS utc-reimport-204
+PASS null-reset-204
+PASS null-reimport-204
+PASS over-reset-204
+PASS over-reimport-204
+PASS fixture-final-204
+== unknown API path is JSON 404 ==
+PASS unknown-404
+PASS unknown-404-code
+
+RESULT pass=101 fail=0

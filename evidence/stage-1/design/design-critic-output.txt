@@ -1,0 +1,137 @@
+# Multimodal Design Review: Tablekeeper UI (Stage 1 / R2)
+
+**Evaluator:** Multimodal Design Critic  
+**Viewports Evaluated:** 375px (Mobile) and 1280px (Desktop)  
+**Themes Evaluated:** Light and Dark Modes  
+**Screenshot Source Directory:** [`runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/)  
+**Persisted Report:** [`design-critic-output.txt`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/design-critic-output.txt)
+
+---
+
+## Concrete Visual & Usability Defects
+
+### 1. Contradictory Navigation State & Severe Mobile Header Stacking
+* **Screenshots:**
+  * **Desktop (1280px):** [`1280-light-signedup-home.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-signedup-home.png), [`1280-light-search-race-B.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-search-race-B.png), [`w1280-dark-home-signedin.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-home-signedin.png), [`1280-light-booking-form.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-booking-form.png), [`1280-light-confirmation.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-confirmation.png), [`w1280-dark-booking-form.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-booking-form.png), [`w1280-dark-confirmation.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-confirmation.png)
+  * **Mobile (375px):** [`w375-light-search-results.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-light-search-results.png), [`w375-dark-search-results.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-search-results.png), [`375-dark-home-signedin.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-dark-home-signedin.png), [`375-dark-lookup-signedin.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-dark-lookup-signedin.png), [`375-light-login-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-login-error.png), [`w375-dark-login-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-login-error.png), [`w375-dark-signup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-signup-error.png), [`375-light-lookup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-lookup-error.png), [`w375-dark-lookup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-lookup-error.png), [`375-light-lookup-cutoff-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-lookup-cutoff-refused.png), [`w375-dark-lookup-cutoff-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-lookup-cutoff-refused.png), [`375-light-lookup-cancelled.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-lookup-cancelled.png), [`w375-dark-lookup-cancelled.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-lookup-cancelled.png), [`375-light-booking-409.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-booking-409.png), [`375-light-booking-uncertain.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-booking-uncertain.png), [`375-light-booking-recovered.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-booking-recovered.png)
+* **Problem:**
+  1. **Contradictory Authentication State:** When signed in as a diner (e.g. `Ada` or `Bob` with a `Log out` button), the primary navigation bar continues to display `Sign in` and `Create account` links alongside the session indicator. Presenting calls to sign in or create an account to an already logged-in user is contradictory and cluttered.
+  2. **Severe Mobile Header Stacking:** On 375px screens, all links (`Search`, `Look up`, `Sign in`, `Create account`) and utility controls (`Light | Dark | System`, user name, and `Log out`) are rendered in a wrapping flex container without a responsive menu. This causes the topbar to stack across **4 to 5 vertical lines** (with `Create account` wrapping as an orphaned text link below `Search`), consuming more than a third of the mobile screen above the fold.
+* **Concrete Fix:** In [`Shell.svelte`](file:///home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-1/web/src/lib/components/Shell.svelte#L18-L57), filter out `Sign in` and `Create account` when `user !== null`. On viewport widths under 640px, collapse navigation into a hamburger drawer or compact tab bar and nest the theme toggle.
+
+---
+
+### 2. Availability Grid Column Header Text Splitting & Misalignment
+* **Screenshot:** [`1280-light-search-race-B.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-search-race-B.png)
+* **Problem:** When 9 time slots are present (expanding to 22:00), column widths compress to ~38px. The header label `"10:00 PM"` wraps into three disjointed lines: `"10:0"`, `"0"`, and `"PM"`, splitting the numeric time between digits. Furthermore, this 3-line wrap pushes the bottom 24-hour time label (`22:00`) down by an extra line, causing it to drop out of horizontal baseline alignment with the other column labels (`18:00`, `18:30`, `19:00`, etc.).
+* **Concrete Fix:** In [`app.css`](file:///home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-1/web/src/app.css#L421-L440), add `white-space: nowrap;` to `.colhead > div` and specify a minimum column width (`min-width: 44px;`) with horizontal scroll (`overflow-x: auto;`) on `.matrix-wrap`.
+
+---
+
+### 3. Grid Cell Status Word Overflow and Clipping ("Taken" and "Held")
+* **Screenshots:** [`w1280-light-zero-available.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-light-zero-available.png), [`1280-light-booking-form.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-booking-form.png), [`1280-light-confirmation.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-confirmation.png), [`1280-light-booking-upgrade-recovered.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-booking-upgrade-recovered.png)
+* **Problem:** In desktop 1280px views, grid cells have fixed padding (`padding: 0.55rem 0.35rem`) and bold typography (`0.95rem`). When all slots are taken ([`w1280-light-zero-available.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-light-zero-available.png)), the word `"Taken"` overflows the pill boundaries and is clipped on the right in every cell (rendering as `"Take"` or `"Takeı"`). Similarly, in [`1280-light-booking-form.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-booking-form.png) and [`1280-light-confirmation.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-confirmation.png), the active cell label `"Held"` is squeezed tightly against the right border.
+* **Concrete Fix:** In [`app.css`](file:///home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-1/web/src/app.css#L455-L483), decrease `.cell` padding to `padding: 0.5rem 0.2rem;` and reduce `.state-word` font size to `0.8rem` (or `clamp(0.72rem, 1vw, 0.82rem)`).
+
+---
+
+### 4. Overlapping & Clipped Table Selection Pills Under Floor Plan
+* **Screenshots:** [`w375-dark-booking-form.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-booking-form.png), [`w1280-dark-booking-form.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-booking-form.png)
+* **Problem:** The table selection chips (`.place-cards`) under the SVG floor plan animate using `animate:flip` and dynamically reorder to place the clicked table first.
+  * In [`w375-dark-booking-form.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-booking-form.png), `"Table 1 · 2 seats"` physically collides with and renders on top of the adjacent peach pill, leaving only the trailing letters `"eats"` peeking out.
+  * In [`w1280-dark-booking-form.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-booking-form.png), the peach pill is clipped mid-slide, displaying `"Table "` directly abutting the dark pill.
+* **Concrete Fix:** In [`FloorPlan.svelte`](file:///home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-1/web/src/lib/components/FloorPlan.svelte#L45-L50), maintain stable ordering for the table list (do not reorder the array on selection). Remove `animate:flip` from `.place-cards li` to eliminate transform collision artifacts.
+
+---
+
+### 5. Critical Color Contrast Failures in Dark Mode Error Banners (WCAG AA Non-Compliance)
+* **Screenshots:** [`w1280-dark-signedout-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-signedout-refused.png), [`w375-dark-signedout-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-signedout-refused.png), [`w1280-dark-login-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-login-error.png), [`w375-dark-login-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-login-error.png), [`w1280-dark-signup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-signup-error.png), [`w375-dark-signup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-signup-error.png), [`w1280-dark-booking-409.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-booking-409.png), [`w375-dark-booking-409.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-booking-409.png), [`w1280-dark-lookup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-lookup-error.png), [`w375-dark-lookup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-lookup-error.png), [`w1280-dark-lookup-cutoff-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-lookup-cutoff-refused.png), [`w375-dark-lookup-cutoff-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-lookup-cutoff-refused.png), [`w1280-dark-booking-uncertain.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-booking-uncertain.png), [`w375-dark-booking-uncertain.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-booking-uncertain.png)
+* **Problem:**
+  * Across all dark mode error banners (`.state-refused`, `.auth-error`, 409 error, and lookup errors), the text color `var(--stop)` is a muted dark red set against a dark maroon card background (`#241515`). The contrast ratio is estimated between 1.8:1 and 2.5:1, failing WCAG AA (minimum 4.5:1). Texts such as `"password must be at least 8 characters"`, `"Email or password is incorrect."`, and `"the table is taken for that interval"` are virtually illegible.
+  * In [`w1280-dark-signedout-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-signedout-refused.png), the inline `"Sign in"` anchor link inherits default unstyled dark link blue on dark maroon, producing an unreadable link.
+  * In [`w1280-dark-booking-uncertain.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-booking-uncertain.png), the muted gold/brown text on the dark banner similarly suffers from low contrast.
+* **Concrete Fix:** In [`theme.css`](file:///home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-1/web/src/theme.css), update dark mode token values:
+  * Set `--stop` to a high-luminance pastel red (`#ff9e9e` or `#ffb3b3`).
+  * Add `.state-refused a { color: var(--on-accent); text-decoration: underline; }`.
+  * Increase the brightness of text on the warning/uncertainty banner.
+
+---
+
+### 6. Inconsistent & Raw Lowercase Error Copy
+* **Screenshots:** [`375-light-booking-409.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-booking-409.png), [`w1280-dark-booking-409.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-booking-409.png), [`w375-dark-booking-409.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-booking-409.png), [`1280-light-signup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-signup-error.png), [`w1280-dark-signup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-signup-error.png), [`375-light-lookup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-lookup-error.png), [`w1280-dark-lookup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-lookup-error.png), [`375-light-lookup-cutoff-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-lookup-cutoff-refused.png), [`w1280-dark-lookup-cutoff-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-lookup-cutoff-refused.png)
+* **Problem:** There is an inconsistent presentation between carefully curated copy and raw API strings:
+  * Login displays proper sentence case with a period: `"Email or password is incorrect."`
+  * Signup displays raw uncapitalized text: `"password must be at least 8 characters"`
+  * Booking 409 displays raw uncapitalized text: `"the table is taken for that interval"`
+  * Lookup displays raw uncapitalized fragments: `"unknown reservation"` and `"the cancellation cutoff has passed"`
+* **Concrete Fix:** Sanitize backend errors through a presentation utility that capitalizes the initial character and appends punctuation, or map error response codes to polished UI copy (e.g. `"The selected table is no longer available for this time interval."`, `"No reservation was found for that reference."`).
+
+---
+
+### 7. Broken Hierarchy: Active Booking Form Remains Displayed on Confirmation & Recovery Screens
+* **Screenshots:** [`1280-light-confirmation.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-confirmation.png), [`w1280-dark-confirmation.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-confirmation.png), [`w375-dark-confirmation.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-confirmation.png), [`375-light-booking-recovered.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-booking-recovered.png), [`1280-light-booking-upgrade-recovered.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-booking-upgrade-recovered.png)
+* **Problem:** Once a booking succeeds and generates a confirmation reference (e.g. `Y746N67V`), the complete interactive "Hold this table" card (with party size input and an active, clickable `"Request this table"` button) remains rendered *above* the green "Your table is confirmed" card. In the availability grid above it, the slot remains labeled `"Held"` rather than `"Confirmed"` or `"Booked"`. Presenting an active submission button above a confirmation reference suggests the transaction was incomplete or invites accidental resubmission.
+* **Concrete Fix:** In [`LiveSearch.svelte`](file:///home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-1/web/src/lib/components/LiveSearch.svelte), once a confirmation reference is present, swap the "Hold this table" input form for the confirmation card, or mark the form fields read-only and disable the button with the label `"Confirmed"`.
+
+---
+
+### 8. Inconsistent Error Banner Placement (Top vs. Bottom of Containers)
+* **Screenshots:** [`375-light-login-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-login-error.png) vs. [`375-light-booking-409.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-booking-409.png), [`375-light-lookup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-lookup-error.png), [`w1280-light-signedout-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-light-signedout-refused.png)
+* **Problem:** Error banners follow contradictory spatial placement across pages:
+  * On Login and Signup, the error banner is rendered *inside* the form card, directly above the inputs.
+  * On Search signed-out refusal, it is inserted between the search form and the floor plan.
+  * On Booking 409 conflict and Lookup error, the alert card is rendered in an orphaned card *below* the form and submission button at the very bottom of the page, where it easily falls below the fold on mobile viewports.
+* **Concrete Fix:** Standardize error placement: anchor all form-related alerts directly inside or immediately above the corresponding form inputs.
+
+---
+
+### 9. Meaningless Empty SVG Box in "No seating times" Empty State
+* **Screenshots:** [`w1280-light-no-slots.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-light-no-slots.png), [`w1280-dark-no-slots.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-no-slots.png), [`w375-light-no-slots.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-light-no-slots.png), [`w375-dark-no-slots.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-no-slots.png)
+* **Problem:** In the "No seating times" card, an empty rounded rectangle (`<rect class="table-top" ... />`) is rendered above the heading with no chairs, plates, calendar icon, or text inside. It appears visually broken, resembling an unstyled skeleton loader or a missing asset rather than an intentional graphic.
+* **Concrete Fix:** In [`LiveSearch.svelte`](file:///home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-1/web/src/lib/components/LiveSearch.svelte#L402-L404), either enrich `<svg class="empty-drawing">` with identifiable iconography (e.g. an empty plate icon or a calendar with a diagonal slash) or remove the SVG element entirely and let clean typography carry the empty state.
+
+---
+
+### 10. Undifferentiated Plaintext Reservation Status in Lookup Results
+* **Screenshots:** [`375-light-lookup-cutoff-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-lookup-cutoff-refused.png), [`375-light-lookup-cancelled.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-lookup-cancelled.png), [`w1280-dark-lookup-cancelled.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-lookup-cancelled.png)
+* **Problem:** Reservation status is output as unadorned lowercase text: `"confirmed"` or `"cancelled"`. Both statuses share identical plain-text styling with no badge, icon, or color differentiation. A user skimming the card cannot readily distinguish an active confirmed reservation from a cancelled one.
+* **Concrete Fix:** Wrap the status in a badge component with semantic styling: e.g. `<span class="badge badge-confirmed">Confirmed</span>` (green tint) and `<span class="badge badge-cancelled">Cancelled</span>` (neutral gray or muted strike-through).
+
+---
+
+### 11. Contradictory Action State on Cutoff-Refused Reservation
+* **Screenshots:** [`375-light-lookup-cutoff-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/375-light-lookup-cutoff-refused.png), [`w1280-dark-lookup-cutoff-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-lookup-cutoff-refused.png), [`w375-dark-lookup-cutoff-refused.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-lookup-cutoff-refused.png)
+* **Problem:** Even after the system displays the error banner `"the cancellation cutoff has passed"`, the `"Cancel reservation"` button remains active, outlined, and clickable directly below. The interface simultaneously asserts that cancellation is forbidden while providing an active trigger to perform it.
+* **Concrete Fix:** When a cutoff refusal error occurs, disable the `"Cancel reservation"` button (`disabled`, `opacity: 0.5`, `cursor: not-allowed`) or replace it with a helper message instructing the diner to contact the venue directly.
+
+---
+
+### 12. Desktop Search Results Vertical Imbalance / Large Blank Void
+* **Screenshots:** [`w1280-light-search-results.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-light-search-results.png), [`w1280-dark-search-results.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-search-results.png)
+* **Problem:** On 1280px viewports, the two-column grid places the SVG floor plan on the left (~420px height) and the availability matrix on the right (~200px height). Because cards align to top, a large blank gap sits beneath the availability grid.
+* **Concrete Fix:** In [`app.css`](file:///home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-1/web/src/app.css#L310-L330), set `.floor-and-grid` to allow the right column container to stretch or fill the vertical space cleanly.
+
+---
+
+### 13. Unconventional Signup Form Field Order
+* **Screenshots:** [`1280-light-signup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/1280-light-signup-error.png), [`w1280-dark-signup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w1280-dark-signup-error.png), [`w375-dark-signup-error.png`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S1-R2/design/w375-dark-signup-error.png)
+* **Problem:** The input field order in the account creation card is:
+  1. `Email`
+  2. `Password`
+  3. `Name`  
+  Placing `Name` after `Password` violates universal sign-up form conventions, where identity fields precede credential fields.
+* **Concrete Fix:** In [`SignupScreen.svelte`](file:///home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-1/web/src/lib/components/SignupScreen.svelte), reorder inputs to `Name`, `Email`, `Password`.
+
+---
+
+## Verdict
+
+### **Verdict: NOT PRESENTATION-READY**
+
+**Summary Rationale:**  
+While the retro serif typography and warm restaurant branding provide strong visual foundations, the candidate contains multiple blocking presentation issues:
+1. **Critical dark mode contrast failures** violating WCAG AA (unreadable error copy and links).
+2. **Severely broken mobile topbar layout** spanning 4–5 wrapped rows with contradictory authentication links shown to logged-in users.
+3. **Layout and data clipping** in the availability grid (split column times and truncated `"Taken"` pills).
+4. **Visual collision & overlap** of table pills during floor plan transitions.
+5. **Confusing confirmation hierarchy** leaving an active `"Request this table"` form displayed over completed reservations.
