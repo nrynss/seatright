@@ -119,6 +119,17 @@ describe('floor geometry', () => {
       expect(scene.tables).toHaveLength(count);
       expect(roomCollision(scene), `${count} tables`).toBeNull();
     }
+    const many = Array.from({ length: 6 }, (_, index) => ({
+      id: `t_${index + 1}`,
+      label: `Window ${index + 1}`,
+      capacity: 4,
+    }));
+    const wide = layoutRoom(many);
+    const stacked = layoutRoom(many, { maxColumns: 1 });
+    expect(stacked.tables).toHaveLength(6);
+    expect(roomCollision(stacked)).toBeNull();
+    expect(stacked.width).toBeLessThan(wide.width);
+    expect(stacked.height).toBeGreaterThan(wide.height);
   });
 });
 
@@ -210,7 +221,36 @@ describe('Chaaya contracts', () => {
     expect(theme).toContain('prefers-color-scheme: dark');
     expect(theme).toContain('data-theme="dark"');
     expect(theme).toContain('data-theme="light"');
+    expect(theme).toContain('"Source Serif 4"');
+    expect(theme).toContain('"Source Code Pro"');
     expect(() => contrastGate(theme, contrastPairs)).not.toThrow();
+  });
+
+  it('ships local serif and numeric faces', () => {
+    const css = readFileSync(join(webRoot, 'src/fonts.css'), 'utf8');
+    expect(css).toContain('@font-face');
+    expect(css).toContain('/fonts/source-serif-4-latin-400-normal.woff2');
+    expect(css).toContain('/fonts/source-serif-4-latin-600-normal.woff2');
+    expect(css).toContain('/fonts/source-serif-4-latin-700-normal.woff2');
+    expect(css).toContain('/fonts/source-code-pro-latin-400-normal.woff2');
+    expect(css).toContain('/fonts/source-code-pro-latin-500-normal.woff2');
+    expect(css).not.toMatch(/https?:\/\//);
+    const app = readFileSync(join(webRoot, 'src/App.svelte'), 'utf8');
+    expect(app).toContain("import './fonts.css'");
+    expect(app).not.toContain('previewFixture');
+    expect(app).not.toContain('readDemo');
+    expect(app).not.toContain('SearchScreen');
+    for (const file of [
+      'source-serif-4-latin-400-normal.woff2',
+      'source-serif-4-latin-600-normal.woff2',
+      'source-serif-4-latin-700-normal.woff2',
+      'source-code-pro-latin-400-normal.woff2',
+      'source-code-pro-latin-500-normal.woff2',
+      'source-serif-4-OFL.txt',
+      'source-code-pro-OFL.txt',
+    ]) {
+      expect(statSync(join(webRoot, 'public/fonts', file)).size).toBeGreaterThan(100);
+    }
   });
 
   it('paints the stored theme before first paint and ships no remote assets in source', () => {

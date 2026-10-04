@@ -23,8 +23,8 @@
   --stop-soft: #F6D6D2;
   --radius-control: 12px;
   --radius-panel: 20px;
-  --font-ui: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, "Times New Roman", serif;
-  --font-numeric: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  --font-ui: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-numeric: "Source Code Pro", ui-monospace, Menlo, Consolas, monospace;
   --focus-ring: 2px solid var(--accent);
 }
 
@@ -79,8 +79,8 @@
   --stop-soft: #4A221E;
   --radius-control: 12px;
   --radius-panel: 20px;
-  --font-ui: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, "Times New Roman", serif;
-  --font-numeric: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  --font-ui: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-numeric: "Source Code Pro", ui-monospace, Menlo, Consolas, monospace;
   --focus-ring: 2px solid var(--accent);
 }
 
@@ -106,7 +106,7 @@
   --stop-soft: #F6D6D2;
   --radius-control: 12px;
   --radius-panel: 20px;
-  --font-ui: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, "Times New Roman", serif;
-  --font-numeric: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  --font-ui: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-numeric: "Source Code Pro", ui-monospace, Menlo, Consolas, monospace;
   --focus-ring: 2px solid var(--accent);
 }

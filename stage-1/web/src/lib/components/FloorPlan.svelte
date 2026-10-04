@@ -21,7 +21,27 @@
   } = $props();
 
   const clock = $derived(formatClock(time));
-  const scene = $derived(layoutRoom(tables));
+  const narrowQuery = '(max-width: 700px)';
+
+  function readNarrow(): boolean {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+    return window.matchMedia(narrowQuery).matches;
+  }
+
+  let narrow = $state(readNarrow());
+
+  $effect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const query = window.matchMedia(narrowQuery);
+    const sync = () => {
+      narrow = query.matches;
+    };
+    sync();
+    query.addEventListener('change', sync);
+    return () => query.removeEventListener('change', sync);
+  });
+
+  const scene = $derived(layoutRoom(tables, { maxColumns: narrow ? 1 : 0 }));
   const ordered = $derived.by(() => {
     if (!selectedId) return [...tables];
     const picked = tables.filter((table) => table.id === selectedId);
