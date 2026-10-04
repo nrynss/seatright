@@ -38,9 +38,8 @@ func errorBody(code, msg string) any {
 	return map[string]any{"error": map[string]any{"code": code, "message": msg}}
 }
 
-// Handler returns the full HTTP router. POST /reservations and
-// POST /reservation-moves stay marked stubs until S1-D2 binds them to the
-// receipt wrapper; every other specified route is live.
+// Handler returns the full HTTP router. All specified stage-1 routes are
+// live, including the idempotent creation and move batches.
 func (s *Service) Handler() http.Handler {
 	return http.HandlerFunc(s.serve)
 }
@@ -70,15 +69,11 @@ func (s *Service) serve(w http.ResponseWriter, r *http.Request) {
 	case method == http.MethodGet && path == "/reservations":
 		res = s.ListReservations(bearerTokenString(r))
 	case method == http.MethodPost && path == "/reservations":
-		res = s.requireAuth(r, func() Result {
-			return notFound("reservation creation binds to idempotency in S1-D2")
-		})
+		res = s.CreateReservation(bearerTokenString(r), r.Header.Get("Idempotency-Key"), readBody(r))
 	case strings.HasPrefix(path, "/reservations/"):
 		res = s.reservationRoute(r, path)
 	case path == "/reservation-moves" && method == http.MethodPost:
-		res = s.requireAuth(r, func() Result {
-			return notFound("reservation moves are not implemented in this foundation")
-		})
+		res = s.MoveReservations(bearerTokenString(r), r.Header.Get("Idempotency-Key"), readBody(r))
 	case method == http.MethodGet && isPageRoute(path):
 		s.serveStatic(w, r)
 		return
