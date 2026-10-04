@@ -343,7 +343,7 @@ select {
 .plan-name {
   fill: var(--text);
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 650;
 }
 
@@ -409,6 +409,7 @@ select {
   grid-template-columns: minmax(4.25rem, 0.8fr) repeat(var(--cols), minmax(0, 1fr));
   gap: 0.5rem;
   width: 100%;
+  max-width: 100%;
 }
 
 .colhead,
@@ -423,10 +424,21 @@ select {
 }
 
 .colhead .raw,
-.numeric {
+.numeric,
+.when {
   font-family: var(--font-numeric);
+  font-weight: 500;
   color: var(--dim);
   font-size: 0.82rem;
+}
+
+.colhead .raw,
+.when .raw {
+  white-space: nowrap;
+}
+
+.when {
+  display: none;
 }
 
 .rowhead {
@@ -498,6 +510,11 @@ select {
 .summary {
   color: var(--text);
   font-size: 1.15rem;
+}
+
+.booking-note {
+  color: var(--dim);
+  margin: 0;
 }
 
 .state {
@@ -621,6 +638,40 @@ select {
 @media (max-width: 799px) {
   .confirmed-layout {
     grid-template-columns: 1fr;
+  }
+
+  .matrix {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .corner,
+  .colhead {
+    display: none;
+  }
+
+  .rowhead {
+    margin-top: 0.35rem;
+  }
+
+  .cell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 52px;
+    text-align: left;
+  }
+
+  .when {
+    display: grid;
+    color: inherit;
+  }
+
+  .state-word {
+    font-size: 1rem;
   }
 }
 

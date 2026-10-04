@@ -139,11 +139,17 @@ function overlaps(a: RoomRect, b: RoomRect): boolean {
   return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 }
 
-/** Place every table in one dining room. Counts other than two use the same aisle, walls and gaps. */
-export function layoutRoom(tables: readonly { id: string; label: string; capacity: number }[]): RoomScene {
+/** Place every table in one dining room. Counts other than two use the same aisle, walls and gaps.
+ * `maxColumns` above zero caps the grid so names stay readable on a narrow screen. */
+export function layoutRoom(
+  tables: readonly { id: string; label: string; capacity: number }[],
+  options?: { maxColumns?: number },
+): RoomScene {
   const items = tables.map((table) => ({ ...table, drawing: drawTable(table.capacity) }));
   const count = items.length;
-  const cols = count <= 1 ? 1 : count <= 4 ? Math.min(count, 2) : Math.ceil(Math.sqrt(count));
+  let cols = count <= 1 ? 1 : count <= 4 ? Math.min(count, 2) : Math.ceil(Math.sqrt(count));
+  const cap = options?.maxColumns ?? 0;
+  if (cap > 0) cols = Math.max(1, Math.min(cols, cap));
   const rows = Math.max(1, Math.ceil(count / Math.max(cols, 1)));
   const gapX = 44;
   const gapY = 40;

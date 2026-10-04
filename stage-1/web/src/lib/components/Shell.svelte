@@ -6,10 +6,12 @@
   let {
     path = '/',
     user = null,
+    onLogout = null,
     children,
   }: {
     path?: string;
     user?: string | null;
+    onLogout?: (() => void) | null;
     children?: Snippet;
   } = $props();
 
@@ -47,9 +49,9 @@
       {/each}
     </nav>
     <div class="top-tools">
-      {#if user}
+      {#if user !== null}
         <p class="current-user" data-testid="current-user">{user}</p>
-        <button type="button" class="btn" data-testid="logout-button">Log out</button>
+        <button type="button" class="btn" data-testid="logout-button" onclick={() => onLogout?.()}>Log out</button>
       {/if}
       <ThemeControl />
     </div>

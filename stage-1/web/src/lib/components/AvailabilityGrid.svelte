@@ -51,6 +51,10 @@
           in:fly={{ y: 8, opacity: 1, duration: motionDuration(240), delay: staggerDelay(row * slots.length + column) }}
           onclick={() => onSelect(table.id, slot.time, available)}
         >
+          <span class="when">
+            <span>{formatClock(slot.time)}</span>
+            <span class="raw">{slot.time}</span>
+          </span>
           <span class="state-word">{short}</span>
           <span class="sr-only">Table {table.label} {slot.time}</span>
         </button>
