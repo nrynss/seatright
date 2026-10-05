@@ -410,13 +410,18 @@ directory (`0600` files). Stdout carries names, codes, counts and provenance
 only. Only `OUT_DIR` is written; reset on these disposable services is
 destructive by design.
 
-There is no `stage4-import.sh`: the transfer probe is not implemented or
-integrated. Native stage-4 export/import portability is unavailable in this
-delivery, including current-stage-4 roundtrips — a functional native importer
-blocker, not just a missing script, so adding the script alone would not
-resolve readiness. Do not treat the same-image roundtrip inside
-`stage3-api.sh` as a cross-version upgrade proof; only a multi-process
-transfer run proves migration.
+There is no `stage4-import.sh`: a multi-process transfer probe is not
+implemented or integrated. `POST /_test/import` itself validates the envelope
+(`track`, `format_version: 1`, `state`), normalizes legacy singleton records
+to their canonical table set, and checks stored-record consistency —
+identities, owners, configuration membership, resolvable local times,
+receipt scope and canonical bodies — before atomically replacing state;
+invalid envelopes or states are rejected without mutation, and stored
+receipts are never rewritten, including historical originals and apply
+receipts with their restaurant-revision binding (unchanged assignments keep
+that binding on re-import). Do not treat the same-image roundtrip inside
+`stage3-api.sh` as a cross-version upgrade proof; only a distinct-process
+transfer run with genuine older exports proves migration.
 `stage1-api.sh`, `stage1-html.sh` and `stage1-export.sh` remain for inherited
 single-table, page and export scope; they are not full stage-4 coverage.
 This guide states probe interfaces only and claims no results, hashes or
