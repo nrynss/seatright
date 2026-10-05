@@ -1278,3 +1278,7 @@ STAGE4_API_SABOTAGE=1 sh probes/stage4-api.sh http://127.0.0.1:9182 <freshsabota
 Keep shared64 in_progress. ONE foreground DONE/BLOCKED report: actualfullbase/onlyowneddiff/sourceSHA/R351–379→namedassertions/retained312baselineactualcount/newracesexactdeltas/allcommands+effectiveexits/absoluteevidence/provenance/failedattempts/ownedcleanup/gaps/measuredelapsed/visibleusage. No acknowledgment-only message, no wait/poll, no stageacceptance. Components: series_engine, replan_engine, closure_store, history_engine, receipt_store.
 
 Complete original task, four specifications verbatim and R1–R382 ledger follow:
+
+
+### S4-P1B actual dispatch
+Full baseb537adf550cac309fe33fab9cbed045fc491efe5 readfromGit AFTER metadata integration; clean fixedOpenCode resetverified. Shared64inprogress, full handoffe5c5b983-5a3d-4717-a953-e6e2dcf0fb21 (one message includes originalTASK/all4verbatim specifications/R382ledger/rolemandate/ownedonlyAPIprobe/contracts/gates/report) delivered. I1fullsamefivefile correction2043fc37 ondirty29d6e55; noreset. G2B2/I2 awaitacceptedvalidator, no stage4freeze yet.
