@@ -1,10 +1,11 @@
 /**
- * S3-G2A live probe.
+ * Live stage-3 diner probe.
  *
  * Talks to the real stage-1 image, the real stage-2 image, and the current
- * stage-3 image. Policy setup is HTTP against the stage-3 process. The two
- * upgrades export the same source that just committed, import those bytes,
- * and retry in the original document. Exits nonzero on failure.
+ * stage-3 image named by the three URL arguments. Policy setup is HTTP
+ * against the stage-3 process. The two upgrades export the same source that
+ * just committed, import those unchanged bytes, and retry in the original
+ * document. Exits nonzero on failure.
  *
  * Does not print tokens, passwords, idempotency keys, request bodies, or
  * export JSON. Reveal checks never call scrollIntoView.
@@ -52,7 +53,7 @@ const videoDir = join(evidence, 'video');
 const privateDir = join(evidence, 'private');
 const logPath = join(evidence, 'probe.log');
 const report = {
-  item: 'S3-G2A',
+  item: evidence.split('/').filter(Boolean).at(-1) || 'S3-G2',
   stage1,
   stage2,
   destination,
@@ -369,6 +370,27 @@ function inspectContainer(name) {
     ports: info.NetworkSettings?.Ports ?? {},
     status: info.State?.Status,
   };
+}
+
+function hostPortOf(url) {
+  const parsed = new URL(url);
+  if (!parsed.port) fail(`${url} has no explicit port`);
+  return parsed.port;
+}
+
+function containerOnHostPort(hostPort) {
+  const ids = execFileSync('docker', ['ps', '-q', '--filter', `publish=${hostPort}`], { encoding: 'utf8' })
+    .trim()
+    .split('\n')
+    .filter(Boolean);
+  if (ids.length !== 1) fail(`publish ${hostPort} matched ${ids.length} containers`);
+  const info = inspectContainer(ids[0]);
+  const published = Object.values(info.ports)
+    .flat()
+    .filter(Boolean)
+    .some((binding) => binding.HostPort === hostPort);
+  if (!published) fail(`${info.name} does not publish ${hostPort}`);
+  return info;
 }
 
 function isApi(pathname) {
@@ -1706,14 +1728,25 @@ async function main() {
   await waitHealth(stage1);
   await waitHealth(stage2);
   await waitHealth(destination);
-  const source1 = inspectContainer('tk-s3-g2-src1');
-  const source2 = inspectContainer('tk-s3-g2-src2');
-  const dest = inspectContainer('tk-s3-g2-dst');
+  const stage1Port = hostPortOf(stage1);
+  const stage2Port = hostPortOf(stage2);
+  const destinationPort = hostPortOf(destination);
+  const source1 = containerOnHostPort(stage1Port);
+  const source2 = containerOnHostPort(stage2Port);
+  const dest = containerOnHostPort(destinationPort);
   report.containers = { source1, source2, dest };
-  await log(`SRC1 image=${source1.image} id=${source1.id} imageId=${source1.imageId} ${source1.portEnv} ${source1.status}`);
-  await log(`SRC2 image=${source2.image} id=${source2.id} imageId=${source2.imageId} ${source2.portEnv} ${source2.status}`);
-  await log(`DST image=${dest.image} id=${dest.id} imageId=${dest.imageId} ${dest.portEnv} ${dest.status}`);
-  await expectCheck('containers', source1.portEnv === 'PORT=9149' && source2.portEnv === 'PORT=9150' && dest.portEnv === 'PORT=9151' && new Set([source1.imageId, source2.imageId, dest.imageId]).size === 3, 'three images on 9149/9150/9151');
+  await log(`SRC1 name=${source1.name} image=${source1.image} id=${source1.id} imageId=${source1.imageId} ${source1.portEnv} ${source1.status}`);
+  await log(`SRC2 name=${source2.name} image=${source2.image} id=${source2.id} imageId=${source2.imageId} ${source2.portEnv} ${source2.status}`);
+  await log(`DST name=${dest.name} image=${dest.image} id=${dest.id} imageId=${dest.imageId} ${dest.portEnv} ${dest.status}`);
+  await expectCheck(
+    'containers',
+    source1.portEnv === `PORT=${stage1Port}` &&
+      source2.portEnv === `PORT=${stage2Port}` &&
+      dest.portEnv === `PORT=${destinationPort}` &&
+      new Set([source1.id, source2.id, dest.id]).size === 3 &&
+      new Set([source1.imageId, source2.imageId, dest.imageId]).size === 3,
+    `three images on ${stage1Port}/${stage2Port}/${destinationPort}`,
+  );
 
   const browser = await chromium.launch({ executablePath: chrome, headless: true });
   try {
