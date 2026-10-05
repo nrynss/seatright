@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import { Spring } from 'svelte/motion';
+  import { PAIR_BADGE_SCALE } from '../floor';
   import { motionDuration, prefersReducedMotion, springOptions } from '../motion';
 
   let {
@@ -33,7 +34,7 @@
   const lift = new Spring(1, springOptions());
 
   $effect(() => {
-    const next = selected ? 1.06 : 1;
+    const next = selected ? PAIR_BADGE_SCALE : 1;
     void lift.set(next, { instant: prefersReducedMotion() || motionDuration(1) === 0 });
   });
 
