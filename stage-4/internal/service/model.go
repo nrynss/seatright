@@ -179,6 +179,8 @@ type State struct {
 	Histories           map[string][]history.Entry `json:"histories"`
 	Series              map[string]Series          `json:"series"`
 	RestaurantRevisions map[string]int             `json:"restaurant_revisions"`
+	Plans               map[string]Replan          `json:"plans"`
+	Closures            map[string][]Closure       `json:"closures"`
 }
 
 // Series is one recurring agreement: ordered members with their scheduled
@@ -200,6 +202,37 @@ type SeriesMember struct {
 	Reference     string `json:"reference"`
 	ScheduledDate string `json:"scheduled_date"`
 	Exception     bool   `json:"exception"`
+}
+
+// Closure is one applied table closure: the closed table plus the half-open
+// interval [from,to) as RFC 3339 instants with explicit offsets.
+type Closure struct {
+	TableID string `json:"table_id"`
+	From    string `json:"from"`
+	To      string `json:"to"`
+}
+
+// ReplanAssignment is one considered booking's seating in a plan: its
+// reference, canonical table set and whether the set changed.
+type ReplanAssignment struct {
+	Reference string   `json:"reference"`
+	TableIDs  []string `json:"table_ids"`
+	Changed   bool     `json:"changed"`
+}
+
+// Replan is one stored seating-repair plan: identity, restaurant, the
+// restaurant revision at preview time, the proposed closure, every considered
+// assignment in reference order, objective values and application state.
+// RestaurantID and Applied are internal (never rendered publicly).
+type Replan struct {
+	ID                 string             `json:"plan_id"`
+	RestaurantID       string             `json:"restaurant_id"`
+	RestaurantRevision int                `json:"restaurant_revision"`
+	Closure            Closure            `json:"closure"`
+	Assignments        []ReplanAssignment `json:"assignments"`
+	MovedCount         int                `json:"moved_count"`
+	UnusedSeats        int                `json:"unused_seats"`
+	Applied            bool               `json:"applied"`
 }
 
 // ReceiptKey scopes an idempotency key to the calling user, method and path,

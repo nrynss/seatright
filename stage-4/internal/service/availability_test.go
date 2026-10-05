@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -600,4 +601,142 @@ func TestFixtureAboveMaxUsable(t *testing.T) {
 	if avail, ok := entry["available"].(bool); !ok || !avail {
 		t.Fatalf("explain = %v", entry)
 	}
+}
+
+func TestClosureAvailabilityService(t *testing.T) {
+	fx := `{"users": [{"id": "u_ada", "email": "ada@example.com", "password": "correct horse", "display_name": "Ada"}],
+  "restaurants": [{"id": "r_anker", "name": "Zum Anker", "timezone": "Europe/Berlin",
+      "slot_minutes": 30, "reservation_duration_minutes": 90, "cancellation_cutoff_minutes": 120,
+      "opening_hours": [{"weekday": "thu", "opens": "18:00", "closes": "23:00"}],
+      "tables": [{"id": "t_1", "label": "1", "capacity": 2},{"id": "t_2", "label": "2", "capacity": 4},{"id": "t_3", "label": "3", "capacity": 4}],
+      "combinable": [["t_1","t_2"],["t_2","t_3"]], "manager_user_ids": ["u_ada"]},
+    {"id": "r_other", "name": "Other", "timezone": "Europe/Berlin",
+      "slot_minutes": 30, "reservation_duration_minutes": 90, "cancellation_cutoff_minutes": 0,
+      "opening_hours": [{"weekday": "thu", "opens": "18:00", "closes": "23:00"}],
+      "tables": [{"id": "t_1", "label": "1", "capacity": 4}], "manager_user_ids": ["u_ada"]}],
+  "reservations": []}`
+	s := New()
+	if res := s.Reset([]byte(fx)); res.Status != 204 {
+		t.Fatalf("reset: %d %v", res.Status, res.Body)
+	}
+	avail := func(restaurant, date string, party int, explain bool) map[string]any {
+		t.Helper()
+		q := map[string][]string{"restaurant_id": {restaurant}, "date": {date}, "party_size": {closureItoa(party)}}
+		if explain {
+			q["explain"] = []string{"true"}
+		}
+		res := s.Availability(q)
+		if res.Status != 200 {
+			t.Fatalf("availability: %d %v", res.Status, res.Body)
+		}
+		m, _ := res.Body.(map[string]any)
+		return m
+	}
+	slotIDs := func(m map[string]any, local string) (ids []string, opts []map[string]any, ex []any) {
+		t.Helper()
+		for _, x := range m["slots"].([]any) {
+			sm, _ := x.(map[string]any)
+			if sm["starts_at_local"] != local {
+				continue
+			}
+			raw, _ := json.Marshal(sm["available_table_ids"])
+			_ = json.Unmarshal(raw, &ids)
+			oraw, _ := json.Marshal(sm["available_options"])
+			_ = json.Unmarshal(oraw, &opts)
+			if e, ok := sm["explain"]; ok {
+				eraw, _ := json.Marshal(e)
+				_ = json.Unmarshal(eraw, &ex)
+			}
+			return ids, opts, ex
+		}
+		t.Fatalf("slot %s missing", local)
+		return nil, nil, nil
+	}
+	contains := func(ids []string, id string) bool {
+		for _, x := range ids {
+			if x == id {
+				return true
+			}
+		}
+		return false
+	}
+	// Baseline: no closures, t_2 free at 19:00 for party 2.
+	ids, opts, _ := slotIDs(avail("r_anker", "2027-06-17", 2, false), "2027-06-17T19:00")
+	if !contains(ids, "t_2") {
+		t.Fatalf("baseline t_2 free: %v", ids)
+	}
+	// Short closure strictly inside the slot interval blocks the member
+	// and every declared pair containing it.
+	s.mu.Lock()
+	s.state.Closures["r_anker"] = []Closure{{TableID: "t_2", From: "2027-06-17T19:15:00+02:00", To: "2027-06-17T19:45:00+02:00"}}
+	s.mu.Unlock()
+	ids, opts, ex := slotIDs(avail("r_anker", "2027-06-17", 2, true), "2027-06-17T19:00")
+	if contains(ids, "t_2") {
+		t.Fatalf("short-inner closure must exclude t_2: %v", ids)
+	}
+	for _, o := range opts {
+		for _, id := range o["table_ids"].([]any) {
+			if id == "t_2" {
+				t.Fatalf("pair member not excluded: %v", opts)
+			}
+		}
+	}
+	found := false
+	for _, e := range ex {
+		em, _ := e.(map[string]any)
+		if em["table_id"] == "t_2" {
+			found = true
+			rm := map[string]bool{}
+			for _, r := range em["rules"].([]any) {
+				rn, _ := r.(map[string]any)
+				rm[rn["rule"].(string)] = rn["holds"].(bool)
+			}
+			if !rm["capacity"] || rm["no_overlap"] || em["available"].(bool) {
+				t.Fatalf("closure explain: %v", em)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("t_2 explanation missing")
+	}
+	// Half-open adjacency: closure ending exactly at slot start is free;
+	// closure starting exactly at slot end is free.
+	s.mu.Lock()
+	s.state.Closures["r_anker"] = []Closure{{TableID: "t_2", From: "2027-06-17T17:00:00+02:00", To: "2027-06-17T19:00:00+02:00"}}
+	s.mu.Unlock()
+	ids, _, _ = slotIDs(avail("r_anker", "2027-06-17", 2, false), "2027-06-17T19:00")
+	if !contains(ids, "t_2") {
+		t.Fatalf("adjacent-before closure must free t_2: %v", ids)
+	}
+	s.mu.Lock()
+	s.state.Closures["r_anker"] = []Closure{{TableID: "t_2", From: "2027-06-17T20:30:00+02:00", To: "2027-06-17T21:00:00+02:00"}}
+	s.mu.Unlock()
+	ids, _, _ = slotIDs(avail("r_anker", "2027-06-17", 2, false), "2027-06-17T19:00")
+	if !contains(ids, "t_2") {
+		t.Fatalf("adjacent-after closure must free t_2: %v", ids)
+	}
+	// Absolute-offset equivalence: the same instant spelled +01:00 blocks.
+	s.mu.Lock()
+	s.state.Closures["r_anker"] = []Closure{{TableID: "t_2", From: "2027-06-17T18:00:00+01:00", To: "2027-06-17T22:00:00+01:00"}}
+	s.mu.Unlock()
+	ids, _, _ = slotIDs(avail("r_anker", "2027-06-17", 2, false), "2027-06-17T19:00")
+	if contains(ids, "t_2") {
+		t.Fatalf("absolute-offset closure must exclude t_2: %v", ids)
+	}
+	// Other restaurant unaffected by r_anker closures.
+	ids, _, _ = slotIDs(avail("r_other", "2027-06-17", 1, false), "2027-06-17T19:00")
+	if len(ids) != 1 || ids[0] != "t_1" {
+		t.Fatalf("other restaurant: %v", ids)
+	}
+	// No-explain shape carries no explain key.
+	m := avail("r_anker", "2027-06-17", 2, false)
+	for _, x := range m["slots"].([]any) {
+		if _, ok := x.(map[string]any)["explain"]; ok {
+			t.Fatal("explain leaked")
+		}
+	}
+}
+
+func closureItoa(n int) string {
+	return strconv.Itoa(n)
 }

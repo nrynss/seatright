@@ -101,6 +101,7 @@ func normalizeVersionState(st *State) error {
 	if st.RestaurantRevisions == nil {
 		st.RestaurantRevisions = map[string]int{}
 	}
+	normalizeReplanState(st)
 	for i := range st.Restaurants {
 		if st.Restaurants[i].ManagerUserIDs == nil {
 			st.Restaurants[i].ManagerUserIDs = []string{}

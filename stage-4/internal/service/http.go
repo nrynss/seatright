@@ -80,6 +80,8 @@ func (s *Service) serve(w http.ResponseWriter, r *http.Request) {
 		res = s.AdoptSeries(bearerTokenString(r), r.Header.Get("Idempotency-Key"), readBody(r))
 	case strings.HasPrefix(path, "/series/") && method == http.MethodGet:
 		res = s.GetSeries(bearerTokenString(r), strings.TrimPrefix(path, "/series/"))
+	case strings.HasPrefix(path, "/series/") && method == http.MethodPost:
+		res = s.seriesRoute(r, path)
 	case method == http.MethodGet && isPageRoute(path):
 		s.serveStatic(w, r)
 		return
@@ -143,6 +145,27 @@ func (s *Service) restaurantRoute(r *http.Request, path string) Result {
 		case http.MethodPost:
 			return s.PublishPolicy(bearerTokenString(r), parts[0], r.Header.Get("Idempotency-Key"), readBody(r))
 		}
+	}
+	if len(parts) == 2 && parts[1] == "replans" && parts[0] != "" && r.Method == http.MethodPost {
+		return s.PreviewReplan(bearerTokenString(r), parts[0], r.Header.Get("Idempotency-Key"), readBody(r))
+	}
+	if len(parts) == 4 && parts[1] == "replans" && parts[0] != "" && parts[2] != "" && parts[3] == "apply" && r.Method == http.MethodPost {
+		return s.ApplyReplan(bearerTokenString(r), parts[0], parts[2], r.Header.Get("Idempotency-Key"), readBody(r))
+	}
+	return notFound("unknown path")
+}
+
+// seriesRoute dispatches POST /series/{id}/amend to the recurring clock
+// amendment engine. Only the exact shape (nonempty id, single amend leaf,
+// POST) routes; trailing slashes, deeper paths, empty ids and wrong methods
+// are 404. Authentication, body parsing and idempotency stay inside the
+// engine's Idempotent wrapper so receipt scope and replay bytes match the
+// service-direct path exactly.
+func (s *Service) seriesRoute(r *http.Request, path string) Result {
+	rest := strings.TrimPrefix(path, "/series/")
+	parts := strings.Split(rest, "/")
+	if len(parts) == 2 && parts[0] != "" && parts[1] == "amend" && r.Method == http.MethodPost {
+		return s.AmendSeries(bearerTokenString(r), parts[0], r.Header.Get("Idempotency-Key"), readBody(r))
 	}
 	return notFound("unknown path")
 }

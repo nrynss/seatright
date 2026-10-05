@@ -33,6 +33,8 @@ func emptyState() State {
 		Histories:           map[string][]history.Entry{},
 		Series:              map[string]Series{},
 		RestaurantRevisions: map[string]int{},
+		Plans:               map[string]Replan{},
+		Closures:            map[string][]Closure{},
 	}
 }
 
@@ -62,6 +64,8 @@ func cloneState(st *State) State {
 		Histories:           cloneHistoryMap(st.Histories),
 		Series:              cloneSeriesMap(st.Series),
 		RestaurantRevisions: cloneCounterMap(st.RestaurantRevisions),
+		Plans:               cloneReplanMap(st.Plans),
+		Closures:            cloneClosureMap(st.Closures),
 	}
 	for k, v := range st.Users {
 		out.Users[k] = v
