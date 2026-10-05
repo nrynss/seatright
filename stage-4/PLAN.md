@@ -1208,3 +1208,11 @@ Report DONE/BLOCKED: sharedcard/fullbase/exactownedfiles/status/invariant→name
 Components: snapshot_store, replan_engine, closure_store, history_engine, series_engine, receipt_store.
 
 Complete original task, four specifications verbatim and R1–R382 ledger follow:
+
+## S4-P1A final bounded proof repair — 2026-10-05T15:36:00Z
+
+Shared61 stays in progress on dirty base b956fb1f920fb245de3dabff900f2060282f7668, ONE owned new executable stage4-api.sh only. Round1 report b7c97bcb retained292/0, dead/sabotage1; host syntax/all46Python compile0. F1 URL/status/retained artifacts and F2 true objective competitions are substantially verified. Host exact extracted series program accepts genuine AND six independently corrupted copied snapshots (each applied-mutation guard), including wrong selectors/history From/terms/unmoved history/receipt owner/plan revision; source/evidence audit in seatright-codex/S4-P1A/r3-audit/{audit.py,host-audit.log}. No live-service mutation/product defect.
+
+Final residual correction e22ee201-4608-4eb1-9967-2a65da32d5f7: A complete series/record/history/public/plan/closure/counter/receipt delta and copied-validator rejection; B full existing empty-apply delta plus history keyset/selector conventions; C one genuine fixed-pair tail and honest failed-limit key labels/reuse; D initial-reset abort and fresh literal fail-closed lifecycle headers. Same file ownership/base, no reset/Git commit; all existing effective scenarios preserved, no new native/import/recurring scope. Whole final probe and same negative guards required; no repeated Go/UI/harness suite for probe-only changes. Binary fallback remains qualified; packaged image later.
+
+Queue: P1B only after P1A accepted. OMP/shared63 I1 and Grok/shared62 G2B1 active unchanged. One wake-time liveness check shows new clock script/evidence with latest15:31:43UTC, so no retry or peer wait. Stage4 remains unaccepted, accepted1–3 immutable.
