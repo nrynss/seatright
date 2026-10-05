@@ -1,5 +1,7 @@
 # Tablekeeper final outcome: stages 1–3 accepted; stage 4 blocked
 
+> Historical outcome superseded by operator instruction46964814 on2026-10-05T19:07:05Z: stage4 reopened for one native fix attempt then first formal review. Three-round limit counts formal ZCode CHANGES verdicts, not integration audits. See active plan and RUNLOG; no stage4 acceptance yet.
+
 The requested four-stage run stops at stage 4. Highest independently accepted stage: **3**. There is **no accepted stage-4 revision** and no formal isolated stage-4 acceptance run. Accepted earlier folders remain immutable. The coordinator did not merge stage-4 product changes to main; they remain in the integration candidate, with the failed native import item preserved separately.
 
 ## Accepted revisions and checks
