@@ -1,4 +1,8 @@
-# Tablekeeper stage 4: final bounded delivery correction; native import blocked
+# Tablekeeper final outcome: stages 1–3 accepted; stage 4 blocked
+
+**Final disposition:** highest independently accepted stage is **3**, exact revision **e13272d90213be0914211ae6f6f0bfd5888900ff**. Stages1–3 are unchanged and available on main. Stage4 is partial and unaccepted; no formal stage4 isolated acceptance run or accepted SHA. Functional native item63 and evidence item67 each reached their three-audit limit and are blocked. No fourth correction, stage4 product merge to main, or human-input dependency. Durable full outcome: **FINAL-OUTCOME.md**; sanitized partial archive: **evidence/stage-4-blocked/**. Historical work queues below are superseded by this closing disposition.
+
+**Delivery audit closure:** frozen producer45581bf3a2dd422b5700a33c3075e56471679971 has observed packaged632/0 current API,245/0/0 inherited and16/0 HTML. Real offline repair→clock, raw replays, typed assets/fonts, network-none and cleanup are recorded. The whole reviewer DELIVERY PASS is not adopted: the final extracted binder accepts forged receipt owner/body/raw response and plan restaurant; its mutation self-test only checks copy inequality. Item67 is evidence-blocked after final audit; native63 independently fails genuine evolved roundtrip and malformed missing-plan-id receipt rejection. No service packaging defect inferred from deficient evidence. The accepted main stage3 service remains the final completed delivery.
 
 Stage 3 is accepted at **e13272d90213be0914211ae6f6f0bfd5888900ff**, formal round 1. Exact isolated results: 120/120 + 25/25 + 7/7, highest/claimed stage 3, expected stage-4 failure. Full source race passed with a 40-minute timeout; UI 90/90; independent correctness, transfer, both true upgrades and design passed. The reviewer reported no critical design findings. Committed review archive: evidence/stage-3/; original private artifacts remain outside Git.
 
