@@ -1430,3 +1430,57 @@ OpenCode latest8aa48670 is a stale P1B extra-selftest report on current P1C base
 ## P1C first audit: portable shell correction
 
 2026-10-05T17:45:32.422170+00:00 | Codex, OpenCode | report/retry | P1Cfirstd000100c peer632/0+inherited245/0 verified; hostsyntax105Python/build0/O50previewdelta+guards pass, then PPIDreadonly fatal (/bin/sh Bash) beforeP/Q/R/inherited/guards. OwnPID57/9283closed. Noproductdefect/noacceptance/commit/reset. Round1fullsameprobe correctioncea089fc: systemvarrename, removevacuouspreloserorTrue, freshr2 runner/evidence/finallycleanup/exactCWDUTC. Shared65inprogress; native63Blocked/I2G2B2formalacceptanceblocked unchanged. Lossyprivateaudit/gates/correctiondispatch completed; integration/P2supersededpendingrepair; durableplan/reportin_progress. d000settledonce. Usageunavailable.
+
+
+## P1C accepted; independent delivery queue
+
+Author ac83a9ba8b92460011f61fcf8016192d779542fc; merge c946678f24d5f90006ca948655eb4ddbbdfbf689. Host final632/0+samebinary inherited245/0, shell105blocks/build0, allfour concurrent races/corruption guards/negative guards/PIDportclean. Initial577PASS PPID failure retained. Shared65complete. Native63blocked afterthreeaudits; I2/G2B2/formal acceptance blocked.
+
+## ACTIONABLE S4-P2A/shared66 — accurate stage-4 guide and bounded delivery preflight
+Role: backend implementer. Mandate /home/nryn/work/seatright/runs/tablekeeper2/result/mandates/seatright-opencode.md. Fixed worktree /home/nryn/work/seatright/runs/tablekeeper2/wt/seatright-opencode. FULL BASE: DISPATCH_BASE, read from Git after committed plan; coordinator verifies clean then resets fixed worktree to that base. No Git mutations. Full original TASK/four verbatim specs/R1–382 ledger follow.
+
+P1C accepted author ac83a9ba8b92460011f61fcf8016192d779542fc merge c946678f24d5f90006ca948655eb4ddbbdfbf689. Actual host /bin/sh runs all four preview/apply races,632/0 stage4 and unchanged245/0 stage3 SAME fresh current binary;105 Python blocks/guards/PIDcleanup verified. All producer APIs real, no stubs.
+
+Native boundary: S4-I1/shared63 BLOCKED after three audits, no fourth repair. Genuine zero-move apply+later party PATCH export imports422 instead204; retained native preview response missing plan_id imports204 instead422. Five dirty paths NOT integrated. R380–382/I2/G2B2/formal freeze and acceptance blocked. This guide is independent; do not repair/bypass/claim native readiness or harness acceptance. Reviewer separately owns package gate.
+
+Own ONLY stage-4/RUN.md plus /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-opencode/S4-P2A/**. Existing guide copiedstage3: rewrite accurate stage4. No Go/product/test/probe/PLAN/RUNLOG/Dockerfile/web/package/earlier-stage/kit/Git edits.
+
+Guide (source facts verified read-only):
+1. Standalone docker build/start stage-4 context, default8080 and explicit PORT matching mapping,0.0.0.0,WEB_DIR, web-build-before-Go source startup; actual manifests stack Go1.27/Keel0.5/Node26/Chaaya0.3 if agrees. Local fonts/assets/bundled /app/probe. Explicit --network none docker run + matching exec localhost PORT + stop/rm. Ephemeral reset/replacement and SHA256 hex prehash then bcrypt from source; no credentials.
+2. Retain dated policies/public original-detail/selected capacities/explain=true/accepted terms/revisions/owner-history/decision. Manager POST /restaurants/{id}/replans {table_id,from,to}: strict offset absolute interval, six-key preview, captured counter, all confirmed overlapping considered, own accepted caps/fixed/prior+proposed half-open closures, lex moved sets/unused/rank, limits+error codes; preview plan+receipt only.
+3. POST /restaurants/{id}/replans/{plan_id}/apply keyed{}: original-key replay before callback; applied409 before stale409; canonical selector-only repair freezes clocks/dates/terms, reassigned history+plan_id, closure/applied marker, counteronce even empty/zero, affectedseriesonce/no new flags. Availability/create/PATCH/moves/adopt closure409/explain independentrules. Operator repair ignores cutoff without pretending ordinary writes do.
+4. Owner POST /series/{id}/amend expected_revision/from_index/local_time: exact clock, owner404, huge revision safely stale, eligible confirmed nonexception original scheduled dates, no-op cutoff/revalidation bypass, real changes old cutoff + dated terms, nonoccupancy precedence before occupancy, closure rollback, once booking/history/series/counter/no new flags, immutable key/body/path replay.
+5. Diner UI only search/book/confirmation/lookup/cancel; no manager/series UI. Original receipt can retain pair/clock while lookup current repaired/amended; uncertain retries original body/key.
+6. ACTUAL probe interfaces from headers: stage4-api.sh BASE_URL FRESH_WORK_DIR; unchanged stage3-api.sh inheritance (same-image smoke only); stage4-donor.sh SRC1_URL SRC2_URL SRC3_URL OUT_DIR genuine older exports ONLY. stage4-import.sh not implemented/integrated; native transfer pending/blocked. No runnable absent-script claims; no passcounts/SHAs/acceptance claims in RUN.
+7. Real URLs/ports/flags only (e.g. actual availability query); disposable/destructive reset stated; no unsupported invented shapes or implementation jargon in diner flows.
+
+Checks root: git diff --check; git status --short; git diff --stat; source references read-only per fact. No Go/UI/whole regression for Markdown scope. Read-only daemon disk/image preflight allowed. If full, record actual free bytes/ENOSPC blocker; no doomed build or image/cache/runner/volume deletion/prune/retag. Reviewer owns image delivery independently. Guide may complete with packaging infra blocked here.
+
+Evidence fresh own logger literal argv/absolute CWD/UTC start-end/effective exits/raw, preserve previous attempts. Private0700/0600, no token/body/export/password stdout. No container lifecycle required; any owned resources finally clean precisely.
+
+ONE bounded foreground20–30min DONE guide/concrete BLOCKED preflight report: item/shared66/fullbase/owned diff/fact→source/commands/exits/raw paths/failures/limitations/cleanup/elapsed/usage unavailable. No acknowledgment/promises/waits/polls/commit/reset/acceptance.
+Components: service_image, replan_engine, series_engine, receipt_store, closure_store.
+
+## ACTIONABLE S4-P2D/shared67 — independent packaged producer delivery gate
+Role: reviewer, evidence-only bounded delivery, NOT formal S4-R1. Mandate /home/nryn/work/seatright/runs/tablekeeper2/result/mandates/seatright-zcode.md. Read-only candidate /home/nryn/work/seatright/runs/tablekeeper2/wt/review. Exact committed producer SHA DISPATCH_BASE. Write ONLY /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-P2D/**. No candidate/product/tests/probes/docs/kit/Git mutation. Full TASK/four verbatim specs/R1–382 ledger follows.
+
+Current producer has real planner/preview/apply/closure/Reassigned/seriesclock/exactHTTP/dinerlookup/immutable retry. P1C author ac83a9ba8b92460011f61fcf8016192d779542fc merge c946678f24d5f90006ca948655eb4ddbbdfbf689: host632/0 all O/P/Q/R races and inherited245/0,105blocks/guards/PIDclean. Native S4-I1/shared63 BLOCKED after three audits: genuine zero-moveapply+partyPATCH valid export rejected422; retained preview receipt missing plan_id accepted204. Dirty I1 NOT integrated. R380–382/I2/G2B2/formalstage4acceptance blocked. Do NOT native import/formal harness/ACCEPT/repair/waive blocker. Report DELIVERY PASS or BLOCKED plus stage4 unaccepted.
+
+Frozen source: verify exact GitSHA/stage4tree and accepted earlier trees stage1 8b8b28da1d7772bbc443ed4fccb57d8e5ed8530c, stage2 9fee3dc7d0766091b3fb7cdbb521c6dfaf652b7f, stage3 c783f9e08522a04a62bb11f9a0e3c485d077684f. Read-only git archive DISPATCH_BASE stage-4 into OWN fresh evidence/source copy; bind extracted files to tree before build. Candidate metadata may advance; archived object bytes authoritative. No Git mutations/nested .git.
+
+A. Read-only separate-daemon RootDir/free/image/bases preflight. R0 had1.8Gfree/warmbases. Only ONE stage4 image, no runner/harnesscoldbuild. Actual ENOSPC preserve rawfailure/diskstop; no cache/runner/base/volume/unowned deletion/prune. Build from evidence/source root: docker build -t tablekeeper:s4-p2d stage-4. Full image ID/sourceSHA/tree/argv/CWD/UTC/exit recorded.
+B. Own tk-s4-p2d-default --cpus 2 --memory 2g -p 9544:8080; tk-s4-p2d-live samecaps -e PORT=9545 -p 9545:9545; tk-s4-p2d-offline samecaps --network none -e PORT=9546 (hostpublish unnecessary). Check free ports; if collision use recorded real replacements. Inspect fullId/Image/Name/Env/Ports/caps/network/privileged. Health exact200 15byte {"status":"ok"} application/json; charset=utf-8. Measure runstart→firsthealth elapsed (not fabricated0s). Default8080/nondefault9545; verify0.0.0.0 via inspected bridgeIP + in-container /app/probe, qualify hostdirect-IP sandboxegress ifblocked.
+C. SAME freshlybuilt liveimage, CWD archivedstage4:
+sh probes/stage4-api.sh http://127.0.0.1:9545 FRESH_WORK (current measured632 baseline, never force count/skip);
+sh probes/stage3-api.sh http://127.0.0.1:9545 FRESH_OTHER_WORK (245 baseline);
+sh probes/stage1-html.sh sameBASE FRESH_HTML_WORK (16 baseline).
+Actual names/counts/status/exits/failures captured, no privatebodies. APIs/inheritance only, NOT migration/native import.
+D. Offline REAL authenticated functionality through bundled /app/probe inside --network none. Inspect actual -method/-url/-body/-token/-key/-timeout flags. Fail-closed expected status/type/payload and prerequisites:
+reset disposablefixture/private auth; dated policy+explain selectedcaps; canonical pair booking201 with six-key terms/absolute duration/rev1/createdhistory/decision; real adoption; manager preview/apply overlappingclosure with handcomputed expectedtarget world pinned BEFORE assertions (never solveroutput sole oracle), frozen table-only clocks/terms, one Reassigned+plan_id, oncecounter/series/no newflags; real POST /series/{id}/amend keeps repairedtable/originaldates/dates-selected terms, Changed afterReassigned/frozenprefix/once metadata. Originalreceipt rawreplay after realevolution when feasible.
+Small deterministic actual routes, no fixturebranches/fakereceipts or /_test/import. Name what genuinely exercised; no exhaustive matrix claim.
+Offline pages / /signup /login /lookup, actual localJS/CSS/exactfive distinct nonemptywoff2 fonts with status/type/body-onlyhash. Actual externalegress attempt must nonzeroDNS/unreachable/dialerror; networkmode alone insufficient.
+Actual assertion count, no forcedtotal; SAMEdriver forcedwrongexpect counts FAIL and nonzero. Tokens/password/body/export privateumask077/0700/0600, stdout onlysafe names/status/counts.
+E. Literal percontainer run/inspect/probe/stop/rm/absence absoluteCWD/UTC-start-end/effectiveexit/raw. Freshperattemptdirs/preservefailures/noreconstruction. Finally onlyOWNnamedcontainers stop/rm proveabsence/portsclosed. Retain image/no prune.
+
+No formalharness/ACCEPT/native/oldtransfer/browser/Go-full/race/UI gates forboundedpackage; previous gates separatelystand. ONE foreground20–30min DELIVERY PASS/BLOCKED at exactSHA, requirement→proof R6–16/assets/auth/currentAPI, actualcounts/exits/rawpaths/full image/container provenance/failures/limitations/nativeblocker/cleanup/elapsed/usage unavailable. No acknowledgment/still-running/waits/polls. No fifthstage.
+Components: service_image, review_gate, restaurant_ui, replan_engine, series_engine.
