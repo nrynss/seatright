@@ -1414,3 +1414,7 @@ No Go fullsuite/UI/race/harness/Docker run for proof-only changes; fresh build i
 
 Foreground one bounded item ~20–30min, ONE DONE or concreteBLOCKED report: item/shared65/fullbase/ownedstatus/SHA; requirements R307–350+R304 inherited→named exact assertions; all real commands/effective exits/measured counts/raw evidence; honest failed attempts/nonclaims; own cleanup/measured UTCelapsed/visibleusage (unavailable if absent). No acknowledgments/still-running promises/waits/polls. P2 delivery/docs queued after acceptance; I2/G2B2 follow native I1 separately. No stage acceptance.
 Components: replan_engine, closure_store, history_engine, series_engine, receipt_store.
+
+
+### S4-P1C actual dispatch
+Rootmetadata86d5e38 merged at actual8afeda6d26b061ac4d165d95e16ed1357dba40dd; cleanfixedOCresetverified/fullsingleP1C65handoffundefined delivered andsharedinprogress. P1Bauthor07f888fe9c962952395af36e3377d11f01933630/merge5d00e3fbe2e27ea0d4b103311d954fd1a5c152a3/shared64completed. Host555/87/sixoldapply/eightplus2checkerreject/guards1/PIDclean verified. Activeimmutableplan106595B/Archsame/oldertreesverificationnext. I1OMPactiveunchanged/recentfile16:56; I2/G2B2dependacceptance. No stage4freeze/acceptance; inboundf4settledonce. Lossyprivateaudits/gates/integration/dispatchcomplete/durableplanrequesterreportinprogress. Usageunavailable.
