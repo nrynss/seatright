@@ -6,14 +6,26 @@ import (
 	"time"
 
 	"tablekeeper/internal/clock"
+	"tablekeeper/internal/policy"
 )
 
 // Availability renders the public slot grid for a restaurant, date and party
-// size. Every opening-grid slot appears, including slots with no free table,
-// in wall-clock order. available_table_ids stays singles-only in fixture
+// size. Terms come from the queried local date's selected policy (fixture
+// policy0 before any publication): the grid and duration follow
+// policy.Rules, and single/pair capacities follow policy.Capacity, while
+// table geometry, fixture order and declared pairs stay original. Every
+// opening-grid slot appears, including slots with no free table, in
+// wall-clock order. available_table_ids stays singles-only in fixture
 // table order; available_options lists every eligible singleton in fixture
 // order followed by every eligible declared pair in combinable order. A
 // closed day returns an empty slots array.
+//
+// explain is optional and accepts only the value "true". Without it the
+// response keeps the ordinary stage-2 shape with no explanation fields.
+// With it every slot carries an explain array: every fixture-order table
+// exactly once with its selected policy_version, available as the
+// conjunction of the independently evaluated capacity and no_overlap rules,
+// and the rules array (capacity then no_overlap) reporting both outcomes.
 func (s *Service) Availability(q url.Values) Result {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -34,7 +46,18 @@ func (s *Service) Availability(q url.Values) Result {
 	if restaurant == nil {
 		return notFound("unknown restaurant")
 	}
-	slots, err := clock.Slots(date, rulesFor(restaurant))
+	explain := false
+	if _, present := q["explain"]; present {
+		if q.Get("explain") != "true" {
+			return validationFailed("explain accepts only true")
+		}
+		explain = true
+	}
+	terms, err := selectedTerms(&s.state, restaurant, date)
+	if err != nil {
+		return validationFailed("invalid availability date")
+	}
+	slots, err := clock.Slots(date, policy.Rules(terms, restaurant.Timezone))
 	if err != nil {
 		if ce, ok := err.(*clock.Error); ok {
 			return Result{Status: 422, Body: errorBody(ce.Code, ce.Code)}
@@ -44,13 +67,17 @@ func (s *Service) Availability(q url.Values) Result {
 	confirmed := confirmedOccupancy(&s.state, restaurantID)
 	rendered := make([]any, 0, len(slots))
 	for _, slot := range slots {
-		options := eligibleOptions(restaurant, confirmed, party, slot.Start, slot.End)
-		rendered = append(rendered, map[string]any{
+		options := eligibleOptions(restaurant, terms, confirmed, party, slot.Start, slot.End)
+		entry := map[string]any{
 			"starts_at_local":     slot.Local,
 			"starts_at":           formatTimestamp(slot.Start),
 			"available_table_ids": singlesOf(options, restaurant),
 			"available_options":   renderOptions(options),
-		})
+		}
+		if explain {
+			entry["explain"] = explainSlot(restaurant, terms, confirmed, party, slot.Start, slot.End)
+		}
+		rendered = append(rendered, entry)
 	}
 	return okResult(map[string]any{
 		"restaurant_id": restaurant.ID,
@@ -106,13 +133,15 @@ func confirmedOccupancy(st *State, restaurantID string) []occupancy {
 	return out
 }
 
-// eligibleOptions returns the seating options with sufficient capacity and no
-// member overlapping [start, end): fixture singles first, then declared pairs
-// in combinable order (the order seatingOptions produces).
-func eligibleOptions(restaurant *Restaurant, confirmed []occupancy, party int, start, end time.Time) []SeatingOption {
+// eligibleOptions returns the seating options with sufficient selected-policy
+// capacity and no member overlapping [start, end): fixture singles first,
+// then declared pairs in combinable order (the order seatingOptions
+// produces). Pair capacity is the sum of the selected policy's capacities.
+func eligibleOptions(restaurant *Restaurant, terms policy.Terms, confirmed []occupancy, party int, start, end time.Time) []SeatingOption {
 	var out []SeatingOption
 	for _, opt := range seatingOptions(restaurant) {
-		if opt.Capacity < party {
+		capacity := policy.Capacity(terms, opt.TableIDs)
+		if capacity < party {
 			continue
 		}
 		blocked := false
@@ -126,8 +155,39 @@ func eligibleOptions(restaurant *Restaurant, confirmed []occupancy, party int, s
 			}
 		}
 		if !blocked {
-			out = append(out, opt)
+			out = append(out, SeatingOption{TableIDs: opt.TableIDs, Capacity: capacity})
 		}
+	}
+	return out
+}
+
+// explainSlot reports every fixture-order table exactly once for a slot: the
+// selected policy_version, available as capacity && no_overlap, and both
+// rules evaluated independently in capacity, no_overlap order.
+func explainSlot(restaurant *Restaurant, terms policy.Terms, confirmed []occupancy, party int, start, end time.Time) []any {
+	out := make([]any, 0, len(restaurant.Tables))
+	for _, t := range restaurant.Tables {
+		capHolds := party <= policy.Capacity(terms, []string{t.ID})
+		overlap := false
+		for _, occ := range confirmed {
+			if !tableSetsIntersect([]string{t.ID}, occ.tables) {
+				continue
+			}
+			if clock.Overlap(start, end, occ.start, occ.end) {
+				overlap = true
+				break
+			}
+		}
+		available := capHolds && !overlap
+		out = append(out, map[string]any{
+			"table_id":       t.ID,
+			"policy_version": terms.PolicyVersion,
+			"available":      available,
+			"rules": []any{
+				map[string]any{"rule": "capacity", "holds": capHolds},
+				map[string]any{"rule": "no_overlap", "holds": !overlap},
+			},
+		})
 	}
 	return out
 }

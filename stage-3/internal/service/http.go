@@ -63,7 +63,9 @@ func (s *Service) serve(w http.ResponseWriter, r *http.Request) {
 	case method == http.MethodGet && path == "/restaurants":
 		res = s.ListRestaurants()
 	case method == http.MethodGet && strings.HasPrefix(path, "/restaurants/"):
-		res = s.restaurantRoute(path)
+		res = s.restaurantRoute(r, path)
+	case method == http.MethodPost && strings.HasPrefix(path, "/restaurants/"):
+		res = s.restaurantRoute(r, path)
 	case method == http.MethodGet && path == "/availability":
 		res = s.Availability(r.URL.Query())
 	case method == http.MethodGet && path == "/reservations":
@@ -110,14 +112,30 @@ func (s *Service) reservationRoute(r *http.Request, path string) Result {
 	}
 }
 
-// restaurantRoute serves GET /restaurants/{id}; deeper paths belong to later
-// stages and return not_found from this foundation.
-func (s *Service) restaurantRoute(path string) Result {
-	id := strings.TrimPrefix(path, "/restaurants/")
-	if id == "" || strings.Contains(id, "/") {
+// restaurantRoute serves GET /restaurants/{id} and the policy subpaths:
+// GET /restaurants/{id}/policies is public, POST requires a manager and an
+// idempotency key. Anything deeper, an empty id, or a wrong method is 404.
+func (s *Service) restaurantRoute(r *http.Request, path string) Result {
+	rest := strings.TrimPrefix(path, "/restaurants/")
+	if rest == "" {
 		return notFound("unknown path")
 	}
-	return s.GetRestaurant(id)
+	parts := strings.Split(rest, "/")
+	if len(parts) == 1 {
+		if r.Method != http.MethodGet {
+			return notFound("unknown path")
+		}
+		return s.GetRestaurant(parts[0])
+	}
+	if len(parts) == 2 && parts[1] == "policies" && parts[0] != "" {
+		switch r.Method {
+		case http.MethodGet:
+			return s.ListPolicies(parts[0])
+		case http.MethodPost:
+			return s.PublishPolicy(bearerTokenString(r), parts[0], r.Header.Get("Idempotency-Key"), readBody(r))
+		}
+	}
+	return notFound("unknown path")
 }
 
 // requireAuth enforces the bearer contract before running fn: missing,
