@@ -2,6 +2,10 @@
 
 Stages are implemented and independently accepted in order. Stage 1 and stage 2 are accepted and immutable. Stage 3 is active; stage 4 starts only after stage 3 acceptance. This snapshot replaces the missing active room plan and records the current contracts and work queue. The full stage ledger follows the architecture.
 
+Current checkpoint: S3-G2A/shared40 is complete and integrated at candidate merge eff1749266be57ce05a95f476b0cbc509dc07dd6 (probe owner c1ddeab901c6a22b58af50c495587dd3eb2cffac). The existing UI passed real policy flows and both same-document stage-1/2 to stage-3 upgrades. The frontend item changed one probe script and no product source; final exact-SHA reviewer acceptance remains pending.
+
+S3-S/shared39 remains in progress. Host verification reproduced two defects: adoption excluded the confirmed anchor from occupancy, and local-midnight date arithmetic shifted a Santiago recurrence to the previous calendar day. OMP has bounded correction handoff ebb1675b-1093-47aa-be2f-0d40ede3bada on the existing dirty base, with effective rollback/calendar/receipt/counter tests and fresh image evidence required before commit. S3-C waits for corrected S integration; modern migration, packaging, and formal stage-3 review follow. No stage-3 acceptance or stage-4 copy is authorized by this checkpoint.
+
 ```arch
 {
   "kind": "layered",
