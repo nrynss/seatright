@@ -260,9 +260,7 @@ describe('Chaaya contracts', () => {
     expect(html).toContain(themeScript);
     expect(app).toContain("@nrynss/chaaya/tokens/reference.css");
     expect(themeControl).toContain('@nrynss/chaaya/theme');
-    // Stage 3 may name policy and series concepts. Stage 4 replans stay out of this folder.
-    const banned = ['replan'];
-    expect(banned).toEqual(['replan']);
+    // Stage 4 seating changes stay on the existing screens. This scan still rejects remote assets.
     const sources = walk(join(webRoot, 'src')).filter((path) => /\.(svelte|ts|css)$/.test(path));
     sources.push(join(webRoot, 'index.html'));
     for (const path of sources) {
@@ -271,7 +269,6 @@ describe('Chaaya contracts', () => {
       expect(text, path).not.toMatch(/https?:\/\//);
       expect(text, path).not.toMatch(/fonts\.googleapis|cdn\.|unpkg|jsdelivr|fontshare|typekit/i);
       expect(text, path).not.toMatch(/fetch\s*\(/);
-      for (const word of banned) expect(text, path).not.toContain(word);
     }
   });
 });
