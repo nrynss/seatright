@@ -167,6 +167,8 @@ Stage 4 starts from the untouched accepted stage-3 tree, copied in **4f52394728a
 
 ## Current work
 
+Latest audit: S4-P objective/oracle/greedy proofs now pass and all host gates are green; one input-to-output test binding remains. S4-M clone shapes, synthetic old storage and pair-to-pair proof pass; two live-object/full-entry comparisons remain. Final tiny test-only repairs are assigned on the same bases; no product defect or owner commit yet.
+
 S4-M/shared52 is under a small test-only verification repair: owned foundation source and recorded gates pass, but public-map alias checks, complete nil/empty clone shapes, old receipt retention and reassigned-entry isolation must be effective. No M commit or dependent S4-A assignment yet. No product defect found; Grok/shared53 continues independently.
 
 S4-P is in a bounded verification repair after its first report: host fmt/vet/race16 tests pass and the pure exhaustive source matches the contract, but objective/oracle/greedy-trap/isolation tests must prove their stated behavior. Shared51 remains in progress; no solver commit yet. S4-M/shared52 and S4-G/shared53 remain independent active items.
