@@ -416,6 +416,7 @@ func (s *Service) CancelReservation(token, reference string) Result {
 		s.state.RestaurantRevisions = map[string]int{}
 	}
 	s.state.RestaurantRevisions[r.RestaurantID]++
+	touchSeriesForChanges(&s.state, []string{reference}, false)
 	return okResult(final.Public())
 }
 
@@ -453,6 +454,7 @@ func (s *Service) PatchReservation(token, reference string, raw []byte) Result {
 			s.state.RestaurantRevisions = map[string]int{}
 		}
 		s.state.RestaurantRevisions[current.RestaurantID]++
+		touchSeriesForChanges(&s.state, []string{reference}, true)
 	}
 	return okResult(final.Public())
 }
