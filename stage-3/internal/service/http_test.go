@@ -171,3 +171,102 @@ func TestUnknownMethodIsNotFound(t *testing.T) {
 		t.Fatalf("DELETE /restaurants: got %d %s", status, code)
 	}
 }
+
+func TestPolicyRoutesHTTP(t *testing.T) {
+	s := New()
+	if res := s.Reset([]byte(policyFixture)); res.Status != 204 {
+		t.Fatalf("reset: %d %v", res.Status, res.Body)
+	}
+	mgr := policyLogin(t, s, "ada@example.com", "correct horse")
+	diner := policyLogin(t, s, "bea@example.com", "correct horse bea")
+	publish := func(token, key string, body []byte) *httptest.ResponseRecorder {
+		headers := map[string]string{"Idempotency-Key": key}
+		if token != "" {
+			headers["Authorization"] = "Bearer " + token
+		}
+		return serveRequest(s, http.MethodPost, "/restaurants/r_anker/policies", body, headers)
+	}
+	// Unknown-field body is accepted; response carries the flat policy.
+	rec := publish(mgr, "http-01", []byte(`{"effective_from":"2027-06-01","slot_minutes":30,"reservation_duration_minutes":90,"cancellation_cutoff_minutes":120,"opening_hours":[{"weekday":"thu","opens":"18:00","closes":"23:00"}],"capacities":{"t_1":2,"t_2":4,"t_3":4},"zzz":1}`))
+	if rec.Code != 201 {
+		t.Fatalf("publish: %d %q", rec.Code, rec.Body.String())
+	}
+	var v map[string]any
+	if err := json.Unmarshal(rec.Body.Bytes(), &v); err != nil {
+		t.Fatal(err)
+	}
+	if v["policy_version"] != float64(1) || v["effective_from"] != "2027-06-01" {
+		t.Fatalf("publish body = %q", rec.Body.String())
+	}
+	if ct := rec.Header().Get("Content-Type"); ct != "application/json; charset=utf-8" {
+		t.Fatalf("content-type = %q", ct)
+	}
+	// Replay returns the identical bytes.
+	rec2 := publish(mgr, "http-01", []byte(`{"effective_from":"2027-06-01","slot_minutes":30,"reservation_duration_minutes":90,"cancellation_cutoff_minutes":120,"opening_hours":[{"weekday":"thu","opens":"18:00","closes":"23:00"}],"capacities":{"t_1":2,"t_2":4,"t_3":4},"zzz":1}`))
+	if rec2.Code != 200 || rec2.Body.String() != rec.Body.String() {
+		t.Fatalf("replay = %d %q, want 200 %q", rec2.Code, rec2.Body.String(), rec.Body.String())
+	}
+	// Auth matrix over HTTP.
+	if status, code := errorCode(t, publish("", "http-02", validPolicyBody("2027-06-02"))); status != 401 || code != "unauthenticated" {
+		t.Fatalf("no token = %d %s", status, code)
+	}
+	if status, code := errorCode(t, publish(diner, "http-03", validPolicyBody("2027-06-03"))); status != 403 || code != "forbidden" {
+		t.Fatalf("non-manager = %d %s", status, code)
+	}
+	rec = serveRequest(s, http.MethodPost, "/restaurants/r_nope/policies", validPolicyBody("2027-06-04"), map[string]string{"Authorization": "Bearer " + mgr, "Idempotency-Key": "http-04"})
+	if status, code := errorCode(t, rec); status != 404 || code != "not_found" {
+		t.Fatalf("unknown restaurant = %d %s", status, code)
+	}
+	// Missing key and malformed bodies.
+	rec = serveRequest(s, http.MethodPost, "/restaurants/r_anker/policies", validPolicyBody("2027-06-05"), map[string]string{"Authorization": "Bearer " + mgr})
+	if status, code := errorCode(t, rec); status != 400 || code != "missing_idempotency_key" {
+		t.Fatalf("missing key = %d %s", status, code)
+	}
+	rec = publish(mgr, "http-05", []byte(`oops`))
+	if status, code := errorCode(t, rec); status != 400 || code != "malformed_request" {
+		t.Fatalf("malformed = %d %s", status, code)
+	}
+	// Public list; exact suffix matching with no catch-all leaks.
+	rec = serveRequest(s, http.MethodGet, "/restaurants/r_anker/policies", nil, nil)
+	if rec.Code != 200 {
+		t.Fatalf("list: %d %q", rec.Code, rec.Body.String())
+	}
+	rec = serveRequest(s, http.MethodGet, "/restaurants/r_anker/policies/extra", nil, nil)
+	if status, _ := errorCode(t, rec); status != 404 {
+		t.Fatalf("deep policies path = %d", status)
+	}
+	rec = serveRequest(s, http.MethodPost, "/restaurants/r_anker", validPolicyBody("2027-06-06"), map[string]string{"Authorization": "Bearer " + mgr, "Idempotency-Key": "http-06"})
+	if status, _ := errorCode(t, rec); status != 404 {
+		t.Fatalf("POST detail = %d", status)
+	}
+	rec = serveRequest(s, http.MethodGet, "/restaurants/r_anker/policies/", nil, nil)
+	if status, _ := errorCode(t, rec); status != 404 {
+		t.Fatalf("trailing slash = %d", status)
+	}
+	// Explain over HTTP: matrix shape and guard codes.
+	rec = serveRequest(s, http.MethodGet, "/availability?restaurant_id=r_anker&date=2027-06-17&party_size=2&explain=true", nil, nil)
+	if rec.Code != 200 {
+		t.Fatalf("explain: %d %q", rec.Code, rec.Body.String())
+	}
+	var avail map[string]any
+	if err := json.Unmarshal(rec.Body.Bytes(), &avail); err != nil {
+		t.Fatal(err)
+	}
+	slot := avail["slots"].([]any)[0].(map[string]any)
+	if _, ok := slot["explain"]; !ok {
+		t.Fatalf("explain missing: %q", rec.Body.String())
+	}
+	for _, bad := range []string{"false", "1", ""} {
+		rec = serveRequest(s, http.MethodGet, "/availability?restaurant_id=r_anker&date=2027-06-17&party_size=2&explain="+bad, nil, nil)
+		if status, code := errorCode(t, rec); status != 422 || code != "validation_failed" {
+			t.Fatalf("explain=%q: %d %s", bad, status, code)
+		}
+	}
+	rec = serveRequest(s, http.MethodGet, "/availability?restaurant_id=r_anker&date=2027-06-17&party_size=2", nil, nil)
+	if err := json.Unmarshal(rec.Body.Bytes(), &avail); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := avail["slots"].([]any)[0].(map[string]any)["explain"]; ok {
+		t.Fatalf("no-explain response carries explain")
+	}
+}

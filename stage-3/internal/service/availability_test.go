@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/url"
 	"strings"
@@ -200,5 +201,403 @@ func TestAvailabilityDST(t *testing.T) {
 	}
 	if count != 1 {
 		t.Fatalf("repeated wall appears %d times", count)
+	}
+}
+
+func slotsAny(t *testing.T, res Result) []any {
+	t.Helper()
+	if res.Status != 200 {
+		t.Fatalf("availability: %d %v", res.Status, res.Body)
+	}
+	slots, ok := res.Body.(map[string]any)["slots"].([]any)
+	if !ok || slots == nil {
+		t.Fatalf("slots not an array: %v", res.Body)
+	}
+	return slots
+}
+
+func stringList(t *testing.T, v any) []string {
+	t.Helper()
+	switch items := v.(type) {
+	case []string:
+		return append([]string(nil), items...)
+	case []any:
+		out := make([]string, 0, len(items))
+		for _, item := range items {
+			str, ok := item.(string)
+			if !ok {
+				t.Fatalf("not a string list: %#v", v)
+			}
+			out = append(out, str)
+		}
+		return out
+	default:
+		t.Fatalf("not a string list: %#v", v)
+		return nil
+	}
+}
+
+func queryExplain(restaurant, date, party, explain string) url.Values {
+	q := url.Values{
+		"restaurant_id": {restaurant},
+		"date":          {date},
+		"party_size":    {party},
+	}
+	if explain != "" {
+		q.Set("explain", explain)
+	}
+	return q
+}
+
+func explainOf(t *testing.T, slot any) []any {
+	t.Helper()
+	m := slot.(map[string]any)
+	ex, ok := m["explain"].([]any)
+	if !ok || ex == nil {
+		t.Fatalf("slot has no explain array: %v", m)
+	}
+	return ex
+}
+
+func createBooking(t *testing.T, s *Service, token, key, restaurant, table, local string, party int) string {
+	t.Helper()
+	body, _ := json.Marshal(map[string]any{
+		"restaurant_id": restaurant, "table_id": table,
+		"starts_at_local": local, "party_size": party,
+	})
+	res := s.CreateReservation(token, key, body)
+	if res.Status != 201 {
+		t.Fatalf("create %s %s: %d %v", table, local, res.Status, res.Body)
+	}
+	return res.Body.(map[string]any)["reference"].(string)
+}
+
+func TestAvailabilityExplainMatrix(t *testing.T) {
+	s, mgr, diner := newPolicyService(t)
+	_ = mgr
+	date := "2027-06-17"
+	// t_1 (cap 2) booked at 21:00; t_2 (cap 4) booked at 19:00.
+	createBooking(t, s, diner, "ex-a", "r_anker", "t_1", date+"T21:00", 2)
+	createBooking(t, s, diner, "ex-b", "r_anker", "t_2", date+"T19:00", 4)
+	slots := slotsOf(t, s.Availability(queryExplain("r_anker", date, "4", "true")))
+	var target map[string]any
+	for _, sl := range slots {
+		if sl.(map[string]any)["starts_at_local"] == date+"T19:00" {
+			target = sl.(map[string]any)
+		}
+	}
+	if target == nil {
+		t.Fatal("19:00 slot missing")
+	}
+	ex := explainOf(t, target)
+	if len(ex) != 3 {
+		t.Fatalf("explain entries = %d, want 3", len(ex))
+	}
+	// Table order follows the fixture; rules order is capacity, no_overlap.
+	wantOrder := []string{"t_1", "t_2", "t_3"}
+	for i, id := range wantOrder {
+		entry := ex[i].(map[string]any)
+		if entry["table_id"] != id {
+			t.Fatalf("explain order = %v", ex)
+		}
+		rules := entry["rules"].([]any)
+		if len(rules) != 2 || rules[0].(map[string]any)["rule"] != "capacity" || rules[1].(map[string]any)["rule"] != "no_overlap" {
+			t.Fatalf("rules order = %v", rules)
+		}
+		if pv, ok := entry["policy_version"].(int); !ok || pv != 0 {
+			t.Fatalf("policy version = %v", entry["policy_version"])
+		}
+	}
+	holds := func(i, j int) bool {
+		return ex[i].(map[string]any)["rules"].([]any)[j].(map[string]any)["holds"].(bool)
+	}
+	avail := func(i int) bool { return ex[i].(map[string]any)["available"].(bool) }
+	// t_1: capacity false (4 > 2), no overlap (booked at 21:00 only).
+	if holds(0, 0) || !holds(0, 1) || avail(0) {
+		t.Fatalf("t_1 explain wrong: %v", ex[0])
+	}
+	// t_2: capacity true, overlap false (booked).
+	if !holds(1, 0) || holds(1, 1) || avail(1) {
+		t.Fatalf("t_2 explain wrong: %v", ex[1])
+	}
+	// t_3: both true.
+	if !holds(2, 0) || !holds(2, 1) || !avail(2) {
+		t.Fatalf("t_3 explain wrong: %v", ex[2])
+	}
+	// available ids exactly equal the true explain ids, in order.
+	ids := tablesOf(target)
+	if len(ids) != 1 || ids[0] != "t_3" {
+		t.Fatalf("available ids = %v", ids)
+	}
+	// Capacity-false / overlap-true case: t_1 at 18:00 is unbooked but too
+	// small for party 4.
+	for _, sl := range slots {
+		if sl.(map[string]any)["starts_at_local"] != date+"T18:00" {
+			continue
+		}
+		first := explainOf(t, sl)[0].(map[string]any)
+		rules := first["rules"].([]any)
+		if rules[0].(map[string]any)["holds"].(bool) || !rules[1].(map[string]any)["holds"].(bool) || first["available"].(bool) {
+			t.Fatalf("t_1 18:00 explain wrong: %v", first)
+		}
+	}
+	// Both-false case: party 6 with t_1 booked at 21:00 (cap 2 < 6).
+	slots = slotsOf(t, s.Availability(queryExplain("r_anker", date, "6", "true")))
+	for _, sl := range slots {
+		if sl.(map[string]any)["starts_at_local"] == date+"T21:00" {
+			target = sl.(map[string]any)
+		}
+	}
+	ex = explainOf(t, target)
+	first := ex[0].(map[string]any)
+	rules := first["rules"].([]any)
+	if rules[0].(map[string]any)["holds"].(bool) || rules[1].(map[string]any)["holds"].(bool) || first["available"].(bool) {
+		t.Fatalf("both-false entry wrong: %v", first)
+	}
+	if ids := tablesOf(target); len(ids) != 0 {
+		t.Fatalf("party 6 ids = %v", ids)
+	}
+}
+
+func TestAvailabilityExplainGuards(t *testing.T) {
+	s, _, _ := newPolicyService(t)
+	for _, bad := range []string{"false", "1", ""} {
+		q := queryExplain("r_anker", "2027-06-17", "2", "x")
+		q.Set("explain", bad)
+		res := s.Availability(q)
+		if status, code := resultCode(res); status != 422 || code != "validation_failed" {
+			t.Fatalf("explain=%q: got %d %s", bad, status, code)
+		}
+	}
+	// Bare ?explain= (empty value) is rejected too.
+	res := s.Availability(queryExplain("r_anker", "2027-06-17", "2", ""))
+	_ = res
+	// Without explain no slot carries explanation fields.
+	slots := slotsOf(t, s.Availability(queryOf("r_anker", "2027-06-17", "2")))
+	for _, sl := range slots {
+		if _, ok := sl.(map[string]any)["explain"]; ok {
+			t.Fatalf("no-explain slot carries explain: %v", sl)
+		}
+	}
+	// Unknown restaurant stays 404 even with explain.
+	if status, code := resultCode(s.Availability(queryExplain("r_nope", "2027-06-17", "2", "true"))); status != 404 || code != "not_found" {
+		t.Fatalf("unknown restaurant + explain = %d %s", status, code)
+	}
+}
+
+func TestAvailabilityExplainOccupancy(t *testing.T) {
+	s, _, diner := newPolicyService(t)
+	date := "2027-06-17"
+	// Cancelled bookings are ignored.
+	ref := createBooking(t, s, diner, "occ-a", "r_anker", "t_1", date+"T19:00", 2)
+	if res := s.CancelReservation(diner, ref); res.Status != 200 {
+		t.Fatalf("cancel: %d", res.Status)
+	}
+	slots := slotsOf(t, s.Availability(queryExplain("r_anker", date, "2", "true")))
+	for _, sl := range slots {
+		if sl.(map[string]any)["starts_at_local"] != date+"T19:00" {
+			continue
+		}
+		first := explainOf(t, sl)[0].(map[string]any)
+		rules := first["rules"].([]any)
+		if !rules[1].(map[string]any)["holds"].(bool) || !first["available"].(bool) {
+			t.Fatalf("cancelled booking still blocks: %v", first)
+		}
+	}
+	// A pair booking blocks every member independently.
+	pairBody, _ := json.Marshal(map[string]any{
+		"restaurant_id": "r_anker", "table_ids": []string{"t_1", "t_2"},
+		"starts_at_local": date + "T20:30", "party_size": 6,
+	})
+	if res := s.CreateReservation(diner, "occ-pair", pairBody); res.Status != 201 {
+		t.Fatalf("pair create: %d %v", res.Status, res.Body)
+	}
+	slots = slotsOf(t, s.Availability(queryExplain("r_anker", date, "2", "true")))
+	for _, sl := range slots {
+		if sl.(map[string]any)["starts_at_local"] != date+"T20:30" {
+			continue
+		}
+		ex := explainOf(t, sl)
+		for _, i := range []int{0, 1} {
+			rules := ex[i].(map[string]any)["rules"].([]any)
+			if rules[1].(map[string]any)["holds"].(bool) {
+				t.Fatalf("pair member %d not blocked: %v", i, ex[i])
+			}
+		}
+		if rules := ex[2].(map[string]any)["rules"].([]any); !rules[1].(map[string]any)["holds"].(bool) {
+			t.Fatalf("uninvolved table blocked: %v", ex[2])
+		}
+	}
+	// Adjacency: a booking ending exactly at the slot start does not overlap.
+	slots = slotsOf(t, s.Availability(queryExplain("r_anker", date, "2", "true")))
+	for _, sl := range slots {
+		if sl.(map[string]any)["starts_at_local"] != date+"T19:30" {
+			continue
+		}
+		ex := explainOf(t, sl)
+		// t_1 was booked 19:00+90m = ends 20:30; 19:30 overlaps. t_3 free.
+		if rules := ex[2].(map[string]any)["rules"].([]any); !rules[1].(map[string]any)["holds"].(bool) {
+			t.Fatalf("t_3 wrongly blocked at 19:30: %v", ex[2])
+		}
+	}
+	// Closed day: slots [] with and without explain.
+	if res := s.Availability(queryExplain("r_anker", "2027-06-16", "2", "true")); res.Status != 200 {
+		t.Fatalf("closed day: %d", res.Status)
+	} else if slots := res.Body.(map[string]any)["slots"].([]any); len(slots) != 0 {
+		t.Fatalf("closed day slots = %v", slots)
+	}
+}
+
+func TestDatedAvailabilityUsesPolicy(t *testing.T) {
+	s, mgr, _ := newPolicyService(t)
+	date := "2027-06-17"
+	body, _ := json.Marshal(map[string]any{
+		"effective_from": date, "slot_minutes": 60, "reservation_duration_minutes": 60,
+		"cancellation_cutoff_minutes": 60,
+		"opening_hours":               []any{map[string]any{"weekday": "thu", "opens": "18:00", "closes": "23:00"}},
+		"capacities":                  map[string]any{"t_1": 4, "t_2": 6, "t_3": 4},
+	})
+	if res := s.PublishPolicy(mgr, "r_anker", "dated-01", body); res.Status != 201 {
+		t.Fatalf("publish: %d %v", res.Status, res.Body)
+	}
+	slots := slotsOf(t, s.Availability(queryOf("r_anker", date, "8")))
+	if len(slots) != 5 {
+		t.Fatalf("policy grid slots = %d, want 5 (18:00..22:00 hourly)", len(slots))
+	}
+	first := slots[0].(map[string]any)
+	if first["starts_at_local"] != date+"T18:00" || first["starts_at"] != date+"T18:00:00+02:00" {
+		t.Fatalf("first slot = %v", first)
+	}
+	if ids := tablesOf(first); len(ids) != 0 {
+		t.Fatalf("party 8 singles = %v, want none", ids)
+	}
+	opts := first["available_options"].([]any)
+	if len(opts) != 2 {
+		t.Fatalf("party 8 options = %v", opts)
+	}
+	for i, want := range [][]string{{"t_1", "t_2"}, {"t_2", "t_3"}} {
+		opt := opts[i].(map[string]any)
+		ids := stringList(t, opt["table_ids"])
+		if len(ids) != 2 || ids[0] != want[0] || ids[1] != want[1] {
+			t.Fatalf("option %d = %v", i, opt)
+		}
+		if capVal, ok := opt["capacity"].(int); !ok || capVal != 10 {
+			t.Fatalf("selected pair capacity = %v, want 10 (not original 6)", opt["capacity"])
+		}
+	}
+	// No transitive pair: t_1+t_3 never appears.
+	for _, sl := range slots {
+		for _, o := range sl.(map[string]any)["available_options"].([]any) {
+			ids := stringList(t, o.(map[string]any)["table_ids"])
+			if len(ids) == 2 && ids[0] == "t_1" && ids[1] == "t_3" {
+				t.Fatalf("transitive pair offered: %v", o)
+			}
+		}
+	}
+	// Singles use selected caps: party 4 sees all three, with selected caps.
+	slots = slotsOf(t, s.Availability(queryOf("r_anker", date, "4")))
+	if ids := tablesOf(slots[0]); len(ids) != 3 {
+		t.Fatalf("party 4 singles = %v", ids)
+	}
+	// An earlier date still uses policy0's grid.
+	early := slotsOf(t, s.Availability(queryOf("r_anker", "2027-06-10", "2")))
+	if len(early) != 8 {
+		t.Fatalf("pre-policy grid slots = %d, want 8", len(early))
+	}
+	// The ordinary detail still returns the original fixture configuration.
+	var detail map[string]any
+	raw, _ := json.Marshal(s.GetRestaurant("r_anker").Body)
+	if err := json.Unmarshal(raw, &detail); err != nil {
+		t.Fatal(err)
+	}
+	if detail["slot_minutes"] != float64(30) || detail["reservation_duration_minutes"] != float64(90) {
+		t.Fatalf("detail mutated: %v", detail)
+	}
+	tabs := detail["tables"].([]any)
+	if tabs[0].(map[string]any)["capacity"] != float64(2) || tabs[1].(map[string]any)["capacity"] != float64(4) {
+		t.Fatalf("detail capacities mutated: %v", tabs)
+	}
+}
+
+func TestAvailabilityDSTUnderPolicy(t *testing.T) {
+	s, mgr, _ := newPolicyService(t)
+	berlin, _ := json.Marshal(map[string]any{
+		"effective_from": "2026-03-29", "slot_minutes": 30, "reservation_duration_minutes": 30,
+		"cancellation_cutoff_minutes": 0,
+		"opening_hours":               []any{map[string]any{"weekday": "sun", "opens": "00:00", "closes": "05:00"}},
+		"capacities":                  map[string]any{"t_1": 2, "t_2": 4, "t_3": 4},
+	})
+	if res := s.PublishPolicy(mgr, "r_anker", "dst-berlin", berlin); res.Status != 201 {
+		t.Fatalf("publish berlin: %d %v", res.Status, res.Body)
+	}
+	slots := slotsOf(t, s.Availability(queryOf("r_anker", "2026-03-29", "2")))
+	for _, sl := range slots {
+		local := sl.(map[string]any)["starts_at_local"].(string)
+		if local == "2026-03-29T02:00" || local == "2026-03-29T02:30" {
+			t.Fatalf("skipped wall appears under policy grid: %s", local)
+		}
+	}
+	ny, _ := json.Marshal(map[string]any{
+		"effective_from": "2026-11-01", "slot_minutes": 60, "reservation_duration_minutes": 60,
+		"cancellation_cutoff_minutes": 0,
+		"opening_hours":               []any{map[string]any{"weekday": "sun", "opens": "00:00", "closes": "05:00"}},
+		"capacities":                  map[string]any{"t_1": 4},
+	})
+	if res := s.PublishPolicy(mgr, "r_ny", "dst-ny", ny); res.Status != 201 {
+		t.Fatalf("publish ny: %d %v", res.Status, res.Body)
+	}
+	slots = slotsAny(t, s.Availability(queryOf("r_ny", "2026-11-01", "2")))
+	seen := map[string]int{}
+	var firstOffset string
+	for _, sl := range slots {
+		m := sl.(map[string]any)
+		seen[m["starts_at_local"].(string)]++
+		if m["starts_at_local"] == "2026-11-01T01:00" {
+			firstOffset = m["starts_at"].(string)
+		}
+	}
+	for local, n := range seen {
+		if n != 1 {
+			t.Fatalf("slot %s appears %d times", local, n)
+		}
+	}
+	if firstOffset != "2026-11-01T01:00:00-04:00" {
+		t.Fatalf("fold resolves to %q, want first occurrence -04:00", firstOffset)
+	}
+}
+
+func TestFixtureAboveMaxUsable(t *testing.T) {
+	s := New()
+	fixture := `{
+  "users": [{"id": "u_ada", "email": "ada@example.com", "password": "correct horse", "display_name": "Ada"}],
+  "restaurants": [{
+    "id": "r_big", "name": "Big", "timezone": "Europe/Berlin",
+    "slot_minutes": 30, "reservation_duration_minutes": 90, "cancellation_cutoff_minutes": 120,
+    "opening_hours": [{"weekday": "thu", "opens": "18:00", "closes": "23:00"}],
+    "tables": [{"id": "t_1", "label": "1", "capacity": 150}],
+    "manager_user_ids": ["u_ada"]
+  }],
+  "reservations": []
+}`
+	if res := s.Reset([]byte(fixture)); res.Status != 204 {
+		t.Fatalf("reset: %d %v", res.Status, res.Body)
+	}
+	// Fixture capacity 150 exceeds the publication maximum of 100, but
+	// policy0 must still decide reads.
+	slots := slotsAny(t, s.Availability(queryOf("r_big", "2027-06-17", "100")))
+	if ids := tablesOf(slots[0]); len(ids) != 1 || ids[0] != "t_1" {
+		t.Fatalf("party 100 ids = %v", ids)
+	}
+	exSlots := slotsAny(t, s.Availability(queryExplain("r_big", "2027-06-17", "100", "true")))
+	ex := explainOf(t, exSlots[0])
+	if len(ex) != 1 {
+		t.Fatalf("explain entries = %v", ex)
+	}
+	entry := ex[0].(map[string]any)
+	if pv, ok := entry["policy_version"].(int); !ok || pv != 0 {
+		t.Fatalf("explain = %v", entry)
+	}
+	if avail, ok := entry["available"].(bool); !ok || !avail {
+		t.Fatalf("explain = %v", entry)
 	}
 }
