@@ -90,8 +90,9 @@ func (s *Service) serve(w http.ResponseWriter, r *http.Request) {
 	writeResult(w, res)
 }
 
-// reservationRoute dispatches GET/PATCH on /reservations/{reference} and POST
-// on /reservations/{reference}/cancel. Deeper or malformed paths are 404.
+// reservationRoute dispatches GET/PATCH on /reservations/{reference}, POST
+// on /reservations/{reference}/cancel, and the owner-only GET history and
+// decision views. Deeper or malformed paths are 404.
 func (s *Service) reservationRoute(r *http.Request, path string) Result {
 	rest := strings.TrimPrefix(path, "/reservations/")
 	if rest == "" {
@@ -107,6 +108,10 @@ func (s *Service) reservationRoute(r *http.Request, path string) Result {
 		return s.PatchReservation(token, reference, readBody(r))
 	case len(parts) == 2 && parts[1] == "cancel" && r.Method == http.MethodPost:
 		return s.CancelReservation(token, reference)
+	case len(parts) == 2 && parts[1] == "history" && r.Method == http.MethodGet:
+		return s.ReservationHistory(token, reference)
+	case len(parts) == 2 && parts[1] == "decision" && r.Method == http.MethodGet:
+		return s.ReservationDecision(token, reference)
 	default:
 		return notFound("unknown path")
 	}
