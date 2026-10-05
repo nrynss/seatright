@@ -2093,16 +2093,17 @@ print("IFINDELTA-OK")
 PYEOF
 pycheck i-corrupt-guards - "$ART/ipre.json" "$ART/ipost.json" "$ART/iam.out" "$ART/ispec.json" <<'PYEOF'
 import json, sys, copy, subprocess, os
+from datetime import datetime, timedelta
 pref, postf, respf, specf = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 pre = json.load(open(pref))["state"]
 post = json.load(open(postf))["state"]
 spec = json.load(open(specf))
 prog = os.path.join(os.path.dirname(os.path.abspath(pref)), "amend_delta.py")
 changed0 = sorted(spec["changed"])[0]
-def run(obj, tag):
+def run(obj, tag, respov=None):
     pj = pref + ".mut-%s.json" % tag
     json.dump({"track": "tablekeeper", "format_version": 1, "state": obj}, open(pj, "w"))
-    r = subprocess.run([sys.executable, prog, pref, pj, respf, specf],
+    r = subprocess.run([sys.executable, prog, pref, pj, respov or respf, specf],
                        capture_output=True, text=True)
     print("%s exit=%d" % (tag, r.returncode))
     return r.returncode
@@ -2155,10 +2156,34 @@ cases.append(("forged-receipt-body", o))
 o = copy.deepcopy(post)
 o["restaurant_revisions"]["r"] = pre["restaurant_revisions"]["r"] + 9
 cases.append(("forged-counter", o))
+o = copy.deepcopy(post)
+o["reservations"]["ZZEXTRA1"] = copy.deepcopy(post["reservations"][changed0])
+o["histories"]["ZZEXTRA1"] = copy.deepcopy(post["histories"][changed0])
+cases.append(("paired-record-history-extras", o))
+o = copy.deepcopy(post)
+rec = o["reservations"][changed0]
+s0 = datetime.fromisoformat(rec["starts_at"])
+s1 = datetime.fromisoformat(rec["ends_at"])
+rec["starts_at"] = (s0 + timedelta(days=1)).isoformat()
+rec["ends_at"] = (s1 + timedelta(days=1)).isoformat()
+resp2 = copy.deepcopy(json.load(open(respf)))
+for x in resp2["occurrences"]:
+    if x["reference"] == changed0:
+        x["reservation"]["starts_at"] = rec["starts_at"]
+        x["reservation"]["ends_at"] = rec["ends_at"]
+resp_f2 = respf + ".shift.json"
+open(resp_f2, "w").write(json.dumps(resp2))
+for k, v in o["receipts"].items():
+    if k not in pre["receipts"]:
+        v["response"] = json.dumps(resp2)
+obj_shift, resp_shift = o, resp_f2
 for name, obj in cases:
     assert json.dumps(obj, sort_keys=True) != json.dumps(post, sort_keys=True), "mutation did not apply: " + name
     results[name] = run(obj, name)
     assert results[name] != 0, name
+results["coherent-date-shift"] = run(obj_shift, "coherent-date-shift", resp_shift)
+assert json.dumps(obj_shift, sort_keys=True) != json.dumps(post, sort_keys=True), "shift did not apply"
+assert results["coherent-date-shift"] != 0, results
 assert results["genuine"] == 0, results
 print("ISELFTEST-OK")
 PYEOF
@@ -3029,6 +3054,727 @@ for name, obj in cases:
 assert results["genuine"] == 0, results
 print("NSELFTEST-OK")
 PYEOF
+
+echo "== O fifty identical-key manager previews (P1C-A) =="
+FOUNDCODE=$(reset_world <<'EOF'
+{"users": [{"id":"m","email":"m@x","password":"password12","display_name":"M"},{"id":"a","email":"a@x","password":"password12","display_name":"A"}],
+ "restaurants": [{"id":"r","name":"N","timezone":"Europe/Berlin","slot_minutes":30,
+  "reservation_duration_minutes":90,"cancellation_cutoff_minutes":120,
+  "opening_hours":[{"weekday":"thu","opens":"18:00","closes":"23:00"}],
+  "tables":[{"id":"t_1","label":"1","capacity":2},{"id":"t_2","label":"2","capacity":4},{"id":"t_3","label":"3","capacity":6}],
+  "combinable":[["t_1","t_2"],["t_2","t_3"]],"manager_user_ids":["m"]},
+  {"id":"ro","name":"O","timezone":"Europe/Berlin","slot_minutes":30,
+  "reservation_duration_minutes":90,"cancellation_cutoff_minutes":120,
+  "opening_hours":[{"weekday":"thu","opens":"18:00","closes":"23:00"}],
+  "tables":[{"id":"q_1","label":"1","capacity":4}],"manager_user_ids":["m"]}],
+ "reservations": [
+  {"id":"s1","reference":"RC0001","user_id":"a","restaurant_id":"r","table_id":"t_2","starts_at_local":"2027-06-17T19:00","party_size":2},
+  {"id":"s2","reference":"RU0001","user_id":"a","restaurant_id":"r","table_id":"t_3","starts_at_local":"2027-06-17T21:30","party_size":1},
+  {"id":"s3","reference":"RO0001","user_id":"a","restaurant_id":"ro","table_id":"q_1","starts_at_local":"2027-06-17T19:00","party_size":1}]}
+EOF
+)
+expect o-reset "$FOUNDCODE" 204
+[ "$FOUNDCODE" = "204" ] || { echo "FAIL: o-reset-abort"; FAIL=$((FAIL + 1)); exit 1; }
+TOK_M=$(login "m@x" "password12")
+TOK_M_CODE=${TOK_M%%:*}; TOK_M=${TOK_M#*:}
+if [ "$TOK_M_CODE" = "200" ] && [ -n "$TOK_M" ]; then echo "PASS: login-m (200-nonempty)"; PASS=$((PASS + 1)); else echo "FAIL: login-m"; FAIL=$((FAIL + 1)); exit 1; fi
+TOK_A=$(login "a@x" "password12")
+TOK_A_CODE=${TOK_A%%:*}; TOK_A=${TOK_A#*:}
+if [ "$TOK_A_CODE" = "200" ] && [ -n "$TOK_A" ]; then echo "PASS: login-a (200-nonempty)"; PASS=$((PASS + 1)); else echo "FAIL: login-a"; FAIL=$((FAIL + 1)); exit 1; fi
+$CURL -o "$ART/oanch.out" -w '%{http_code}' -X POST "$BASE/reservations" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_A" -H 'Idempotency-Key: o-anch' -d '{"restaurant_id":"r","table_id":"t_1","starts_at_local":"2027-06-24T19:00","party_size":1}' > "$SCR/oanch.code" 2>>"$DIAG"
+chmod 600 "$ART/oanch.out"
+expect o-anchor "$(cat "$SCR/oanch.code")" 201
+OAREF=$(py -c 'import json; print(json.load(open("'"$ART"'/oanch.out"))["reference"])' 2>>"$DIAG")
+$CURL -o "$ART/oad.out" -w '%{http_code}' -X POST "$BASE/series" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_A" -H 'Idempotency-Key: o-ad' -d '{"anchor_reference":"'"$OAREF"'","count":2,"interval_weeks":1}' > "$SCR/oad.code" 2>>"$DIAG"
+chmod 600 "$ART/oad.out"
+expect o-adopt "$(cat "$SCR/oad.code")" 201
+OSID=$(py -c 'import json; print(json.load(open("'"$ART"'/oad.out"))["series_id"])' 2>>"$DIAG")
+OGEN=$(py -c 'import json; print(json.load(open("'"$ART"'/oad.out"))["occurrences"][1]["reservation"]["reference"])' 2>>"$DIAG")
+$CURL -o /dev/null -w '%{http_code}' -X POST "$BASE/restaurants/ro/replans" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: o-upv' -d '{"table_id":"q_1","from":"2027-06-17T18:00:00+02:00","to":"2027-06-17T19:00:00+02:00"}' > "$SCR/oupv.code" 2>>"$DIAG"
+expect o-unrelated-preview "$(cat "$SCR/oupv.code")" 201
+export_ok "$ART/opre.json" && { echo "PASS: o-export-pre (200)"; PASS=$((PASS + 1)); }
+OCLO='{"table_id":"t_2","from":"2027-06-17T19:00:00+02:00","to":"2027-06-17T20:00:00+02:00"}'
+i=1
+while [ "$i" -le 50 ]; do
+  $CURL -o "$ART/o50-$i.out" -w '%{http_code}\n' -X POST "$BASE/restaurants/r/replans" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: o-r50' -d "$OCLO" > "$SCR/o50-$i.code" 2>>"$DIAG" &
+  i=$((i + 1))
+done
+wait
+chmod 600 "$ART"/o50-*.out
+export_ok "$ART/opost.json" && { echo "PASS: o-export-post (200)"; PASS=$((PASS + 1)); }
+cat > "$ART/preview_race_delta.py" <<'PYEOF'
+import json, sys
+pre = json.load(open(sys.argv[1]))["state"]
+post = json.load(open(sys.argv[2]))["state"]
+body = json.load(open(sys.argv[3]))
+spec = json.load(open(sys.argv[4]))
+raw = open(sys.argv[3], "rb").read()
+rest = spec["restaurant"]
+assert sorted(body.keys()) == ["assignments", "closure", "moved_count", "plan_id", "restaurant_revision", "unused_seats"], body.keys()
+assert body["closure"] == json.loads(spec["closure"]), body["closure"]
+assert body["assignments"] == spec["hand_assignments"], body["assignments"]
+assert (body["moved_count"], body["unused_seats"]) == (spec["hand_moved"], spec["hand_unused"]), body
+assert body["restaurant_revision"] == pre["restaurant_revisions"][rest], (body["restaurant_revision"], pre["restaurant_revisions"])
+assert isinstance(body["plan_id"], str) and body["plan_id"], "plan id"
+pid = body["plan_id"]
+assert len(post["plans"]) == len(pre["plans"]) + 1, "one plan"
+assert len(post["receipts"]) == len(pre["receipts"]) + 1, "one receipt"
+for k in ("reservations", "histories", "series", "closures", "restaurant_revisions", "users", "tokens", "restaurants", "policies"):
+    assert pre[k] == post[k], "namespace %s changed" % k
+for k, v in pre["plans"].items():
+    assert post["plans"][k] == v, "prior plan %s changed" % k
+for k, v in pre["receipts"].items():
+    assert post["receipts"][k] == v, "prior receipt changed"
+new_plans = [k for k in post["plans"] if k not in pre["plans"]]
+assert len(new_plans) == 1, new_plans
+st = post["plans"][new_plans[0]]
+assert st["applied"] is False, st
+assert st["plan_id"] == pid, "stored id"
+assert st["restaurant_id"] == rest, st
+assert st["restaurant_revision"] == pre["restaurant_revisions"][rest], "captured rev"
+assert st["closure"] == body["closure"], "stored closure"
+assert st["assignments"] == body["assignments"], "stored assignments"
+assert (st["moved_count"], st["unused_seats"]) == (spec["hand_moved"], spec["hand_unused"]), st
+new_rc = [v for k, v in post["receipts"].items() if k not in pre["receipts"]]
+assert len(new_rc) == 1, "one receipt"
+rc = new_rc[0]
+assert rc["user_id"] == spec["owner"] and rc["method"] == "POST", rc
+assert rc["path"] == spec["path"] and rc["key"] == spec["key"], rc
+assert rc["status"] == 201, rc
+assert json.loads(rc["body"]) == json.loads(spec["closure"]), rc["body"]
+assert rc["response"].encode() == raw, "receipt response != raw first201 bytes"
+print("PREVIEW-RACE-DELTA-OK %s" % pid)
+PYEOF
+chmod 600 "$ART/preview_race_delta.py"
+pycheck o-race-outcome - "$ART/opre.json" "$ART/opost.json" "$ART" "$SCR" <<'PYEOF'
+import json, sys, os, subprocess
+pref, postf, art, scr = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+pre = json.load(open(pref))["state"]
+codes, bodies = [], set()
+for i in range(1, 51):
+    codes.append(open(os.path.join(scr, "o50-%d.code" % i)).read().strip())
+    bodies.add(open(os.path.join(art, "o50-%d.out" % i), "rb").read())
+assert sorted(codes) == ["200"] * 49 + ["201"], sorted(codes)
+assert len(bodies) == 1, "all 50 preview raw bodies byte-equal"
+raw = bodies.pop()
+wbody = json.loads(raw)
+hand = [{"reference": "RC0001", "table_ids": ["t_1"], "changed": True}]
+assert wbody["assignments"] == hand, wbody["assignments"]
+assert (wbody["moved_count"], wbody["unused_seats"]) == (1, 0), wbody
+assert wbody["closure"] == {"table_id": "t_2", "from": "2027-06-17T19:00:00+02:00", "to": "2027-06-17T20:00:00+02:00"}, wbody["closure"]
+assert wbody["restaurant_revision"] == pre["restaurant_revisions"]["r"], wbody["restaurant_revision"]
+spec = {"restaurant": "r", "owner": "m", "path": "/restaurants/r/replans", "key": "o-r50",
+        "closure": '{"table_id":"t_2","from":"2027-06-17T19:00:00+02:00","to":"2027-06-17T20:00:00+02:00"}',
+        "hand_assignments": hand, "hand_moved": 1, "hand_unused": 0}
+spec_f = os.path.join(art, "ospec.json")
+json.dump(spec, open(spec_f, "w"))
+resp_f = os.path.join(art, "o50-winner.out")
+open(resp_f, "wb").write(raw)
+checker = os.path.join(art, "preview_race_delta.py")
+r = subprocess.run([sys.executable, checker, pref, postf, resp_f, spec_f], capture_output=True, text=True)
+sys.stdout.write(r.stdout)
+sys.stderr.write(r.stderr)
+assert r.returncode == 0, "preview race checker failed"
+print("ORACE-OK")
+PYEOF
+pycheck o-corrupt-guards - "$ART/opre.json" "$ART/opost.json" "$ART/o50-winner.out" "$ART/ospec.json" <<'PYEOF'
+import json, sys, copy, subprocess, os
+pref, postf, respf, specf = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+pre = json.load(open(pref))["state"]
+post = json.load(open(postf))["state"]
+prog = os.path.join(os.path.dirname(os.path.abspath(pref)), "preview_race_delta.py")
+def run(obj, tag):
+    pj = pref + ".mut-%s.json" % tag
+    json.dump({"track": "tablekeeper", "format_version": 1, "state": obj}, open(pj, "w"))
+    r = subprocess.run([sys.executable, prog, pref, pj, respf, specf], capture_output=True, text=True)
+    print("%s exit=%d" % (tag, r.returncode))
+    return r.returncode
+results = {"genuine": run(post, "genuine")}
+cases = []
+o = copy.deepcopy(post)
+newk = next(k for k in o["plans"] if k not in pre["plans"])
+o["plans"][newk]["applied"] = True
+cases.append(("applied-flip", o))
+o = copy.deepcopy(post)
+newk = next(k for k in o["plans"] if k not in pre["plans"])
+o["plans"][newk]["assignments"] = [{"reference": "RC0001", "table_ids": ["t_3"], "changed": True}]
+cases.append(("copied-selector", o))
+o = copy.deepcopy(post)
+newk = next(k for k in o["plans"] if k not in pre["plans"])
+o["plans"][newk]["restaurant_revision"] = pre["restaurant_revisions"]["r"] + 5
+cases.append(("captured-rev", o))
+o = copy.deepcopy(post)
+for k, v in o["receipts"].items():
+    if k not in pre["receipts"]:
+        v["user_id"] = "wrong-owner"
+cases.append(("receipt-owner", o))
+o = copy.deepcopy(post)
+for k, v in o["receipts"].items():
+    if k not in pre["receipts"]:
+        v["body"] = '{"table_id":"t_1","from":"2027-06-17T18:00:00+02:00","to":"2027-06-17T19:00:00+02:00"}'
+cases.append(("receipt-body", o))
+o = copy.deepcopy(post)
+o["restaurant_revisions"]["r"] = pre["restaurant_revisions"]["r"] + 9
+cases.append(("forged-counter", o))
+o = copy.deepcopy(post)
+o["reservations"]["ZZEXTRA1"] = copy.deepcopy(next(iter(o["reservations"].values())))
+o["histories"]["ZZEXTRA1"] = copy.deepcopy(next(iter(o["histories"].values())))
+cases.append(("paired-record-history-extras", o))
+o = copy.deepcopy(post)
+o["plans"]["unexpected-plan"] = copy.deepcopy(next(iter(o["plans"].values())))
+cases.append(("extra-plan", o))
+for name, obj in cases:
+    assert json.dumps(obj, sort_keys=True) != json.dumps(post, sort_keys=True), "mutation did not apply: " + name
+    results[name] = run(obj, name)
+    assert results[name] != 0, name
+assert results["genuine"] == 0, results
+print("OSELFTEST-OK")
+PYEOF
+expect o-retry "$($CURL -o "$ART/orepr.out" -w '%{http_code}' -X POST "$BASE/restaurants/r/replans" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: o-r50' -d "$OCLO")" 200
+chmod 600 "$ART/orepr.out"
+if cmp -s "$ART/o50-winner.out" "$ART/orepr.out"; then echo "PASS: o-replay-bytes (identical)"; PASS=$((PASS + 1)); else echo "FAIL: o-replay-bytes"; FAIL=$((FAIL + 1)); fi
+export_ok "$ART/orepost.json" && { echo "PASS: o-export-repost (200)"; PASS=$((PASS + 1)); }
+if cmp -s "$ART/opost.json" "$ART/orepost.json"; then echo "PASS: o-replay-atomic (identical)"; PASS=$((PASS + 1)); else echo "FAIL: o-replay-atomic"; FAIL=$((FAIL + 1)); fi
+echo "== P fifty identical-key applications (P1C-B) =="
+FOUNDCODE=$(reset_world <<'EOF'
+{"users": [{"id":"m","email":"m@x","password":"password12","display_name":"M"},{"id":"a","email":"a@x","password":"password12","display_name":"A"}],
+ "restaurants": [{"id":"r","name":"N","timezone":"Europe/Berlin","slot_minutes":30,
+  "reservation_duration_minutes":90,"cancellation_cutoff_minutes":120,
+  "opening_hours":[{"weekday":"thu","opens":"18:00","closes":"23:00"}],
+  "tables":[{"id":"t_1","label":"1","capacity":2},{"id":"t_2","label":"2","capacity":4},{"id":"t_3","label":"3","capacity":6}],
+  "combinable":[["t_1","t_2"],["t_2","t_3"]],"manager_user_ids":["m"]},
+  {"id":"ro","name":"O","timezone":"Europe/Berlin","slot_minutes":30,
+  "reservation_duration_minutes":90,"cancellation_cutoff_minutes":120,
+  "opening_hours":[{"weekday":"thu","opens":"18:00","closes":"23:00"}],
+  "tables":[{"id":"q_1","label":"1","capacity":4}],"manager_user_ids":["m"]}],
+ "reservations": [
+  {"id":"s1","reference":"RC0001","user_id":"a","restaurant_id":"r","table_id":"t_2","starts_at_local":"2027-06-17T19:00","party_size":2},
+  {"id":"s2","reference":"RU0001","user_id":"a","restaurant_id":"r","table_id":"t_3","starts_at_local":"2027-06-17T21:30","party_size":1},
+  {"id":"s3","reference":"RO0001","user_id":"a","restaurant_id":"ro","table_id":"q_1","starts_at_local":"2027-06-17T19:00","party_size":1}]}
+EOF
+)
+expect p-reset "$FOUNDCODE" 204
+[ "$FOUNDCODE" = "204" ] || { echo "FAIL: p-reset-abort"; FAIL=$((FAIL + 1)); exit 1; }
+TOK_M=$(login "m@x" "password12")
+TOK_M_CODE=${TOK_M%%:*}; TOK_M=${TOK_M#*:}
+if [ "$TOK_M_CODE" = "200" ] && [ -n "$TOK_M" ]; then echo "PASS: login-m (200-nonempty)"; PASS=$((PASS + 1)); else echo "FAIL: login-m"; FAIL=$((FAIL + 1)); exit 1; fi
+TOK_A=$(login "a@x" "password12")
+TOK_A_CODE=${TOK_A%%:*}; TOK_A=${TOK_A#*:}
+if [ "$TOK_A_CODE" = "200" ] && [ -n "$TOK_A" ]; then echo "PASS: login-a (200-nonempty)"; PASS=$((PASS + 1)); else echo "FAIL: login-a"; FAIL=$((FAIL + 1)); exit 1; fi
+$CURL -o "$ART/panch.out" -w '%{http_code}' -X POST "$BASE/reservations" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_A" -H 'Idempotency-Key: p-anch' -d '{"restaurant_id":"r","table_id":"t_1","starts_at_local":"2027-06-24T19:00","party_size":1}' > "$SCR/panch.code" 2>>"$DIAG"
+chmod 600 "$ART/panch.out"
+expect p-anchor "$(cat "$SCR/panch.code")" 201
+PAREF=$(py -c 'import json; print(json.load(open("'"$ART"'/panch.out"))["reference"])' 2>>"$DIAG")
+$CURL -o "$ART/pad.out" -w '%{http_code}' -X POST "$BASE/series" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_A" -H 'Idempotency-Key: p-ad' -d '{"anchor_reference":"'"$PAREF"'","count":2,"interval_weeks":1}' > "$SCR/pad.code" 2>>"$DIAG"
+chmod 600 "$ART/pad.out"
+expect p-adopt "$(cat "$SCR/pad.code")" 201
+PSID=$(py -c 'import json; print(json.load(open("'"$ART"'/pad.out"))["series_id"])' 2>>"$DIAG")
+$CURL -o /dev/null -w '%{http_code}' -X POST "$BASE/restaurants/ro/replans" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: p-upv' -d '{"table_id":"q_1","from":"2027-06-17T18:00:00+02:00","to":"2027-06-17T19:00:00+02:00"}' > "$SCR/pupv.code" 2>>"$DIAG"
+expect p-unrelated-preview "$(cat "$SCR/pupv.code")" 201
+PCLO='{"table_id":"t_2","from":"2027-06-17T19:00:00+02:00","to":"2027-06-17T20:00:00+02:00"}'
+$CURL -o "$ART/ppv.out" -w '%{http_code}' -X POST "$BASE/restaurants/r/replans" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: p-pv' -d "$PCLO" > "$SCR/ppv.code" 2>>"$DIAG"
+chmod 600 "$ART/ppv.out"
+expect p-preview "$(cat "$SCR/ppv.code")" 201
+pycheck p-preview-hand - "$ART/ppv.out" <<'PYEOF'
+import json, sys
+d = json.load(open(sys.argv[1]))
+assert d["assignments"] == [{"reference": "RC0001", "table_ids": ["t_1"], "changed": True}], d["assignments"]
+assert (d["moved_count"], d["unused_seats"]) == (1, 0), d
+assert d["closure"] == {"table_id": "t_2", "from": "2027-06-17T19:00:00+02:00", "to": "2027-06-17T20:00:00+02:00"}, d["closure"]
+print("PPV-HAND-OK")
+PYEOF
+P_APPLY_PLAN_ID=$(py -c 'import json; print(json.load(open("'"$ART"'/ppv.out"))["plan_id"])' 2>>"$DIAG")
+export_ok "$ART/ppre.json" && { echo "PASS: p-export-pre (200)"; PASS=$((PASS + 1)); }
+i=1
+while [ "$i" -le 50 ]; do
+  $CURL -o "$ART/p50-$i.out" -w '%{http_code}\n' -X POST "$BASE/restaurants/r/replans/$P_APPLY_PLAN_ID/apply" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: p-r50' -d '{}' > "$SCR/p50-$i.code" 2>>"$DIAG" &
+  i=$((i + 1))
+done
+wait
+chmod 600 "$ART"/p50-*.out
+export_ok "$ART/ppost.json" && { echo "PASS: p-export-post (200)"; PASS=$((PASS + 1)); }
+pycheck p-race-outcome - "$ART/ppre.json" "$ART/ppost.json" "$ART" "$SCR" "$P_APPLY_PLAN_ID" <<'PYEOF'
+import json, sys, os, subprocess
+pref, postf, art, scr, pid = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]
+pre = json.load(open(pref))["state"]
+codes, bodies = [], set()
+for i in range(1, 51):
+    codes.append(open(os.path.join(scr, "p50-%d.code" % i)).read().strip())
+    bodies.add(open(os.path.join(art, "p50-%d.out" % i), "rb").read())
+assert sorted(codes) == ["200"] * 49 + ["201"], sorted(codes)
+assert len(bodies) == 1, "all 50 apply raw bodies byte-equal"
+raw = bodies.pop()
+wbody = json.loads(raw)
+assert wbody["plan_id"] == pid, wbody["plan_id"]
+assert [r["reference"] for r in wbody["reservations"]] == ["RC0001"], wbody["reservations"]
+assert wbody["restaurant_revision"] == pre["restaurant_revisions"]["r"] + 1, wbody["restaurant_revision"]
+unmoved = sorted(r for r in pre["reservations"] if r != "RC0001")
+assert len(unmoved) >= 4, unmoved
+spec = {"plan_id": pid, "restaurant": "r", "path": "/restaurants/r/replans/%s/apply" % pid,
+        "key": "p-r50", "owner": "m", "body": "{}",
+        "order": ["RC0001"], "revision": pre["restaurant_revisions"]["r"] + 1,
+        "moved": {"RC0001": {"from": ["t_2"], "to": ["t_1"]}},
+        "unmoved": unmoved, "series": {}}
+spec_f = os.path.join(art, "pspec.json")
+json.dump(spec, open(spec_f, "w"))
+resp_f = os.path.join(art, "p50-winner.out")
+open(resp_f, "wb").write(raw)
+checker = os.path.join(art, "apply_delta.py")
+r = subprocess.run([sys.executable, checker, pref, postf, resp_f, spec_f], capture_output=True, text=True)
+sys.stdout.write(r.stdout)
+sys.stderr.write(r.stderr)
+assert r.returncode == 0, "shared apply checker failed"
+print("PRACE-OK")
+PYEOF
+pycheck p-corrupt-guards - "$ART/ppre.json" "$ART/ppost.json" "$ART/p50-winner.out" "$ART/pspec.json" <<'PYEOF'
+import json, sys, copy, subprocess, os
+pref, postf, respf, specf = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+pre = json.load(open(pref))["state"]
+post = json.load(open(postf))["state"]
+spec = json.load(open(specf))
+prog = os.path.join(os.path.dirname(os.path.abspath(pref)), "apply_delta.py")
+changed0 = sorted(spec["moved"])[0]
+unmoved0 = sorted(spec["unmoved"])[0]
+assert changed0 != unmoved0
+def run(obj, tag):
+    pj = pref + ".mut-%s.json" % tag
+    json.dump({"track": "tablekeeper", "format_version": 1, "state": obj}, open(pj, "w"))
+    r = subprocess.run([sys.executable, prog, pref, pj, respf, specf], capture_output=True, text=True)
+    print("%s exit=%d" % (tag, r.returncode))
+    return r.returncode
+results = {"genuine": run(post, "genuine")}
+cases = []
+o = copy.deepcopy(post)
+o["reservations"][changed0]["table_ids"] = ["t_3"]
+cases.append(("copied-selector", o))
+o = copy.deepcopy(post)
+o["histories"][changed0][-1]["changes"] = [{"field": "table_ids", "from": ["t_1"], "to": ["t_1"]}]
+cases.append(("reassigned-from", o))
+o = copy.deepcopy(post)
+o["histories"][changed0][-1]["accepted_terms"]["capacities"]["t_1"] = 99
+cases.append(("reassigned-terms", o))
+o = copy.deepcopy(post)
+o["histories"][unmoved0].append(copy.deepcopy(o["histories"][changed0][-1]))
+cases.append(("unrelated-history", o))
+o = copy.deepcopy(post)
+o["restaurant_revisions"]["r"] = pre["restaurant_revisions"]["r"] + 9
+cases.append(("forged-counter", o))
+o = copy.deepcopy(post)
+o["plans"][spec["plan_id"]]["applied"] = False
+cases.append(("plan-applied", o))
+o = copy.deepcopy(post)
+o["plans"][spec["plan_id"]]["restaurant_revision"] = pre["restaurant_revisions"]["r"] + 99
+cases.append(("captured-rev", o))
+o = copy.deepcopy(post)
+for k, v in o["receipts"].items():
+    if k not in pre["receipts"]:
+        v["user_id"] = "wrong-owner"
+cases.append(("receipt-owner", o))
+o = copy.deepcopy(post)
+for k, v in o["receipts"].items():
+    if k not in pre["receipts"]:
+        v["body"] = '{"other":true}'
+cases.append(("receipt-body", o))
+o = copy.deepcopy(post)
+o["reservations"]["ZZEXTRA1"] = copy.deepcopy(post["reservations"][changed0])
+o["histories"]["ZZEXTRA1"] = copy.deepcopy(post["histories"][changed0])
+cases.append(("paired-record-history-extras", o))
+o = copy.deepcopy(post)
+o["plans"]["unexpected-plan"] = copy.deepcopy(next(iter(o["plans"].values())))
+cases.append(("extra-plan", o))
+for name, obj in cases:
+    assert json.dumps(obj, sort_keys=True) != json.dumps(post, sort_keys=True), "mutation did not apply: " + name
+    results[name] = run(obj, name)
+    assert results[name] != 0, name
+assert results["genuine"] == 0, results
+print("PSELFTEST-OK")
+PYEOF
+$CURL -o "$ART/pcur.out" -G "$BASE/reservations/RC0001" -H "Authorization: Bearer $TOK_A" 2>>"$DIAG"
+chmod 600 "$ART/pcur.out"
+pycheck p-evolved-proof - "$ART/p50-winner.out" "$ART/pcur.out" <<'PYEOF'
+import json, sys
+w = json.load(open(sys.argv[1]))
+cur = json.load(open(sys.argv[2]))
+wrec = [r for r in w["reservations"] if r["reference"] == "RC0001"][0]
+assert wrec["party_size"] == 2, wrec
+assert cur["party_size"] == 2, cur
+print("PEVOLVED-BASE-OK")
+PYEOF
+expect p-patch "$($CURL -o "$ART/ppatch.out" -w '%{http_code}' -X PATCH "$BASE/reservations/RC0001" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_A" -d '{"party_size":1}')" 200
+chmod 600 "$ART/ppatch.out"
+pycheck p-patch-evolved - "$ART/ppatch.out" <<'PYEOF'
+import json, sys
+d = json.load(open(sys.argv[1]))
+assert d["party_size"] == 1 and d["reference"] == "RC0001", d
+print("PPATCH-OK")
+PYEOF
+export_ok "$ART/p-repre.json" && { echo "PASS: p-export-repre (200)"; PASS=$((PASS + 1)); }
+expect p-replay "$($CURL -o "$ART/prepr.out" -w '%{http_code}' -X POST "$BASE/restaurants/r/replans/$P_APPLY_PLAN_ID/apply" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: p-r50' -d '{}')" 200
+chmod 600 "$ART/prepr.out"
+if cmp -s "$ART/p50-winner.out" "$ART/prepr.out"; then echo "PASS: p-replay-bytes (identical)"; PASS=$((PASS + 1)); else echo "FAIL: p-replay-bytes"; FAIL=$((FAIL + 1)); fi
+export_ok "$ART/p-repost.json" && { echo "PASS: p-export-repost (200)"; PASS=$((PASS + 1)); }
+if cmp -s "$ART/p-repre.json" "$ART/p-repost.json"; then echo "PASS: p-replay-atomic (identical)"; PASS=$((PASS + 1)); else echo "FAIL: p-replay-atomic"; FAIL=$((FAIL + 1)); fi
+echo "== Q two keys applying same plan (P1C-C) =="
+FOUNDCODE=$(reset_world <<'EOF'
+{"users": [{"id":"m","email":"m@x","password":"password12","display_name":"M"},{"id":"a","email":"a@x","password":"password12","display_name":"A"}],
+ "restaurants": [{"id":"r","name":"N","timezone":"Europe/Berlin","slot_minutes":30,
+  "reservation_duration_minutes":90,"cancellation_cutoff_minutes":120,
+  "opening_hours":[{"weekday":"thu","opens":"18:00","closes":"23:00"}],
+  "tables":[{"id":"t_1","label":"1","capacity":2},{"id":"t_2","label":"2","capacity":4},{"id":"t_3","label":"3","capacity":6}],
+  "combinable":[["t_1","t_2"],["t_2","t_3"]],"manager_user_ids":["m"]},
+  {"id":"ro","name":"O","timezone":"Europe/Berlin","slot_minutes":30,
+  "reservation_duration_minutes":90,"cancellation_cutoff_minutes":120,
+  "opening_hours":[{"weekday":"thu","opens":"18:00","closes":"23:00"}],
+  "tables":[{"id":"q_1","label":"1","capacity":4}],"manager_user_ids":["m"]}],
+ "reservations": [
+  {"id":"s1","reference":"RC0001","user_id":"a","restaurant_id":"r","table_id":"t_2","starts_at_local":"2027-06-17T19:00","party_size":2},
+  {"id":"s2","reference":"RU0001","user_id":"a","restaurant_id":"r","table_id":"t_3","starts_at_local":"2027-06-17T21:30","party_size":1},
+  {"id":"s3","reference":"RO0001","user_id":"a","restaurant_id":"ro","table_id":"q_1","starts_at_local":"2027-06-17T19:00","party_size":1}]}
+EOF
+)
+expect q-reset "$FOUNDCODE" 204
+[ "$FOUNDCODE" = "204" ] || { echo "FAIL: q-reset-abort"; FAIL=$((FAIL + 1)); exit 1; }
+TOK_M=$(login "m@x" "password12")
+TOK_M_CODE=${TOK_M%%:*}; TOK_M=${TOK_M#*:}
+if [ "$TOK_M_CODE" = "200" ] && [ -n "$TOK_M" ]; then echo "PASS: login-m (200-nonempty)"; PASS=$((PASS + 1)); else echo "FAIL: login-m"; FAIL=$((FAIL + 1)); exit 1; fi
+TOK_A=$(login "a@x" "password12")
+TOK_A_CODE=${TOK_A%%:*}; TOK_A=${TOK_A#*:}
+if [ "$TOK_A_CODE" = "200" ] && [ -n "$TOK_A" ]; then echo "PASS: login-a (200-nonempty)"; PASS=$((PASS + 1)); else echo "FAIL: login-a"; FAIL=$((FAIL + 1)); exit 1; fi
+$CURL -o "$ART/qanch.out" -w '%{http_code}' -X POST "$BASE/reservations" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_A" -H 'Idempotency-Key: q-anch' -d '{"restaurant_id":"r","table_id":"t_1","starts_at_local":"2027-06-24T19:00","party_size":1}' > "$SCR/qanch.code" 2>>"$DIAG"
+chmod 600 "$ART/qanch.out"
+expect q-anchor "$(cat "$SCR/qanch.code")" 201
+QAREF=$(py -c 'import json; print(json.load(open("'"$ART"'/qanch.out"))["reference"])' 2>>"$DIAG")
+$CURL -o "$ART/qad.out" -w '%{http_code}' -X POST "$BASE/series" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_A" -H 'Idempotency-Key: q-ad' -d '{"anchor_reference":"'"$QAREF"'","count":2,"interval_weeks":1}' > "$SCR/qad.code" 2>>"$DIAG"
+chmod 600 "$ART/qad.out"
+expect q-adopt "$(cat "$SCR/qad.code")" 201
+$CURL -o /dev/null -w '%{http_code}' -X POST "$BASE/restaurants/ro/replans" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: q-upv' -d '{"table_id":"q_1","from":"2027-06-17T18:00:00+02:00","to":"2027-06-17T19:00:00+02:00"}' > "$SCR/qupv.code" 2>>"$DIAG"
+expect q-unrelated-preview "$(cat "$SCR/qupv.code")" 201
+QCLO='{"table_id":"t_2","from":"2027-06-17T19:00:00+02:00","to":"2027-06-17T20:00:00+02:00"}'
+$CURL -o "$ART/qpv.out" -w '%{http_code}' -X POST "$BASE/restaurants/r/replans" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: q-pv' -d "$QCLO" > "$SCR/qpv.code" 2>>"$DIAG"
+chmod 600 "$ART/qpv.out"
+expect q-preview "$(cat "$SCR/qpv.code")" 201
+pycheck q-preview-hand - "$ART/qpv.out" <<'PYEOF'
+import json, sys
+d = json.load(open(sys.argv[1]))
+assert d["assignments"] == [{"reference": "RC0001", "table_ids": ["t_1"], "changed": True}], d["assignments"]
+assert (d["moved_count"], d["unused_seats"]) == (1, 0), d
+print("QPV-HAND-OK")
+PYEOF
+QPID=$(py -c 'import json; print(json.load(open("'"$ART"'/qpv.out"))["plan_id"])' 2>>"$DIAG")
+export_ok "$ART/qpre.json" && { echo "PASS: q-export-pre (200)"; PASS=$((PASS + 1)); }
+$CURL -o "$ART/qa1.out" -w '%{http_code}\n' -X POST "$BASE/restaurants/r/replans/$QPID/apply" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: q-a1' -d '{}' > "$SCR/qa1.code" 2>>"$DIAG" &
+$CURL -o "$ART/qa2.out" -w '%{http_code}\n' -X POST "$BASE/restaurants/r/replans/$QPID/apply" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: q-a2' -d '{}' > "$SCR/qa2.code" 2>>"$DIAG" &
+wait
+chmod 600 "$ART/qa1.out" "$ART/qa2.out"
+export_ok "$ART/qpost.json" && { echo "PASS: q-export-post (200)"; PASS=$((PASS + 1)); }
+pycheck q-race-outcome - "$ART/qa1.out" "$ART/qa2.out" "$SCR/qa1.code" "$SCR/qa2.code" "$ART/qpre.json" "$ART/qpost.json" "$QPID" <<'PYEOF'
+import json, sys, os, subprocess
+ra, rb, ca, cb, pref, postf, pid = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7]
+ca = open(ca).read().strip()
+cb = open(cb).read().strip()
+pre = json.load(open(pref))["state"]
+codes = sorted([(ca, "q-a1", ra), (cb, "q-a2", rb)])
+assert sorted([c[0] for c in codes]) == ["201", "409"], codes
+win = [c for c in codes if c[0] == "201"][0]
+lose = [c for c in codes if c[0] == "409"][0]
+assert json.load(open(lose[2]))["error"]["code"] == "plan_already_applied", lose
+wbody = json.load(open(win[2]))
+assert wbody["plan_id"] == pid, wbody["plan_id"]
+assert [r["reference"] for r in wbody["reservations"]] == ["RC0001"], wbody["reservations"]
+assert wbody["restaurant_revision"] == pre["restaurant_revisions"]["r"] + 1, wbody["restaurant_revision"]
+unmoved = sorted(r for r in pre["reservations"] if r != "RC0001")
+spec = {"plan_id": pid, "restaurant": "r", "path": "/restaurants/r/replans/%s/apply" % pid,
+        "key": win[1], "owner": "m", "body": "{}",
+        "order": ["RC0001"], "revision": pre["restaurant_revisions"]["r"] + 1,
+        "moved": {"RC0001": {"from": ["t_2"], "to": ["t_1"]}},
+        "unmoved": unmoved, "series": {}}
+spec_f = os.path.join(os.path.dirname(os.path.abspath(pref)), "qspec.json")
+json.dump(spec, open(spec_f, "w"))
+open(os.path.join(os.path.dirname(os.path.abspath(pref)), "qwinner.txt"), "w").write(win[1] + "\n" + lose[1] + "\n")
+open(os.path.join(os.path.dirname(os.path.abspath(pref)), "qwinner.out"), "wb").write(open(win[2], "rb").read())
+checker = os.path.join(os.path.dirname(os.path.abspath(pref)), "apply_delta.py")
+r = subprocess.run([sys.executable, checker, pref, postf, win[2], spec_f], capture_output=True, text=True)
+sys.stdout.write(r.stdout)
+sys.stderr.write(r.stderr)
+assert r.returncode == 0, "shared apply checker failed"
+print("QRACE-OK winner=%s loser=%s" % (win[1], lose[1]))
+PYEOF
+QWIN=$(head -n 1 "$ART/qwinner.txt")
+QLOSE=$(tail -n 1 "$ART/qwinner.txt")
+cp "$ART/qwinner.out" "$ART/q50-winner.out"
+chmod 600 "$ART/q50-winner.out"
+pycheck q-corrupt-guards - "$ART/qpre.json" "$ART/qpost.json" "$ART/q50-winner.out" "$ART/qspec.json" <<'PYEOF'
+import json, sys, copy, subprocess, os
+pref, postf, respf, specf = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+pre = json.load(open(pref))["state"]
+post = json.load(open(postf))["state"]
+spec = json.load(open(specf))
+prog = os.path.join(os.path.dirname(os.path.abspath(pref)), "apply_delta.py")
+changed0 = sorted(spec["moved"])[0]
+unmoved0 = sorted(spec["unmoved"])[0]
+def run(obj, tag):
+    pj = pref + ".mut-%s.json" % tag
+    json.dump({"track": "tablekeeper", "format_version": 1, "state": obj}, open(pj, "w"))
+    r = subprocess.run([sys.executable, prog, pref, pj, respf, specf], capture_output=True, text=True)
+    print("%s exit=%d" % (tag, r.returncode))
+    return r.returncode
+results = {"genuine": run(post, "genuine")}
+cases = []
+o = copy.deepcopy(post)
+o["reservations"][changed0]["table_ids"] = ["t_2"]
+cases.append(("copied-selector", o))
+o = copy.deepcopy(post)
+o["histories"][changed0][-1]["changes"] = [{"field": "table_ids", "from": ["t_1"], "to": ["t_1"]}]
+cases.append(("reassigned-from", o))
+o = copy.deepcopy(post)
+o["histories"][changed0][-1]["accepted_terms"]["capacities"]["t_1"] = 99
+cases.append(("reassigned-terms", o))
+o = copy.deepcopy(post)
+o["histories"][unmoved0].append(copy.deepcopy(o["histories"][changed0][-1]))
+cases.append(("unrelated-history", o))
+o = copy.deepcopy(post)
+o["restaurant_revisions"]["r"] = pre["restaurant_revisions"]["r"] + 9
+cases.append(("forged-counter", o))
+o = copy.deepcopy(post)
+o["plans"][spec["plan_id"]]["applied"] = False
+cases.append(("plan-applied", o))
+o = copy.deepcopy(post)
+o["plans"][spec["plan_id"]]["restaurant_revision"] = pre["restaurant_revisions"]["r"] + 99
+cases.append(("captured-rev", o))
+o = copy.deepcopy(post)
+for k, v in o["receipts"].items():
+    if k not in pre["receipts"]:
+        v["user_id"] = "wrong-owner"
+cases.append(("receipt-owner", o))
+o = copy.deepcopy(post)
+for k, v in o["receipts"].items():
+    if k not in pre["receipts"]:
+        v["body"] = '{"other":true}'
+cases.append(("receipt-body", o))
+o = copy.deepcopy(post)
+o["histories"]["unexpected-ref"] = copy.deepcopy(o["histories"][changed0])
+cases.append(("extra-orphan-history", o))
+o = copy.deepcopy(post)
+o["plans"]["unexpected-plan"] = copy.deepcopy(next(iter(o["plans"].values())))
+cases.append(("extra-plan", o))
+o = copy.deepcopy(post)
+o["reservations"]["ZZEXTRA1"] = copy.deepcopy(post["reservations"][changed0])
+o["histories"]["ZZEXTRA1"] = copy.deepcopy(post["histories"][changed0])
+cases.append(("paired-record-history-extras", o))
+for name, obj in cases:
+    assert json.dumps(obj, sort_keys=True) != json.dumps(post, sort_keys=True), "mutation did not apply: " + name
+    results[name] = run(obj, name)
+    assert results[name] != 0, name
+assert results["genuine"] == 0, results
+print("QSELFTEST-OK")
+PYEOF
+pycheck q-loser-absent - "$ART/qpost.json" "$ART/qpre.json" "$QLOSE" <<'PYEOF'
+import json, sys
+post = json.load(open(sys.argv[1]))["state"]
+pre = json.load(open(sys.argv[2]))["state"]
+loser = sys.argv[3]
+assert all(not (v["key"] == loser and v["path"].startswith("/restaurants/r/replans/")) for v in post["receipts"].values()), "loser receipt stored"
+assert all(not (v["key"] == loser and v["path"].startswith("/restaurants/r/replans/")) for v in pre["receipts"].values()), "loser key already present before race"
+print("QLOSER-ABSENT-OK")
+PYEOF
+$CURL -o "$ART/qa3.out" -w '%{http_code}' -X POST "$BASE/restaurants/r/replans/$QPID/apply" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: q-a3' -d '{}' > "$SCR/qa3.code" 2>>"$DIAG"
+chmod 600 "$ART/qa3.out"
+expect q-loser-retry "$(cat "$SCR/qa3.code")" 409
+pycheck q-loser-retry-code - "$ART/qa3.out" <<'PYEOF'
+import json, sys
+assert json.load(open(sys.argv[1]))["error"]["code"] == "plan_already_applied"
+print("QRETRY-CODE-OK")
+PYEOF
+export_ok "$ART/qrepost.json" && { echo "PASS: q-export-repost (200)"; PASS=$((PASS + 1)); }
+if cmp -s "$ART/qpost.json" "$ART/qrepost.json"; then echo "PASS: q-loser-atomic (identical)"; PASS=$((PASS + 1)); else echo "FAIL: q-loser-atomic"; FAIL=$((FAIL + 1)); fi
+expect q-winner-replay "$($CURL -o "$ART/qrepr.out" -w '%{http_code}' -X POST "$BASE/restaurants/r/replans/$QPID/apply" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H "Idempotency-Key: $QWIN" -d '{}')" 200
+chmod 600 "$ART/qrepr.out"
+if cmp -s "$ART/q50-winner.out" "$ART/qrepr.out"; then echo "PASS: q-winner-bytes (identical)"; PASS=$((PASS + 1)); else echo "FAIL: q-winner-bytes"; FAIL=$((FAIL + 1)); fi
+export_ok "$ART/qrepost2.json" && { echo "PASS: q-export-repost2 (200)"; PASS=$((PASS + 1)); }
+if cmp -s "$ART/qrepost.json" "$ART/qrepost2.json"; then echo "PASS: q-winner-atomic (identical)"; PASS=$((PASS + 1)); else echo "FAIL: q-winner-atomic"; FAIL=$((FAIL + 1)); fi
+echo "== R two plans at same revision (P1C-D) =="
+FOUNDCODE=$(reset_world <<'EOF'
+{"users": [{"id":"m","email":"m@x","password":"password12","display_name":"M"},{"id":"a","email":"a@x","password":"password12","display_name":"A"}],
+ "restaurants": [{"id":"r","name":"N","timezone":"Europe/Berlin","slot_minutes":30,
+  "reservation_duration_minutes":90,"cancellation_cutoff_minutes":120,
+  "opening_hours":[{"weekday":"thu","opens":"18:00","closes":"23:00"}],
+  "tables":[{"id":"t_1","label":"1","capacity":2},{"id":"t_2","label":"2","capacity":4},{"id":"t_3","label":"3","capacity":6}],
+  "combinable":[["t_1","t_2"],["t_2","t_3"]],"manager_user_ids":["m"]},
+  {"id":"ro","name":"O","timezone":"Europe/Berlin","slot_minutes":30,
+  "reservation_duration_minutes":90,"cancellation_cutoff_minutes":120,
+  "opening_hours":[{"weekday":"thu","opens":"18:00","closes":"23:00"}],
+  "tables":[{"id":"q_1","label":"1","capacity":4}],"manager_user_ids":["m"]}],
+ "reservations": [
+  {"id":"s1","reference":"RC0001","user_id":"a","restaurant_id":"r","table_id":"t_2","starts_at_local":"2027-06-17T19:00","party_size":2},
+  {"id":"s2","reference":"RU0001","user_id":"a","restaurant_id":"r","table_id":"t_3","starts_at_local":"2027-06-17T21:30","party_size":1},
+  {"id":"s3","reference":"RO0001","user_id":"a","restaurant_id":"ro","table_id":"q_1","starts_at_local":"2027-06-17T19:00","party_size":1}]}
+EOF
+)
+expect r-reset "$FOUNDCODE" 204
+[ "$FOUNDCODE" = "204" ] || { echo "FAIL: r-reset-abort"; FAIL=$((FAIL + 1)); exit 1; }
+TOK_M=$(login "m@x" "password12")
+TOK_M_CODE=${TOK_M%%:*}; TOK_M=${TOK_M#*:}
+if [ "$TOK_M_CODE" = "200" ] && [ -n "$TOK_M" ]; then echo "PASS: login-m (200-nonempty)"; PASS=$((PASS + 1)); else echo "FAIL: login-m"; FAIL=$((FAIL + 1)); exit 1; fi
+TOK_A=$(login "a@x" "password12")
+TOK_A_CODE=${TOK_A%%:*}; TOK_A=${TOK_A#*:}
+if [ "$TOK_A_CODE" = "200" ] && [ -n "$TOK_A" ]; then echo "PASS: login-a (200-nonempty)"; PASS=$((PASS + 1)); else echo "FAIL: login-a"; FAIL=$((FAIL + 1)); exit 1; fi
+$CURL -o "$ART/ranch.out" -w '%{http_code}' -X POST "$BASE/reservations" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_A" -H 'Idempotency-Key: r-anch' -d '{"restaurant_id":"r","table_id":"t_1","starts_at_local":"2027-06-24T19:00","party_size":1}' > "$SCR/ranch.code" 2>>"$DIAG"
+chmod 600 "$ART/ranch.out"
+expect r-anchor "$(cat "$SCR/ranch.code")" 201
+RAREF=$(py -c 'import json; print(json.load(open("'"$ART"'/ranch.out"))["reference"])' 2>>"$DIAG")
+$CURL -o "$ART/rad.out" -w '%{http_code}' -X POST "$BASE/series" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_A" -H 'Idempotency-Key: r-ad' -d '{"anchor_reference":"'"$RAREF"'","count":2,"interval_weeks":1}' > "$SCR/rad.code" 2>>"$DIAG"
+chmod 600 "$ART/rad.out"
+expect r-adopt "$(cat "$SCR/rad.code")" 201
+$CURL -o /dev/null -w '%{http_code}' -X POST "$BASE/restaurants/ro/replans" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: r-upv' -d '{"table_id":"q_1","from":"2027-06-17T18:00:00+02:00","to":"2027-06-17T19:00:00+02:00"}' > "$SCR/rupv.code" 2>>"$DIAG"
+expect r-unrelated-preview "$(cat "$SCR/rupv.code")" 201
+RCLO='{"table_id":"t_2","from":"2027-06-17T19:00:00+02:00","to":"2027-06-17T20:00:00+02:00"}'
+$CURL -o "$ART/rpv1.out" -w '%{http_code}' -X POST "$BASE/restaurants/r/replans" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: r-pv1' -d "$RCLO" > "$SCR/rpv1.code" 2>>"$DIAG"
+chmod 600 "$ART/rpv1.out"
+expect r-preview1 "$(cat "$SCR/rpv1.code")" 201
+$CURL -o "$ART/rpv2.out" -w '%{http_code}' -X POST "$BASE/restaurants/r/replans" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: r-pv2' -d "$RCLO" > "$SCR/rpv2.code" 2>>"$DIAG"
+chmod 600 "$ART/rpv2.out"
+expect r-preview2 "$(cat "$SCR/rpv2.code")" 201
+RPID1=$(py -c 'import json; print(json.load(open("'"$ART"'/rpv1.out"))["plan_id"])' 2>>"$DIAG")
+RPID2=$(py -c 'import json; print(json.load(open("'"$ART"'/rpv2.out"))["plan_id"])' 2>>"$DIAG")
+pycheck r-pins - "$ART/rpv1.out" "$ART/rpv2.out" <<'PYEOF'
+import json, sys
+a = json.load(open(sys.argv[1]))
+b = json.load(open(sys.argv[2]))
+assert a["plan_id"] != b["plan_id"], "distinct plan ids"
+assert a["restaurant_revision"] == b["restaurant_revision"], "same captured revision"
+assert a["assignments"] == b["assignments"] == [{"reference": "RC0001", "table_ids": ["t_1"], "changed": True}], (a["assignments"], b["assignments"])
+assert (a["moved_count"], a["unused_seats"]) == (1, 0), a
+assert (b["moved_count"], b["unused_seats"]) == (1, 0), b
+print("RPINS-OK")
+PYEOF
+export_ok "$ART/rpre.json" && { echo "PASS: r-export-pre (200)"; PASS=$((PASS + 1)); }
+$CURL -o "$ART/ra1.out" -w '%{http_code}\n' -X POST "$BASE/restaurants/r/replans/$RPID1/apply" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: r-a1' -d '{}' > "$SCR/ra1.code" 2>>"$DIAG" &
+$CURL -o "$ART/ra2.out" -w '%{http_code}\n' -X POST "$BASE/restaurants/r/replans/$RPID2/apply" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: r-a2' -d '{}' > "$SCR/ra2.code" 2>>"$DIAG" &
+wait
+chmod 600 "$ART/ra1.out" "$ART/ra2.out"
+export_ok "$ART/rpost.json" && { echo "PASS: r-export-post (200)"; PASS=$((PASS + 1)); }
+pycheck r-race-outcome - "$ART/ra1.out" "$ART/ra2.out" "$SCR/ra1.code" "$SCR/ra2.code" "$ART/rpre.json" "$ART/rpost.json" "$RPID1" "$RPID2" <<'PYEOF'
+import json, sys, os, subprocess
+ra, rb, ca, cb, pref, postf, pid1, pid2 = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8]
+ca = open(ca).read().strip()
+cb = open(cb).read().strip()
+pre = json.load(open(pref))["state"]
+post = json.load(open(postf))["state"]
+first = {"r-a1": (ca, ra, pid1), "r-a2": (cb, rb, pid2)}
+codes = sorted([(v[0], k, v[1], v[2]) for k, v in first.items()])
+assert sorted([c[0] for c in codes]) == ["201", "409"], codes
+win = [c for c in codes if c[0] == "201"][0]
+lose = [c for c in codes if c[0] == "409"][0]
+assert json.load(open(lose[2]))["error"]["code"] == "stale_plan", lose
+assert win[3] != lose[3], "different plans"
+wbody = json.load(open(win[2]))
+assert wbody["plan_id"] == win[3], wbody["plan_id"]
+assert [r["reference"] for r in wbody["reservations"]] == ["RC0001"], wbody["reservations"]
+assert wbody["restaurant_revision"] == pre["restaurant_revisions"]["r"] + 1, wbody["restaurant_revision"]
+unmoved = sorted(r for r in pre["reservations"] if r != "RC0001")
+spec = {"plan_id": win[3], "restaurant": "r", "path": "/restaurants/r/replans/%s/apply" % win[3],
+        "key": win[1], "owner": "m", "body": "{}",
+        "order": ["RC0001"], "revision": pre["restaurant_revisions"]["r"] + 1,
+        "moved": {"RC0001": {"from": ["t_2"], "to": ["t_1"]}},
+        "unmoved": unmoved, "series": {}}
+spec_f = os.path.join(os.path.dirname(os.path.abspath(pref)), "rspec.json")
+json.dump(spec, open(spec_f, "w"))
+open(os.path.join(os.path.dirname(os.path.abspath(pref)), "rwinner.txt"), "w").write(win[1] + "\n" + win[3] + "\n" + lose[1] + "\n" + lose[3] + "\n")
+open(os.path.join(os.path.dirname(os.path.abspath(pref)), "rwinner.out"), "wb").write(open(win[2], "rb").read())
+checker = os.path.join(os.path.dirname(os.path.abspath(pref)), "apply_delta.py")
+r = subprocess.run([sys.executable, checker, pref, postf, win[2], spec_f], capture_output=True, text=True)
+sys.stdout.write(r.stdout)
+sys.stderr.write(r.stderr)
+assert r.returncode == 0, "shared apply checker failed"
+loser_pid = lose[3]
+assert post["plans"][loser_pid] == pre["plans"][loser_pid], "loser plan drifted"
+assert post["plans"][loser_pid]["applied"] is False, "loser must stay unapplied"
+print("RRACE-OK winner=%s loser=%s" % (win[1], lose[1]))
+PYEOF
+RWINKEY=$(sed -n '1p' "$ART/rwinner.txt")
+RWINPID=$(sed -n '2p' "$ART/rwinner.txt")
+RLOSEKEY=$(sed -n '3p' "$ART/rwinner.txt")
+RLOSEPID=$(sed -n '4p' "$ART/rwinner.txt")
+cp "$ART/rwinner.out" "$ART/r50-winner.out"
+chmod 600 "$ART/r50-winner.out"
+pycheck r-corrupt-guards - "$ART/rpre.json" "$ART/rpost.json" "$ART/r50-winner.out" "$ART/rspec.json" <<'PYEOF'
+import json, sys, copy, subprocess, os
+pref, postf, respf, specf = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+pre = json.load(open(pref))["state"]
+post = json.load(open(postf))["state"]
+spec = json.load(open(specf))
+prog = os.path.join(os.path.dirname(os.path.abspath(pref)), "apply_delta.py")
+changed0 = sorted(spec["moved"])[0]
+unmoved0 = sorted(spec["unmoved"])[0]
+def run(obj, tag):
+    pj = pref + ".mut-%s.json" % tag
+    json.dump({"track": "tablekeeper", "format_version": 1, "state": obj}, open(pj, "w"))
+    r = subprocess.run([sys.executable, prog, pref, pj, respf, specf], capture_output=True, text=True)
+    print("%s exit=%d" % (tag, r.returncode))
+    return r.returncode
+results = {"genuine": run(post, "genuine")}
+cases = []
+o = copy.deepcopy(post)
+o["reservations"][changed0]["table_ids"] = ["t_1", "t_2"]
+cases.append(("copied-selector", o))
+o = copy.deepcopy(post)
+o["histories"][changed0][-1]["plan_id"] = "forged-plan"
+cases.append(("reassigned-plan", o))
+o = copy.deepcopy(post)
+o["histories"][changed0][-1]["accepted_terms"]["slot_minutes"] = 45
+cases.append(("reassigned-terms", o))
+o = copy.deepcopy(post)
+o["histories"][unmoved0].append(copy.deepcopy(o["histories"][changed0][-1]))
+cases.append(("unrelated-history", o))
+o = copy.deepcopy(post)
+o["restaurant_revisions"]["ro"] = pre["restaurant_revisions"].get("ro", 0) + 9
+cases.append(("other-counter", o))
+o = copy.deepcopy(post)
+o["plans"][spec["plan_id"]]["restaurant_revision"] = pre["restaurant_revisions"]["r"] + 99
+cases.append(("captured-rev", o))
+o = copy.deepcopy(post)
+for k, v in o["receipts"].items():
+    if k not in pre["receipts"]:
+        v["user_id"] = "wrong-owner"
+cases.append(("receipt-owner", o))
+o = copy.deepcopy(post)
+o["reservations"]["ZZEXTRA1"] = copy.deepcopy(post["reservations"][changed0])
+cases.append(("extra-record", o))
+o = copy.deepcopy(post)
+o["histories"]["unexpected-ref"] = copy.deepcopy(o["histories"][changed0])
+cases.append(("extra-orphan-history", o))
+for name, obj in cases:
+    assert json.dumps(obj, sort_keys=True) != json.dumps(post, sort_keys=True), "mutation did not apply: " + name
+    results[name] = run(obj, name)
+    assert results[name] != 0, name
+assert results["genuine"] == 0, results
+print("RSELFTEST-OK")
+PYEOF
+pycheck r-loser-absent - "$ART/rpost.json" "$RLOSEKEY" "$RLOSEPID" "$ART/rpre.json" <<'PYEOF'
+import json, sys
+post = json.load(open(sys.argv[1]))["state"]
+loser_key, loser_pid = sys.argv[2], sys.argv[3]
+pre = json.load(open(sys.argv[4]))["state"]
+assert all(not (v["key"] == loser_key and v["path"].endswith("/apply")) for v in post["receipts"].values()), "loser receipt stored"
+assert post["plans"][loser_pid]["applied"] is False, "loser applied"
+assert post["plans"][loser_pid] == pre["plans"][loser_pid], "loser plan changed"
+print("RLOSER-ABSENT-OK")
+PYEOF
+$CURL -o "$ART/ra3.out" -w '%{http_code}' -X POST "$BASE/restaurants/r/replans/$RLOSEPID/apply" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H 'Idempotency-Key: r-a3' -d '{}' > "$SCR/ra3.code" 2>>"$DIAG"
+chmod 600 "$ART/ra3.out"
+expect r-loser-retry "$(cat "$SCR/ra3.code")" 409
+pycheck r-loser-retry-code - "$ART/ra3.out" <<'PYEOF'
+import json, sys
+assert json.load(open(sys.argv[1]))["error"]["code"] == "stale_plan"
+print("RRETRY-CODE-OK")
+PYEOF
+export_ok "$ART/rrepost.json" && { echo "PASS: r-export-repost (200)"; PASS=$((PASS + 1)); }
+if cmp -s "$ART/rpost.json" "$ART/rrepost.json"; then echo "PASS: r-loser-atomic (identical)"; PASS=$((PASS + 1)); else echo "FAIL: r-loser-atomic"; FAIL=$((FAIL + 1)); fi
+expect r-winner-replay "$($CURL -o "$ART/rrepr.out" -w '%{http_code}' -X POST "$BASE/restaurants/r/replans/$RWINPID/apply" -H 'Content-Type: application/json' -H "Authorization: Bearer $TOK_M" -H "Idempotency-Key: $RWINKEY" -d '{}')" 200
+chmod 600 "$ART/rrepr.out"
+if cmp -s "$ART/r50-winner.out" "$ART/rrepr.out"; then echo "PASS: r-winner-bytes (identical)"; PASS=$((PASS + 1)); else echo "FAIL: r-winner-bytes"; FAIL=$((FAIL + 1)); fi
+export_ok "$ART/rrepost2.json" && { echo "PASS: r-export-repost2 (200)"; PASS=$((PASS + 1)); }
+if cmp -s "$ART/rrepost.json" "$ART/rrepost2.json"; then echo "PASS: r-winner-atomic (identical)"; PASS=$((PASS + 1)); else echo "FAIL: r-winner-atomic"; FAIL=$((FAIL + 1)); fi
 
 echo "checks passed: $PASS failed: $FAIL"
 [ "$FAIL" = "0" ]
