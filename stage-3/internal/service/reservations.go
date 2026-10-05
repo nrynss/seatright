@@ -5,7 +5,6 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/nrynss/keel/id"
 	"tablekeeper/internal/clock"
 	"tablekeeper/internal/history"
 	"tablekeeper/internal/policy"
@@ -49,8 +48,9 @@ func rulesFor(r *Restaurant) clock.Rules {
 }
 
 // validatedBooking is the common validated outcome of create and amendment
-// field checks: the restaurant, the canonical table set, the summed capacity,
-// the party size and the resolved slot. Occupancy is checked separately by
+// field checks: the restaurant, the canonical table set, the summed selected
+// capacity, the party size, the resolved slot and the selected complete
+// terms for the resulting local date. Occupancy is checked separately by
 // the caller.
 type validatedBooking struct {
 	restaurant *Restaurant
@@ -58,6 +58,7 @@ type validatedBooking struct {
 	capacity   int
 	party      int
 	slot       clock.Slot
+	terms      policy.Terms
 }
 
 // partySize extracts party_size under the endpoint-specific rule: every
@@ -108,7 +109,9 @@ func summedCapacity(restaurant *Restaurant, ids []string) int {
 
 // validateBookingFields runs the identical field validation for create and
 // amendment: restaurant, canonical table selection, time, party size and
-// summed capacity. It performs no occupancy check and no mutation.
+// summed capacity. Grid, duration and capacity come from the resulting local
+// date's selected policy, never the stale fixture snapshot. It performs no
+// occupancy check and no mutation.
 func validateBookingFields(st *State, obj map[string]any) (validatedBooking, *codedError) {
 	var out validatedBooking
 	restaurant, cerr := bookingRestaurant(st, obj)
@@ -119,7 +122,22 @@ func validateBookingFields(st *State, obj map[string]any) (validatedBooking, *co
 	if cerr != nil {
 		return out, cerr
 	}
-	slot, cerr := bookingSlot(obj, rulesFor(restaurant))
+	local, present, wrongType := fieldString(obj, "starts_at_local")
+	if wrongType {
+		return out, malformedErr()
+	}
+	if !present {
+		return out, invalidErr("starts_at_local is required")
+	}
+	datePart := local
+	if len(local) > 10 {
+		datePart = local[:10]
+	}
+	terms, err := selectedTerms(st, restaurant, datePart)
+	if err != nil {
+		return out, invalidErr("invalid starts_at_local")
+	}
+	slot, cerr := bookingSlot(obj, policy.Rules(terms, restaurant.Timezone))
 	if cerr != nil {
 		return out, cerr
 	}
@@ -127,10 +145,10 @@ func validateBookingFields(st *State, obj map[string]any) (validatedBooking, *co
 	if cerr != nil {
 		return out, cerr
 	}
-	if capacity := summedCapacity(restaurant, ids); party > capacity {
+	if capacity := policy.Capacity(terms, ids); party > capacity {
 		return out, &codedError{status: 422, code: "party_exceeds_capacity", msg: "party exceeds capacity"}
 	} else {
-		out = validatedBooking{restaurant: restaurant, tableIDs: ids, capacity: capacity, party: party, slot: slot}
+		out = validatedBooking{restaurant: restaurant, tableIDs: ids, capacity: capacity, party: party, slot: slot, terms: terms}
 	}
 	return out, nil
 }
@@ -223,44 +241,22 @@ func newReference(st *State) (string, *codedError) {
 // createReservationLocked validates obj, checks occupancy on every selected
 // table member and stores a new confirmed reservation in st. It locks nothing
 // itself; callers hold the state lock (or operate on a clone for atomic
-// wrappers).
+// wrappers). Failure and replay add no record, history or counter; success
+// starts revision 1 with the complete selected terms, one created history
+// entry and one restaurant counter increment.
 func (s *Service) createReservationLocked(st *State, userID string, obj map[string]any) Result {
-	vb, cerr := validateBookingFields(st, obj)
+	candidate, cerr := prepareReservation(st, userID, obj)
 	if cerr != nil {
 		return cerr.Result()
 	}
-	start := vb.slot.Start
-	end := vb.slot.End
-	reservationID, err := id.New()
-	if err != nil {
-		return internalErr()
-	}
-	reference, cerr := newReference(st)
-	if cerr != nil {
-		return cerr.Result()
-	}
-	candidate := Reservation{
-		ReservationID: reservationID,
-		Reference:     reference,
-		UserID:        userID,
-		RestaurantID:  vb.restaurant.ID,
-		PartySize:     vb.party,
-		Status:        StatusConfirmed,
-		StartsAtLocal: vb.slot.Local,
-		StartsAt:      formatTimestamp(start),
-		EndsAt:        formatTimestamp(end),
-		CreatedAt:     formatTimestamp(time.Now().UTC()),
-	}
-	setReservationTables(&candidate, vb.tableIDs)
 	if conflictingReservation(st, candidate, nil) {
 		return conflict("table_unavailable", "the table is taken for that interval")
 	}
-	candidate.Revision = 1
-	candidate.AcceptedTerms = policy.CloneTerms(fixtureTerms(*vb.restaurant))
-	snap := reservationSnapshot(candidate)
-	st.Histories[reference] = []history.Entry{history.Created(snap, candidate.CreatedAt)}
-	st.Reservations[reference] = candidate
-	st.RestaurantRevisions[vb.restaurant.ID]++
+	commitReservationCreation(st, candidate)
+	if st.RestaurantRevisions == nil {
+		st.RestaurantRevisions = map[string]int{}
+	}
+	st.RestaurantRevisions[candidate.RestaurantID]++
 	return created(candidate.Public())
 }
 
@@ -290,57 +286,6 @@ func amendmentTables(current []string, changes map[string]any) map[string]any {
 		}
 	}
 	return fields
-}
-
-// prepareAmendment validates a PATCH-style change set against the current
-// record: cancelled bookings and passed cutoffs are rejected before changed
-// fields are examined. It returns the fully prepared record with preserved
-// identity, owner and creation time, without any occupancy check or mutation.
-// A no-op change set (including a merely reversed pair, which names the same
-// canonical set) returns the current values unchanged, but only for an
-// editable (confirmed, within-cutoff) booking.
-func prepareAmendment(st *State, current Reservation, changes map[string]any) (Reservation, *codedError) {
-	if current.Status == StatusCancelled {
-		return Reservation{}, &codedError{status: 409, code: "reservation_cancelled", msg: "the reservation is cancelled"}
-	}
-	restaurant := restaurantByID(st, current.RestaurantID)
-	if restaurant == nil {
-		return Reservation{}, &codedError{status: 404, code: "not_found", msg: "unknown restaurant"}
-	}
-	start, err := parseStoredInstant(current.StartsAt)
-	if err != nil {
-		return Reservation{}, &codedError{status: 500, code: "internal", msg: "internal error"}
-	}
-	if clock.CutoffPassed(time.Now(), start, restaurant.CancellationCutoffMinutes) {
-		return Reservation{}, &codedError{status: 409, code: "cutoff_passed", msg: "the cancellation cutoff has passed"}
-	}
-	merged := map[string]any{
-		"restaurant_id":   current.RestaurantID,
-		"starts_at_local": current.StartsAtLocal,
-		// Stored party sizes are Go ints; validation consumes decoded JSON,
-		// so convert to float64 exactly as a request body would carry it.
-		"party_size": float64(current.PartySize),
-	}
-	for field, raw := range amendmentTables(reservationTableIDs(current), changes) {
-		merged[field] = raw
-	}
-	if raw, ok := changes["starts_at_local"]; ok {
-		merged["starts_at_local"] = raw
-	}
-	if raw, ok := changes["party_size"]; ok {
-		merged["party_size"] = raw
-	}
-	vb, cerr := validateBookingFields(st, merged)
-	if cerr != nil {
-		return Reservation{}, cerr
-	}
-	prepared := current
-	setReservationTables(&prepared, vb.tableIDs)
-	prepared.PartySize = vb.party
-	prepared.StartsAtLocal = vb.slot.Local
-	prepared.StartsAt = formatTimestamp(vb.slot.Start)
-	prepared.EndsAt = formatTimestamp(vb.slot.End)
-	return prepared, nil
 }
 
 // ownedReservation fetches a reservation by reference for an authenticated
@@ -427,9 +372,11 @@ func (s *Service) GetReservation(token, reference string) Result {
 	return okResult(r.Public())
 }
 
-// CancelReservation cancels a booking, freeing every table in its set
-// immediately. Cancelling an already-cancelled booking returns its current
-// state.
+// CancelReservation cancels a booking under its accepted cutoff, freeing
+// every table in its set immediately. It changes status and revision once
+// with one cancelled history entry and one restaurant counter increment.
+// Cancelling an already-cancelled booking returns its current state with no
+// new metadata, consistent with inherited behavior.
 func (s *Service) CancelReservation(token, reference string) Result {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -452,17 +399,32 @@ func (s *Service) CancelReservation(token, reference string) Result {
 	if err != nil {
 		return internalErr()
 	}
-	if clock.CutoffPassed(time.Now(), start, restaurant.CancellationCutoffMinutes) {
+	if clock.CutoffPassed(time.Now(), start, r.AcceptedTerms.CancellationCutoffMinutes) {
 		return conflict("cutoff_passed", "the cancellation cutoff has passed")
 	}
-	r.Status = StatusCancelled
-	s.state.Reservations[reference] = r
-	return okResult(r.Public())
+	final := r
+	final.Status = StatusCancelled
+	final.Revision = r.Revision + 1
+	after := reservationSnapshot(final)
+	if s.state.Histories == nil {
+		s.state.Histories = map[string][]history.Entry{}
+	}
+	seq, at := history.Next(s.state.Histories[reference], time.Now())
+	s.state.Histories[reference] = append(s.state.Histories[reference], history.Cancelled(after, seq, at))
+	s.state.Reservations[reference] = final
+	if s.state.RestaurantRevisions == nil {
+		s.state.RestaurantRevisions = map[string]int{}
+	}
+	s.state.RestaurantRevisions[r.RestaurantID]++
+	return okResult(final.Public())
 }
 
-// PatchReservation amends time, tables or party size atomically: prepare,
-// final occupancy validation and commit happen under one lock. Failures leave
-// the original record and its occupancy unchanged.
+// PatchReservation amends time, tables or party size: expected-revision,
+// cutoff and field checks run in prepareAmendment, then final occupancy
+// excluding the record itself, then an atomic commit. A real change gains
+// one revision, one history entry and one restaurant counter increment; a
+// no-op returns the unchanged record. Failures leave the original booking
+// and its occupancy unchanged.
 func (s *Service) PatchReservation(token, reference string, raw []byte) Result {
 	obj, _, err := ParseBody(raw)
 	if err != nil {
@@ -485,6 +447,12 @@ func (s *Service) PatchReservation(token, reference string, raw []byte) Result {
 	if conflictingReservation(&s.state, prepared, map[string]bool{reference: true}) {
 		return conflict("table_unavailable", "the table is taken for that interval")
 	}
-	s.state.Reservations[reference] = prepared
-	return okResult(prepared.Public())
+	final, changed := commitReservationAmendment(&s.state, current, prepared, time.Now())
+	if changed {
+		if s.state.RestaurantRevisions == nil {
+			s.state.RestaurantRevisions = map[string]int{}
+		}
+		s.state.RestaurantRevisions[current.RestaurantID]++
+	}
+	return okResult(final.Public())
 }
