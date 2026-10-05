@@ -1484,3 +1484,7 @@ E. Literal percontainer run/inspect/probe/stop/rm/absence absoluteCWD/UTC-start-
 
 No formalharness/ACCEPT/native/oldtransfer/browser/Go-full/race/UI gates forboundedpackage; previous gates separatelystand. ONE foreground20–30min DELIVERY PASS/BLOCKED at exactSHA, requirement→proof R6–16/assets/auth/currentAPI, actualcounts/exits/rawpaths/full image/container provenance/failures/limitations/nativeblocker/cleanup/elapsed/usage unavailable. No acknowledgment/still-running/waits/polls. No fifthstage.
 Components: service_image, review_gate, restaurant_ui, replan_engine, series_engine.
+
+### P2 actual dispatch
+
+2026-10-05T18:02:24.969970+00:00 | Codex/OpenCode/ZCode | handoff | P2A/shared66 full c215fc16-b5cf-4bc9-8e56-d6126885be4c and P2D/shared67 full 8ffc3a3f-fc2d-4e10-b6cf-134b1ff28b72 dispatched after exact clean base45581bf3a2dd422b5700a33c3075e56471679971. OC cleanfixed reset verified; reviewer exactGitarchive ownE immutableproducer unaffectedfuturemetadata. Both in_progress; one104KB selfcontained TASK4specsR382ledger each. Immutableactiveplan107682B/Archidentical. Native63Blocked/I2G2B2/formalacceptanceblocked; nofourthrepair. Lossyprivate audit/gates/integration/plan/handoffscompleted; requesterreportin_progress. Usageunavailable.
