@@ -1,5 +1,7 @@
 # Tablekeeper Stage 4 implementation plan
 
+**Active operator amendment:** stage4 formal review round count0; coordinator audits never consume the3formalround budget. S4-I1F/shared68 OMP: one fix attempt B1 genuine zero-move apply→party PATCH snapshot mustimport204 and B2 missing-plan-id previewreceipt mustreject422atomically, no weakening; preserve exact5owned native paths. S4-R1P/shared69 ZCode prepares independentchecklist/readiness. Freeze after attempt and send full first formal review with every unresolved knownissue; target2026-10-05T22:07:05Z. Prior stop/third-audit-limit language below is historical/superseded.
+
 
 
 ## S4-R0 readiness verified — shared57 completed
