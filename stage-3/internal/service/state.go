@@ -2,6 +2,9 @@ package service
 
 import (
 	"sync"
+
+	"tablekeeper/internal/history"
+	"tablekeeper/internal/policy"
 )
 
 // Service owns all mutable state. mu guards every operation including reads,
@@ -21,11 +24,15 @@ func New() *Service {
 
 func emptyState() State {
 	return State{
-		Users:        map[string]User{},
-		Tokens:       map[string]string{},
-		Restaurants:  []Restaurant{},
-		Reservations: map[string]Reservation{},
-		Receipts:     map[string]Receipt{},
+		Users:               map[string]User{},
+		Tokens:              map[string]string{},
+		Restaurants:         []Restaurant{},
+		Reservations:        map[string]Reservation{},
+		Receipts:            map[string]Receipt{},
+		Policies:            map[string][]policy.Policy{},
+		Histories:           map[string][]history.Entry{},
+		Series:              map[string]Series{},
+		RestaurantRevisions: map[string]int{},
 	}
 }
 
@@ -46,11 +53,15 @@ func (s *Service) snapshot() State {
 
 func cloneState(st *State) State {
 	out := State{
-		Users:        make(map[string]User, len(st.Users)),
-		Tokens:       make(map[string]string, len(st.Tokens)),
-		Restaurants:  make([]Restaurant, len(st.Restaurants)),
-		Reservations: make(map[string]Reservation, len(st.Reservations)),
-		Receipts:     make(map[string]Receipt, len(st.Receipts)),
+		Users:               make(map[string]User, len(st.Users)),
+		Tokens:              make(map[string]string, len(st.Tokens)),
+		Restaurants:         make([]Restaurant, len(st.Restaurants)),
+		Reservations:        make(map[string]Reservation, len(st.Reservations)),
+		Receipts:            make(map[string]Receipt, len(st.Receipts)),
+		Policies:            clonePolicyMap(st.Policies),
+		Histories:           cloneHistoryMap(st.Histories),
+		Series:              cloneSeriesMap(st.Series),
+		RestaurantRevisions: cloneCounterMap(st.RestaurantRevisions),
 	}
 	for k, v := range st.Users {
 		out.Users[k] = v
@@ -62,7 +73,8 @@ func cloneState(st *State) State {
 		out.Restaurants[i] = cloneRestaurant(r)
 	}
 	for k, v := range st.Reservations {
-		v.TableIDs = append([]string(nil), v.TableIDs...)
+		v.TableIDs = cloneStringsPreserveNil(v.TableIDs)
+		v.AcceptedTerms = policy.CloneTerms(v.AcceptedTerms)
 		out.Reservations[k] = v
 	}
 	for k, v := range st.Receipts {
@@ -71,14 +83,104 @@ func cloneState(st *State) State {
 	return out
 }
 
+// clonePolicyMap deep-copies the policies map preserving nil-vs-empty at the
+// map, per-key slice and nested terms levels.
+func clonePolicyMap(in map[string][]policy.Policy) map[string][]policy.Policy {
+	if in == nil {
+		return nil
+	}
+	out := make(map[string][]policy.Policy, len(in))
+	for k, v := range in {
+		if v == nil {
+			out[k] = nil
+			continue
+		}
+		cp := make([]policy.Policy, len(v))
+		for i, p := range v {
+			cp[i] = policy.ClonePolicy(p)
+		}
+		out[k] = cp
+	}
+	return out
+}
+
+// cloneHistoryMap deep-copies histories preserving nil-vs-empty at the map
+// and per-key entry-slice levels (CloneEntries preserves entry internals).
+func cloneHistoryMap(in map[string][]history.Entry) map[string][]history.Entry {
+	if in == nil {
+		return nil
+	}
+	out := make(map[string][]history.Entry, len(in))
+	for k, v := range in {
+		if v == nil {
+			out[k] = nil
+			continue
+		}
+		out[k] = history.CloneEntries(v)
+	}
+	return out
+}
+
+// cloneSeriesMap deep-copies series preserving nil-vs-empty at the map level
+// and nil-vs-empty member slices per series.
+func cloneSeriesMap(in map[string]Series) map[string]Series {
+	if in == nil {
+		return nil
+	}
+	out := make(map[string]Series, len(in))
+	for k, v := range in {
+		out[k] = cloneSeries(v)
+	}
+	return out
+}
+
+// cloneCounterMap copies revision counters preserving nil-vs-empty.
+func cloneCounterMap(in map[string]int) map[string]int {
+	if in == nil {
+		return nil
+	}
+	out := make(map[string]int, len(in))
+	for k, v := range in {
+		out[k] = v
+	}
+	return out
+}
+
+// cloneStringsPreserveNil copies a string slice while preserving nil vs
+// non-nil empty shape, so producer JSON identity survives cloning.
+func cloneStringsPreserveNil(in []string) []string {
+	if in == nil {
+		return nil
+	}
+	out := make([]string, len(in))
+	copy(out, in)
+	return out
+}
+
+// cloneSeries deep-copies series members.
+func cloneSeries(s Series) Series {
+	out := s
+	if s.Members != nil {
+		out.Members = append([]SeriesMember{}, s.Members...)
+	}
+	return out
+}
+
 func cloneRestaurant(r Restaurant) Restaurant {
 	out := r
-	out.OpeningHours = append([]OpeningHour(nil), r.OpeningHours...)
-	out.Tables = append([]Table(nil), r.Tables...)
-	out.Combinable = append([][]string(nil), r.Combinable...)
-	for i, p := range r.Combinable {
-		out.Combinable[i] = append([]string(nil), p...)
+	if r.OpeningHours != nil {
+		out.OpeningHours = append([]OpeningHour{}, r.OpeningHours...)
 	}
+	if r.Tables != nil {
+		out.Tables = append([]Table{}, r.Tables...)
+	}
+	if r.Combinable != nil {
+		out.Combinable = append([][]string{}, r.Combinable...)
+		for i, p := range r.Combinable {
+			out.Combinable[i] = cloneStringsPreserveNil(p)
+		}
+	}
+	out.ManagerUserIDs = cloneStringsPreserveNil(r.ManagerUserIDs)
 	return out
 }
 
