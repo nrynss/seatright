@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { Spring } from 'svelte/motion';
-  import type { PlacedTable } from '../floor';
+  import { captionLayout, plateLayout, type PlacedTable } from '../floor';
   import { motionDuration, prefersReducedMotion, springOptions } from '../motion';
 
   let {
@@ -30,6 +30,11 @@
   const stateWord = $derived(selected ? 'Selected' : available ? 'Available' : 'Unavailable');
   const name = $derived(
     `Table ${place.label}, ${place.capacity} seats, ${stateWord.toLowerCase()} at ${clock}`,
+  );
+  const plate = $derived(plateLayout(place.label, drawing));
+  const caption = $derived(captionLayout(place.label, drawing));
+  const hitHeight = $derived(
+    Math.max(drawing.size + 28, drawing.size + 6 + caption.lines.length * caption.lineHeight),
   );
   const transform = $derived.by(() => {
     const size = drawing.size;
@@ -63,7 +68,7 @@
   onclick={activate}
   onkeydown={onKey}
 >
-  <rect class="table-hit" x="0" y="0" width={drawing.size} height={drawing.size + 28} />
+  <rect class="table-hit" x="0" y="0" width={drawing.size} height={hitHeight} />
   {#if drawing.kind === 'round'}
     <circle class="table-top" cx={drawing.cx} cy={drawing.cy} r={drawing.radius} />
   {:else if drawing.rect}
@@ -79,17 +84,28 @@
   {#each drawing.seats as seat, index (`${place.id}-${index}`)}
     <circle class="seat" cx={seat.x} cy={seat.y} r={seat.r} />
   {/each}
-  <text
-    class="plate-label"
-    x={drawing.cx}
-    y={drawing.cy}
-    text-anchor="middle"
-    dominant-baseline="central"
-    font-size={drawing.labelSize}
-  >
-    {place.label}
-  </text>
-  <text class="plan-name" x={drawing.cx} y={drawing.size + 6} text-anchor="middle" dominant-baseline="hanging">
-    Table {place.label}
-  </text>
+  {#each plate.lines as line, index (`plate-${index}`)}
+    <text
+      class="plate-label"
+      x={drawing.cx}
+      y={drawing.cy + (index - (plate.lines.length - 1) / 2) * plate.lineHeight}
+      text-anchor="middle"
+      dominant-baseline="central"
+      font-size={plate.fontSize}
+    >
+      {line}
+    </text>
+  {/each}
+  {#each caption.lines as line, index (`name-${index}`)}
+    <text
+      class="plan-name"
+      x={drawing.cx}
+      y={drawing.size + 6 + index * caption.lineHeight}
+      text-anchor="middle"
+      dominant-baseline="hanging"
+      font-size={caption.fontSize}
+    >
+      {line}
+    </text>
+  {/each}
 </g>
