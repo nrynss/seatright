@@ -1,0 +1,43 @@
+UI GATES 2026-10-05T04:11:07Z node v26.10.0
+$ npm ci
+
+added 117 packages in 25s
+ci_exit=0
+$ npm run check
+Loading svelte-check in workspace: /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/staging/stage-2/web
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings
+check_exit=0
+$ npm test
+ [32m✓[39m src/test/search.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32m✓[39m src/test/floor-label.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 169[2mms[22m[39m
+ [32m✓[39m src/test/selection-contrast.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m src/test/login-copy.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 122[2mms[22m[39m
+ [32m✓[39m src/test/pair-badge.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 115[2mms[22m[39m
+ [32m✓[39m src/test/dense-grid.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 1080[2mms[22m[39m
+   [32m✓[39m dense availability grids [2m(2)[22m
+     [33m[2m✓[22m[39m renders every returned 5-minute slot[33m 779[2mms[22m[39m
+ [32m✓[39m src/test/a11y.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 5859[2mms[22m[39m
+   [32m✓[39m accessibility gate [2m(2)[22m
+     [33m[2m✓[22m[39m passes the search presentations in light and dark[33m 4731[2mms[22m[39m
+     [33m[2m✓[22m[39m passes signup, login and lookup in light and dark[33m 1126[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m13 passed[39m[22m[90m (13)[39m
+[2m      Tests [22m [1m[32m82 passed[39m[22m[90m (82)[39m
+[2m   Start at [22m 04:12:10
+[2m   Duration [22m 65.80s[2m (environment 43%, tests 41%, transform 10%, import 5%, setup 1%)[22m
+
+[2mEnvironment [22m [33mjsdom was created 13 times[39m[2m · 26.26s total, 43% of tracked time[22m
+[2m            [22m [2mcreate it once per worker with [22m[33mpool: 'vmThreads'[39m[2m (keeps per-file isolation) or [22m[33misolate: false[39m[2m (shares it across files)[22m
+[2m            [22m [2mlearn more: https://vitest.dev/guide/improving-performance#test-environments[22m
+
+test_exit=0
+$ npm run build
+computing gzip size...
+dist/index.html                   0.84 kB │ gzip:  0.52 kB
+dist/assets/index-DoSv5bVs.css   14.56 kB │ gzip:  3.58 kB
+dist/assets/index-D-GAb4zz.js   106.97 kB │ gzip: 37.61 kB
+
+✓ built in 1.08s
+build_exit=0

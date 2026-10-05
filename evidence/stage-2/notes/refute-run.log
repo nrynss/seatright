@@ -1,0 +1,13 @@
+  ok dense slot15: caption in view after reveal
+  ok dense slot15: actionable available cells visible after reveal
+  ok dense slot5: caption in view after reveal
+  ok dense slot5: actionable available cells visible after reveal
+  ok form fully visible after settle (d-light)
+  ok submit fully visible after settle (d-light)
+  ok form fully visible after settle (d-dark)
+  ok submit fully visible after settle (d-dark)
+  ok form fully visible after settle (p-light)
+  ok submit fully visible after settle (p-light)
+  ok form fully visible after settle (p-dark)
+  ok submit fully visible after settle (p-dark)
+REFUTE RESULT pass=12 fail=0

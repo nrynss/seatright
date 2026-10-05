@@ -1,0 +1,958 @@
+S2-R2 FORMAL RE-REVIEW START 2026-10-05T04:07:43Z
+EXPECT SHA: 8812cdeaaa993cd944493c654e51d355cdd6b676
+
+### [04:07:43Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ git -C /home/nryn/work/seatright/runs/tablekeeper2/wt/review rev-parse HEAD
+8812cdeaaa993cd944493c654e51d355cdd6b676
+exit=0
+
+### [04:07:43Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ git -C /home/nryn/work/seatright/runs/tablekeeper2/wt/review status --short
+exit=0
+
+### [04:07:43Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ git -C /home/nryn/work/seatright/runs/tablekeeper2/wt/review log -1 --format=%H%n%ci%n%s
+8812cdeaaa993cd944493c654e51d355cdd6b676
+2026-10-05 09:34:33 +0530
+Freeze S2-R2 after verified frontend review corrections
+exit=0
+
+### [04:07:43Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c git -C /home/nryn/work/seatright/runs/tablekeeper2/wt/review diff --stat bb604b827260a0691a0e3f5546b08b669c421709..8812cdeaaa993cd944493c654e51d355cdd6b676 -- stage-2 | tail -15
+ stage-2/PLAN.md                                  |   24 +-
+ stage-2/web/scripts/s2-f-live.mjs                | 1777 ++++++++++++++++++++++
+ stage-2/web/src/app.css                          |    6 +-
+ stage-2/web/src/lib/components/FloorPlan.svelte  |   19 +-
+ stage-2/web/src/lib/components/LiveSearch.svelte |   49 +-
+ stage-2/web/src/lib/components/PairMark.svelte   |   12 +-
+ stage-2/web/src/lib/components/PlanTable.svelte  |   23 +-
+ stage-2/web/src/lib/components/Shell.svelte      |    7 +-
+ stage-2/web/src/lib/motion.ts                    |   22 +
+ stage-2/web/src/test/floor-label.test.ts         |   43 +-
+ stage-2/web/src/test/s2-f.test.ts                |  439 ++++++
+ 11 files changed, 2390 insertions(+), 31 deletions(-)
+exit=0
+
+### [04:07:43Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ df -h /var/lib/docker
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vdd        9.8G  7.2G  2.1G  78% /var/lib/docker
+exit=0
+
+### [04:08:00Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c mkdir -p /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/staging && cp -a /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/staging/stage-2 && cp -a /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-1 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/staging/stage-1 && du -sh /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/staging/*
+984K	/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/staging/stage-1
+1.6M	/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/staging/stage-2
+exit=0
+
+### [04:08:00Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c cp /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes/r1_api_probe.py /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes/r1_migration_probe.py /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes/r1_upgrade.py /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes/r1_states.py /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes/r1_measure.py /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes/r1_offline_probe.py /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes/r1_offgrid_noop.py /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes/ 2>/dev/null; cp /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes/*.py /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes/ && ls /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+r1_api_probe.py
+r1_debug_click.py
+r1_measure.py
+r1_migration_probe.py
+r1_offgrid_noop.py
+r1_offline_probe.py
+r1_states.py
+r1_upgrade.py
+r1_verify_critic.py
+exit=0
+
+### [04:08:00Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c sed -n '1,40p' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/session.ts
+/** A signed-in diner. The token is the one the service issued. Nothing here invents one. */
+export interface Session {
+  token: string;
+  displayName: string;
+  userId: string;
+}
+
+const KEY = 'tablekeeper-session';
+
+function readable(value: unknown): Session | null {
+  if (!value || typeof value !== 'object') return null;
+  const record = value as Partial<Session>;
+  if (typeof record.token !== 'string' || record.token === '') return null;
+  if (typeof record.userId !== 'string' || record.userId === '') return null;
+  if (typeof record.displayName !== 'string') return null;
+  return { token: record.token, displayName: record.displayName, userId: record.userId };
+}
+
+export function loadSession(storage: Storage = localStorage): Session | null {
+  try {
+    const raw = storage.getItem(KEY);
+    if (!raw) return null;
+    return readable(JSON.parse(raw) as unknown);
+  } catch {
+    return null;
+  }
+}
+
+export function saveSession(session: Session, storage: Storage = localStorage): void {
+  storage.setItem(KEY, JSON.stringify(session));
+}
+
+export function clearSession(storage: Storage = localStorage): void {
+  storage.removeItem(KEY);
+}
+exit=0
+
+### [04:08:35Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c grep -nE 'user === null|user !== null|auth-link|Sign in|Create account|current-user' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/Shell.svelte | head -12
+21:    { href: '/login', label: 'Sign in' },
+22:    { href: '/signup', label: 'Create account' },
+27:    links.filter((link) => user === null || (link.href !== '/login' && link.href !== '/signup')),
+57:      {#if user !== null}
+58:        <p class="current-user" data-testid="current-user">{user}</p>
+exit=0
+
+### [04:08:35Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c grep -nE 'grid-caption|reveal|scrollBy|revealOutcome|generation|serial' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/motion.ts | head -25
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:21:  import { motionDuration, revealOutcome } from '../motion';
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:71:  let generation = 0;
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:74:  let revealSerial = 0;
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:77:  const revealPortion = 220;
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:79:  function revealTarget(root: ParentNode, kind: string): Element | null {
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:80:    if (kind === 'results') return root.querySelector('.grid-caption');
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:92:    const serial = ++revealSerial;
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:94:      if (serial !== revealSerial || gen !== generation) return;
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:97:      const node = revealTarget(root, kind);
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:99:      revealOutcome(node, kind === 'results' ? revealPortion : 0);
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:206:      publishReveal('search-error', generation);
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:212:      publishReveal('search-error', generation);
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:215:    generation += 1;
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:216:    const mine = generation;
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:224:    const loaded = await loadSearch(transport, query, () => mine === generation);
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:225:    if (mine !== generation || loaded.status === 'stale') return;
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:250:      publishReveal('auth-error', generation);
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:276:    publishReveal('form', generation);
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:337:      if (mine !== refreshSeq || searchGeneration !== generation || !result) return;
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:346:      if (mine !== refreshSeq || searchGeneration !== generation || !result) return;
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:359:      publishReveal('booking-error', generation);
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:365:      publishReveal('booking-error', generation);
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte:378:    const searchGeneration = generation;
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/motion.ts:23: * `portionPx` reveals only the start of a taller region, so a long availability
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/motion.ts:27:export function revealOutcome(node: Element | null, portionPx = 0): void {
+exit=0
+
+### [04:08:35Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c grep -nE 'seat|plan-name|plate-label|layer' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/PlanTable.svelte /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/PairMark.svelte /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/FloorPlan.svelte | head -30
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/PlanTable.svelte:32:    `Table ${place.label}, ${place.capacity} seats, ${stateWord.toLowerCase()} at ${clock}`,
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/PlanTable.svelte:36:  const seatsLabel = $derived(`${place.capacity} ${place.capacity === 1 ? 'seat' : 'seats'}`);
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/PlanTable.svelte:85:  {#each drawing.seats as seat, index (`${place.id}-${index}`)}
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/PlanTable.svelte:86:    <circle class="seat" cx={seat.x} cy={seat.y} r={seat.r} />
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/PlanTable.svelte:90:      class="plate-label"
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/PlanTable.svelte:101:    class="plan-seats"
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/PlanTable.svelte:108:    {seatsLabel}
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/PairMark.svelte:20:    layer,
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/PairMark.svelte:34:    layer: 'link' | 'badge';
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/PairMark.svelte:57:{#if layer === 'link'}
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/FloorPlan.svelte:7:  import { pairPlanTestId, sameMembers } from '../seating';
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/FloorPlan.svelte:103:          label: `${names} together, ${pair.capacity} seats, ${state.toLowerCase()} at ${clock}`,
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/FloorPlan.svelte:129:        layer="link"
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/FloorPlan.svelte:154:        layer="badge"
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/FloorPlan.svelte:170:    Floor at {clock}. Tables share one room and are drawn to their number of seats.
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/FloorPlan.svelte:176:        Table {table.label} · {table.capacity} seats
+exit=0
+
+### [04:08:35Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c grep -nE 'pair-link|pair-badge|layer' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/app.css | head -12
+380:.pair-link {
+388:.pair-mark[data-available="true"] .pair-link {
+392:.pair-mark[data-selected="true"] .pair-link {
+398:.pair-badge {
+402:.pair-badge rect {
+408:.pair-badge text {
+415:.pair-badge[data-available="false"] rect {
+420:.pair-badge[data-available="false"] text {
+424:.pair-badge[data-selected="true"] rect {
+429:.pair-badge[data-selected="true"] text {
+exit=0
+
+### [04:10:48Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ cat /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/harness-stdout.log
+building /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2 ...
+  stage 1: pass  (log: /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/checks/stage-1.log)
+building upgrade source /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-1 ...
+  stage 2: pass  (log: /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/checks/stage-2.log)
+  stage 3: fail  (log: /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/checks/stage-3.log)
+highest contiguous stage: 2
+claimed stage: 2 on the shipped checks
+report: /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/checks/report.json
+NOTE: this run only includes a portion of the full tests that are applied before judging; this is meant to provide directional feedback, and ultimately you may not pass the stage with the full set of tests.
+exit=0
+
+### [04:10:48Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c python3 -c "
+import json
+r=json.load(open('/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/checks/report.json'))
+print('revision', r['revision'], '| mode', r['mode'], '| state', r['state'])
+print('stages', r['stages'], '| highest', r['highest_contiguous'], '| claimed', r['claimed_stage'], '| share', r['share'])
+print('s1', r['checks']['1']['passed'], '/', r['checks']['1']['collected'])
+print('s2', r['checks']['2']['passed'], '/', r['checks']['2']['collected'])
+"
+revision 8812cdeaaa993cd944493c654e51d355cdd6b676 | mode isolated | state completed
+stages {'1': 'pass', '2': 'pass'} | highest 2 | claimed 2 | share 1.0
+s1 120 / 120
+s2 25 / 25
+exit=0
+
+### [04:11:08Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ docker build -t s2r2/stage2:cand /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/staging/stage-2
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.02kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.27-bookworm
+#2 DONE 0.2s
+
+#3 [internal] load metadata for docker.io/library/node:26-bookworm-slim
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#4 DONE 1.1s
+
+#3 [internal] load metadata for docker.io/library/node:26-bookworm-slim
+#3 DONE 1.1s
+
+#5 [internal] load .dockerignore
+#5 transferring context:
+#5 transferring context: 195B 0.0s done
+#5 DONE 0.2s
+
+#6 [internal] load build context
+#6 DONE 0.0s
+
+#7 [stage-2 1/6] FROM docker.io/library/debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251
+#7 resolve docker.io/library/debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251 0.1s done
+#7 DONE 0.1s
+
+#8 [gobuild 1/7] FROM docker.io/library/golang:1.27-bookworm@sha256:69a7b9788769bec032d238959b61854e9ae87f57be9029ec04e9885fabf99195
+#8 resolve docker.io/library/golang:1.27-bookworm@sha256:69a7b9788769bec032d238959b61854e9ae87f57be9029ec04e9885fabf99195
+#8 resolve docker.io/library/golang:1.27-bookworm@sha256:69a7b9788769bec032d238959b61854e9ae87f57be9029ec04e9885fabf99195 0.1s done
+#8 DONE 0.1s
+
+#9 [webbuild 1/6] FROM docker.io/library/node:26-bookworm-slim@sha256:662933cf47f013bc8e4beb31a6116448427a82057ba7c42c97e4c5ba766504c2
+#9 resolve docker.io/library/node:26-bookworm-slim@sha256:662933cf47f013bc8e4beb31a6116448427a82057ba7c42c97e4c5ba766504c2 0.1s done
+#9 DONE 0.1s
+
+#6 [internal] load build context
+#6 transferring context: 6.17kB 0.1s done
+#6 DONE 0.2s
+
+#10 [gobuild 6/7] RUN CGO_ENABLED=0 go build -trimpath -o /out/tablekeeper ./cmd/tablekeeper
+#10 CACHED
+
+#11 [gobuild 2/7] WORKDIR /src
+#11 CACHED
+
+#12 [webbuild 3/6] COPY web/package.json web/package-lock.json ./
+#12 CACHED
+
+#13 [webbuild 4/6] RUN npm ci
+#13 CACHED
+
+#14 [gobuild 4/7] RUN go mod download
+#14 CACHED
+
+#15 [gobuild 7/7] RUN CGO_ENABLED=0 go build -trimpath -o /out/probe ./probes/pclient
+#15 CACHED
+
+#16 [gobuild 3/7] COPY go.mod go.sum ./
+#16 CACHED
+
+#17 [webbuild 5/6] COPY web/ ./
+#17 CACHED
+
+#18 [stage-2 5/6] COPY --from=gobuild /out/probe /app/probe
+#18 CACHED
+
+#19 [stage-2 2/6] COPY --from=webbuild /web/dist /app/web/dist
+#19 CACHED
+
+#20 [gobuild 5/7] COPY . ./
+#20 CACHED
+
+#21 [webbuild 6/6] RUN npm run build
+#21 CACHED
+
+#22 [stage-2 3/6] COPY --from=gobuild /usr/share/zoneinfo /usr/share/zoneinfo
+#22 CACHED
+
+#23 [stage-2 4/6] COPY --from=gobuild /out/tablekeeper /app/tablekeeper
+#23 CACHED
+
+#24 [webbuild 2/6] WORKDIR /web
+#24 CACHED
+
+#25 [stage-2 6/6] WORKDIR /app
+#25 CACHED
+
+#26 exporting to image
+#26 exporting layers 0.0s done
+#26 exporting manifest sha256:c3b89b30c557cc3b8957415a70fa38dff5465fda71ae5485e2ff102a6448afb3
+#26 exporting manifest sha256:c3b89b30c557cc3b8957415a70fa38dff5465fda71ae5485e2ff102a6448afb3 done
+#26 exporting config sha256:f502951e13ce40a35bb019e98809b9d2c7331ec597f6057b7567dc405dcc0658 0.0s done
+#26 exporting attestation manifest sha256:f0eb6e1eef34a0b041af91d568f4765a90b2806a4bbbf2083e6eb13eaf9fb20f 0.0s done
+#26 exporting manifest list sha256:898659df1aedb412ffc89763e646f9952e4de574d4b7b1c80f486e8cbfc59ce2 0.1s done
+#26 naming to docker.io/s2r2/stage2:cand
+#26 naming to docker.io/s2r2/stage2:cand 0.0s done
+#26 unpacking to docker.io/s2r2/stage2:cand
+#26 unpacking to docker.io/s2r2/stage2:cand 1.8s done
+#26 DONE 2.4s
+exit=0
+
+### [04:11:13Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ docker build -t s2r2/stage1:donor /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/staging/stage-1
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.02kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.27-bookworm
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/node:26-bookworm-slim
+#3 DONE 0.4s
+
+#4 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#4 DONE 0.4s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 195B 0.0s done
+#5 DONE 0.1s
+
+#6 [gobuild 1/7] FROM docker.io/library/golang:1.27-bookworm@sha256:69a7b9788769bec032d238959b61854e9ae87f57be9029ec04e9885fabf99195
+#6 ...
+
+#7 [internal] load build context
+#7 DONE 0.0s
+
+#6 [gobuild 1/7] FROM docker.io/library/golang:1.27-bookworm@sha256:69a7b9788769bec032d238959b61854e9ae87f57be9029ec04e9885fabf99195
+#6 resolve docker.io/library/golang:1.27-bookworm@sha256:69a7b9788769bec032d238959b61854e9ae87f57be9029ec04e9885fabf99195
+#6 ...
+
+#8 [webbuild 1/6] FROM docker.io/library/node:26-bookworm-slim@sha256:662933cf47f013bc8e4beb31a6116448427a82057ba7c42c97e4c5ba766504c2
+#8 resolve docker.io/library/node:26-bookworm-slim@sha256:662933cf47f013bc8e4beb31a6116448427a82057ba7c42c97e4c5ba766504c2 0.4s done
+#8 DONE 0.5s
+
+#6 [gobuild 1/7] FROM docker.io/library/golang:1.27-bookworm@sha256:69a7b9788769bec032d238959b61854e9ae87f57be9029ec04e9885fabf99195
+#6 resolve docker.io/library/golang:1.27-bookworm@sha256:69a7b9788769bec032d238959b61854e9ae87f57be9029ec04e9885fabf99195 0.4s done
+#6 DONE 0.4s
+
+#9 [stage-2 1/6] FROM docker.io/library/debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251
+#9 resolve docker.io/library/debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251 0.4s done
+#9 DONE 0.4s
+
+#7 [internal] load build context
+#7 transferring context: 5.13kB 0.1s done
+#7 DONE 0.2s
+
+#10 [gobuild 6/7] RUN CGO_ENABLED=0 go build -trimpath -o /out/tablekeeper ./cmd/tablekeeper
+#10 CACHED
+
+#11 [webbuild 3/6] COPY web/package.json web/package-lock.json ./
+#11 CACHED
+
+#12 [gobuild 3/7] COPY go.mod go.sum ./
+#12 CACHED
+
+#13 [stage-2 4/6] COPY --from=gobuild /out/tablekeeper /app/tablekeeper
+#13 CACHED
+
+#14 [stage-2 2/6] COPY --from=webbuild /web/dist /app/web/dist
+#14 CACHED
+
+#15 [webbuild 2/6] WORKDIR /web
+#15 CACHED
+
+#16 [gobuild 2/7] WORKDIR /src
+#16 CACHED
+
+#17 [webbuild 4/6] RUN npm ci
+#17 CACHED
+
+#18 [webbuild 6/6] RUN npm run build
+#18 CACHED
+
+#19 [gobuild 5/7] COPY . ./
+#19 CACHED
+
+#20 [gobuild 4/7] RUN go mod download
+#20 CACHED
+
+#21 [stage-2 5/6] COPY --from=gobuild /out/probe /app/probe
+#21 CACHED
+
+#22 [webbuild 5/6] COPY web/ ./
+#22 CACHED
+
+#23 [stage-2 3/6] COPY --from=gobuild /usr/share/zoneinfo /usr/share/zoneinfo
+#23 CACHED
+
+#24 [gobuild 7/7] RUN CGO_ENABLED=0 go build -trimpath -o /out/probe ./probes/pclient
+#24 CACHED
+
+#25 [stage-2 6/6] WORKDIR /app
+#25 CACHED
+
+#26 exporting to image
+#26 exporting layers
+#26 exporting layers 0.0s done
+#26 exporting manifest sha256:56c50a60c0fe51745400c9d0caf892e7d881d81b5ef13bdeef80a8bcbaa185cd done
+#26 exporting config sha256:49f306573c6eaf768b587f771fb1717c6b8ad421e85f58f3dd33591793a4b8fb done
+#26 exporting attestation manifest sha256:a0e197d37ced69557c6cf56f7296d8f06919f61cacf24259aceb45b0df91be2b 0.0s done
+#26 exporting manifest list sha256:87dec5741642c1b5580946d1b66d428792d7443c0406149933e76fabf1d5c098 0.0s done
+#26 naming to docker.io/s2r2/stage1:donor done
+#26 unpacking to docker.io/s2r2/stage1:donor
+#26 unpacking to docker.io/s2r2/stage1:donor 0.0s done
+#26 DONE 0.2s
+exit=0
+
+### [04:11:16Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c docker images --format '{{.Repository}}:{{.Tag}} id={{.ID}} size={{.Size}}' | grep s2r2
+s2r2/stage2:cand id=898659df1aed size=144MB
+s2r2/stage1:donor id=87dec5741642 size=143MB
+exit=0
+
+### [04:11:48Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c docker rm -f s2r2-def s2r2-alt s2r2-off s2r2-donor s2r2-dest2 >/dev/null 2>&1; docker network rm s2r2off >/dev/null 2>&1; T0=$(date +%s.%N); docker run -d --name s2r2-def --cpus 2 --memory 2g -p 127.0.0.1:9401:8080 s2r2/stage2:cand >/dev/null; for i in $(seq 1 120); do code=$(curl -s -o /tmp/h.json -w "%{http_code}" http://127.0.0.1:9401/health || true); [ "$code" = 200 ] && break; sleep 0.25; done; T1=$(date +%s.%N); echo "default8080 healthy_after=$(echo "$T1-$T0"|bc)s code=$code body=$(cat /tmp/h.json)"
+default8080 healthy_after=1.083640937s code=200 body={"status":"ok"}
+exit=0
+
+### [04:11:49Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c docker run -d --name s2r2-alt --cpus 2 --memory 2g -e PORT=9555 -p 127.0.0.1:9402:9555 s2r2/stage2:cand >/dev/null; sleep 1; for i in $(seq 1 40); do code=$(curl -s -o /tmp/h2.json -w "%{http_code}" http://127.0.0.1:9402/health || true); [ "$code" = 200 ] && break; sleep 0.25; done; echo "PORT=9555 code=$code body=$(cat /tmp/h2.json)"
+PORT=9555 code=200 body={"status":"ok"}
+exit=0
+
+### [04:11:51Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ docker run --rm df-harness-runner python -c import httpx; r=httpx.get('http://172.18.0.3:8080/health',timeout=3); print('via container IP', '172.18.0.3', r.status_code, r.text, '| content-type:', r.headers.get('content-type'))
+via container IP 172.18.0.3 200 {"status":"ok"} | content-type: application/json; charset=utf-8
+exit=0
+
+### [04:11:54Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c docker network create --internal s2r2off >/dev/null && docker run -d --name s2r2-off --network s2r2off --cpus 2 --memory 2g s2r2/stage2:cand >/dev/null && sleep 1.5 && docker run --rm --network s2r2off -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes:/probes:ro df-harness-runner python /probes/r1_offline_probe.py; echo offline_exit=$?
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/usr/local/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/usr/local/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/usr/local/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/usr/local/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno -3] Temporary failure in name resolution
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/probes/r1_offline_probe.py", line 6, in <module>
+    h = c.get("/health")
+        ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/httpx/_client.py", line 1053, in get
+    return self.request(
+           ^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/httpx/_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/usr/local/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno -3] Temporary failure in name resolution
+offline_exit=1
+exit=0
+
+### [04:11:58Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c docker inspect -f "def cpus={{.HostConfig.NanoCpus}} mem={{.HostConfig.Memory}}" s2r2-def; docker stats --no-stream --format "{{.Name}} cpu={{.CPUPerc}} mem={{.MemUsage}}" s2r2-def s2r2-off
+def cpus=2000000000 mem=2147483648
+s2r2-def cpu=0.00% mem=5.18MiB / 1.941GiB
+s2r2-off cpu=0.00% mem=1.273MiB / 1.941GiB
+exit=0
+
+### [04:12:00Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c docker run -d --name s2r2-donor --cpus 2 --memory 2g -p 127.0.0.1:9403:8080 s2r2/stage1:donor >/dev/null && docker run -d --name s2r2-dest2 --cpus 2 --memory 2g -p 127.0.0.1:9404:8080 s2r2/stage2:cand >/dev/null && sleep 1 && curl -s http://127.0.0.1:9403/health && curl -s http://127.0.0.1:9404/health
+{"status":"ok"}{"status":"ok"}exit=0
+
+### [04:12:23Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c sed -i 's/s2r1-off/s2r2-off/g' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes/r1_offline_probe.py && docker run --rm --network s2r2off -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes:/probes:ro df-harness-runner python /probes/r1_offline_probe.py; echo offline_exit=$?
+health 200 {"status":"ok"}
+reset 204
+signup(fresh) 201
+login(seeded) 200
+availability 200 46 slots
+booking 201
+index 200 text/html; charset=utf-8 842 bytes
+asset links: ['/assets/index-D-GAb4zz.js', '/assets/index-DoSv5bVs.css']
+asset /assets/index-D-GAb4zz.js 200 text/javascript; charset=utf-8 106974 bytes
+asset /assets/index-DoSv5bVs.css 200 text/css; charset=utf-8 14568 bytes
+font /fonts/source-code-pro-latin-400-normal.woff2 200 11656 bytes (binary not dumped)
+font /fonts/source-code-pro-latin-500-normal.woff2 200 11604 bytes (binary not dumped)
+font /fonts/source-serif-4-latin-400-normal.woff2 200 20088 bytes (binary not dumped)
+font /fonts/source-serif-4-latin-600-normal.woff2 200 21532 bytes (binary not dumped)
+font /fonts/source-serif-4-latin-700-normal.woff2 200 21716 bytes (binary not dumped)
+routes [200, 200, 200]
+outbound blocked: ConnectError
+offline_exit=0
+exit=0
+
+### [04:12:43Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c tail -7 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/go-gates.log
+build_exit=0
+$ go test ./...
+?   	tablekeeper/cmd/tablekeeper	[no test files]
+ok  	tablekeeper/internal/clock	0.080s
+ok  	tablekeeper/internal/service	57.541s
+?   	tablekeeper/probes/pclient	[no test files]
+test_exit=0
+exit=0
+
+### [04:12:43Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes/r1_api_probe.py http://127.0.0.1:9401 stage2 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/api-probe-stage2.log 2>&1; echo PROBE_EXIT=$?; tail -4 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/api-probe-stage2.log
+PROBE_EXIT=0
+== limits/50 in flight
+
+RESULT mode=stage2 pass=346 fail=0 elapsed=10.1s slow=[]
+statuses seen: [200, 201, 204, 400, 401, 404, 409, 422]
+exit=0
+
+### [04:12:54Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes/r1_migration_probe.py http://127.0.0.1:9403 http://127.0.0.1:9401 http://127.0.0.1:9404 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/migration-probe.log 2>&1; echo MIG_EXIT=$?; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/migration-probe.log
+MIG_EXIT=0
+== phase 3: modern pair/mixed receipts stage-2 -> stage-2 (distinct processes)
+
+RESULT pass=38 fail=0
+exit=0
+
+### [04:13:09Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R1/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes:/probes:ro df-harness-runner python /probes/r2_closure.py http://127.0.0.1:9401 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log 2>&1; echo CLOSURE_EXIT=$?; tail -30 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log
+CLOSURE_EXIT=1
+    asyncio.run(run())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/probes/r2_closure.py", line 100, in run
+    await login_ui(page)
+  File "/probes/r2_closure.py", line 61, in login_ui
+    await page.wait_for_selector('[data-testid="current-user"]')
+  File "/usr/local/lib/python3.12/site-packages/playwright/async_api/_generated.py", line 9085, in wait_for_selector
+    await self._impl_obj.wait_for_selector(
+  File "/usr/local/lib/python3.12/site-packages/playwright/_impl/_page.py", line 429, in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/playwright/_impl/_frame.py", line 395, in wait_for_selector
+    await self._channel.send(
+  File "/usr/local/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 76, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 632, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-testid=\"current-user\"]") to be visible
+
+exit=0
+
+### [04:14:15Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c head -12 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log
+  ok F1 signed-out shows auth links (d)
+  ok F1 signed-out has no current-user (d)
+Traceback (most recent call last):
+  File "/probes/r2_closure.py", line 417, in <module>
+    asyncio.run(run())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+exit=0
+
+### [04:14:15Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes:/probes:ro df-harness-runner python /probes/r2_closure.py http://127.0.0.1:9401 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log 2>&1; echo CLOSURE_EXIT=$?; tail -25 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log
+CLOSURE_EXIT=1
+  ok F2 empty state fully visible (p812)
+  ok F2 late A does not scroll or replace B grid
+  ok F2 reduced motion: reveal applied immediately
+  ok F2 reduced motion: selected attribute immediate
+  FAIL F3 one plate label per table, no plan-name (d-light) :: [{"table": null, "labelCount": 2, "planNameCount": 0, "fontSize": "13px", "seatsFontSize": "16px", "fits": true}, {"table": null, "labelCount": 2, "planNameCount": 0, "fontSize": "19px", "seatsFontSize": "16px", "fits": true}, {"table": null, "labelCount": 2, "planNameCount": 0, "fontSize": "19px", "seatsFontSize": "16px", "fits": true}]
+  ok F3 plate font >=13px (d-light)
+  ok F3 seat metadata present at 16px (d-light)
+  ok F3 plate names fit table tops (d-light)
+  ok F3 accessible full names retained (d-light)
+Traceback (most recent call last):
+  File "/probes/r2_closure.py", line 418, in <module>
+    asyncio.run(run())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/probes/r2_closure.py", line 386, in run
+    and geo["order"]["lastBadge"] > geo["order"]["lastTop"],
+                                    ~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 'lastTop'
+exit=0
+
+### [04:15:31Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c sed -n '80,115p' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/PlanTable.svelte
+      width={drawing.rect.w}
+      height={drawing.rect.h}
+      rx={drawing.rect.rx}
+    />
+  {/if}
+  {#each drawing.seats as seat, index (`${place.id}-${index}`)}
+    <circle class="seat" cx={seat.x} cy={seat.y} r={seat.r} />
+  {/each}
+  {#each plate.lines as line, index (`plate-${index}`)}
+    <text
+      class="plate-label"
+      x={drawing.cx}
+      y={drawing.cy + (index - (plate.lines.length - 1) / 2) * plate.lineHeight}
+      text-anchor="middle"
+      dominant-baseline="central"
+      font-size={plate.fontSize}
+    >
+      {line}
+    </text>
+  {/each}
+  <text
+    class="plan-seats"
+    x={drawing.cx}
+    y={drawing.size + 6}
+    text-anchor="middle"
+    dominant-baseline="hanging"
+    font-size="16"
+  >
+    {seatsLabel}
+  </text>
+</g>
+exit=0
+
+### [04:15:58Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes:/probes:ro df-harness-runner python /probes/r2_closure.py http://127.0.0.1:9401 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log 2>&1; echo CLOSURE_EXIT=$?; grep -c '  ok ' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log; grep 'FAIL' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log | head -10; tail -4 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log
+CLOSURE_EXIT=1
+103
+  FAIL F2 actionable available cells visible after search (d) :: 0 in view
+  FAIL F2 floor retained in view (d) :: {"top": -554, "bottom": -518, "left": 80, "right": 116, "h": 36, "w": 36, "vh": 900, "vw": 1280}
+  FAIL F2 party typing does not hijack scroll (d) :: 
+  FAIL F2 409 refresh does not repeat reveal scroll (d) :: 1219->1296
+  FAIL F2 actionable available cells visible after search (p) :: 0 in view
+  FAIL F2 floor retained in view (p) :: {"top": -1025, "bottom": -989, "left": 16, "right": 52, "h": 36, "w": 36, "vh": 900, "vw": 375}
+  FAIL F2 party typing does not hijack scroll (p) :: 
+  FAIL F2 409 refresh does not repeat reveal scroll (p) :: 4264->4310
+  FAIL F2 actionable available cells visible after search (p812) :: 0 in view
+  FAIL F2 floor retained in view (p812) :: {"top": -1113, "bottom": -1077, "left": 16, "right": 52, "h": 36, "w": 36, "vh": 812, "vw": 375}
+ - F4 connector never slices label ink (d-dark) :: [{"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}]
+ - F4 badge not occluded, inside svg (d-dark) :: {"occ": true, "b": [{"inSvg": true}]}
+ - F4 connector never slices label ink (p-light) :: [{"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}]
+ - F4 connector never slices label ink (p-dark) :: [{"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}, {"slice": true}]
+exit=0
+
+### [04:18:37Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes:/probes:ro df-harness-runner python /probes/r2_closure.py http://127.0.0.1:9401 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log 2>&1; echo CLOSURE_EXIT=$?; grep -c '  ok ' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log; grep 'FAIL' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log | head -8; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log
+CLOSURE_EXIT=1
+119
+  FAIL F2 uncertain visible (p) :: {"top": 938, "bottom": 1113, "left": 16, "right": 359, "h": 176, "w": 343, "vh": 900, "vw": 375}
+  FAIL F2 uncertain visible (p812) :: {"top": 839, "bottom": 1014, "left": 16, "right": 359, "h": 176, "w": 343, "vh": 812, "vw": 375}
+CLOSURE RESULT pass=119 fail=2
+ - F2 uncertain visible (p) :: {"top": 938, "bottom": 1113, "left": 16, "right": 359, "h": 176, "w": 343, "vh": 900, "vw": 375}
+ - F2 uncertain visible (p812) :: {"top": 839, "bottom": 1014, "left": 16, "right": 359, "h": 176, "w": 343, "vh": 812, "vw": 375}
+exit=0
+
+### [04:19:56Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c grep -n 'uncertain\|booking-error\|publishReveal' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte | head -20
+69:  let uncertain = $state(false);
+86:    if (kind === 'booking-error') return root.querySelector('[data-testid="booking-error"]');
+87:    if (kind === 'uncertain') return root.querySelector('[data-testid="booking-uncertain"]');
+91:  function publishReveal(kind: string, gen: number): void {
+206:      publishReveal('search-error', generation);
+212:      publishReveal('search-error', generation);
+229:      publishReveal('search-error', mine);
+235:    publishReveal(phase === 'empty' ? 'empty' : 'results', mine);
+250:      publishReveal('auth-error', generation);
+276:    publishReveal('form', generation);
+328:    uncertain = false;
+358:      uncertain = false;
+359:      publishReveal('booking-error', generation);
+365:      publishReveal('booking-error', generation);
+373:      uncertain = false;
+387:      uncertain = false;
+388:      publishReveal('confirm', searchGeneration);
+391:    if (outcome.kind === 'uncertain') {
+394:        uncertain = true;
+395:        publishReveal('uncertain', searchGeneration);
+exit=0
+
+### [04:19:56Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c sed -n '350,375p' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/web/src/lib/components/LiveSearch.svelte
+      // The refusal is already on screen. A failed refresh leaves the previous grid in place.
+    }
+  }
+
+  async function onBook(size: number): Promise<void> {
+    partyDraft = size;
+    if (!held || !signedIn || !token) {
+      bookingError = 'Sign in to request this table.';
+      uncertain = false;
+      publishReveal('booking-error', generation);
+      return;
+    }
+    const body = draftBody(size);
+    if (!body) {
+      bookingError = 'Party size must be a whole number.';
+      publishReveal('booking-error', generation);
+      return;
+    }
+    const next = attemptFor(pending, body, newIdempotencyKey());
+    const replaced = !pending || next.key !== pending.key;
+    pending = next;
+    if (replaced) {
+      receipt = null;
+      uncertain = false;
+    }
+    bookingError = null;
+exit=0
+
+### [04:20:10Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes:/probes:ro df-harness-runner python /probes/r2_closure.py http://127.0.0.1:9401 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log 2>&1; echo CLOSURE_EXIT=$?; grep -c '  ok ' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log; grep 'FAIL' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log | head -5; tail -2 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/closure-run.log
+CLOSURE_EXIT=0
+121
+
+CLOSURE RESULT pass=121 fail=0
+exit=0
+
+### [04:21:05Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c tail -6 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/go-race.log
+go: downloading golang.org/x/crypto v0.57.0
+?   	tablekeeper/cmd/tablekeeper	[no test files]
+ok  	tablekeeper/internal/clock	1.097s
+ok  	tablekeeper/internal/service	363.644s
+?   	tablekeeper/probes/pclient	[no test files]
+race_exit=0
+exit=0
+
+### [04:21:25Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes:/probes:ro df-harness-runner python /probes/r1_states.py http://127.0.0.1:9401 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/states-run.log 2>&1; echo STATES_EXIT=$?; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/states-run.log
+STATES_EXIT=0
+
+STATES RESULT pass=132 fail=0
+exit=0
+
+### [04:22:23Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes:/probes:ro df-harness-runner python /probes/r1_measure.py http://127.0.0.1:9401 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/measure-run.log 2>&1; echo MEASURE_EXIT=$?; tail -8 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/measure-run.log
+MEASURE_EXIT=0
+  info selected-pair ratio d-light: 7.611 fg=rgb(255, 248, 240) bg=rgb(140, 52, 24)
+  info selected-pair ratio d-dark: 9.915 fg=rgb(26, 18, 14) bg=rgb(240, 176, 136)
+  info selected-pair ratio p-light: 7.611 fg=rgb(255, 248, 240) bg=rgb(140, 52, 24)
+  info selected-pair ratio p-dark: 9.915 fg=rgb(26, 18, 14) bg=rgb(240, 176, 136)
+
+MEASURE RESULT pass=59 fail=0
+exit=0
+
+### [04:23:02Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes:/probes:ro df-harness-runner python /probes/r1_upgrade.py http://127.0.0.1:9403 http://127.0.0.1:9404 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/upgrade-run.log 2>&1; echo UPGRADE_EXIT=$?; tail -4 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/upgrade-run.log
+UPGRADE_EXIT=0
+  ok destination lookup carries table_ids + singleton table_id
+  ok destination holds exactly one booking
+
+UPGRADE RESULT pass=19 fail=0
+exit=0
+
+### [04:23:07Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c grep -E 'ci_exit|check_exit|test_exit|build_exit|Tests' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/ui-gates.log | head -8
+ci_exit=0
+check_exit=0
+[2m      Tests [22m [1m[32m82 passed[39m[22m[90m (82)[39m
+test_exit=0
+build_exit=0
+exit=0
+
+### [04:23:07Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c mkdir -p /tmp/s2r2-priv && sh /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/probes/stage2-api.sh http://127.0.0.1:9401 /tmp/s2r2-priv > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/ctx-stage2-api.log 2>&1; echo API_CTX_EXIT=$?; tail -2 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/ctx-stage2-api.log
+API_CTX_EXIT=0
+
+RESULT pass=231 fail=0
+exit=0
+
+### [04:23:11Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c sh /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/probes/stage2-donor.sh http://127.0.0.1:9403 /tmp/s2r2-priv/donor > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/ctx-donor.log 2>&1; echo DONOR_EXIT=$?; tail -1 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/ctx-donor.log
+DONOR_EXIT=0
+donor checks passed: 41 failed: 0
+exit=0
+
+### [04:23:12Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c sh /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/probes/stage2-import.sh http://127.0.0.1:9403 http://127.0.0.1:9404 /tmp/s2r2-priv/donor /tmp/s2r2-priv/import > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/ctx-import.log 2>&1; echo IMPORT_EXIT=$?; tail -2 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/ctx-import.log
+IMPORT_EXIT=0
+
+RESULT pass=34 fail=0 skip=1
+exit=0
+
+### [04:23:14Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c sh /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2/probes/stage1-html.sh http://127.0.0.1:9401 /tmp/s2r2-priv/html > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/ctx-html.log 2>&1; echo HTML_EXIT=$?; tail -2 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/ctx-html.log
+HTML_EXIT=0
+
+RESULT pass=16 fail=0
+exit=0
+
+### [04:33:43Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c wc -l /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/design-critic.log && cat /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/design-critic.log
+77 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/design-critic.log
+### Visual Design Critique
+
+#### 1. `measure-dense-15.png`
+- **Element:** Availability grid container (`[data-testid="availability-grid"]` / `.matrix-wrap`)
+- **What is wrong:** The 15-slot dense availability grid resulting from the search is completely missing from the viewport (100% off-screen below the 900px fold). The 680px tall SVG floor plan is stacked vertically above the grid, pushing all bookable time slots off-screen so the screen appears empty of results upon search execution.
+- **Concrete fix:** Place the floor plan and availability grid side-by-side on desktop viewports ($\ge 1024\text{px}$) via CSS grid (`grid-template-columns: 1fr 1fr; gap: var(--space-4)`), or ensure the auto-scroll reveal scrolls the availability grid caption into the top half of the viewport.
+
+---
+
+#### 2. `measure-dense-5.png`
+- **Element:** Availability grid container (`[data-testid="availability-grid"]` / `.matrix-wrap`)
+- **What is wrong:** The 43-slot dense availability grid is completely hidden below the 900px fold. As in the 15-minute density test, the vertically stacked floor plan pushes the entire grid of bookable times out of view.
+- **Concrete fix:** Use a two-column desktop layout (`grid-template-columns: 1.1fr 1fr`) so the availability grid is visible alongside the floor plan, or trigger an immediate reveal scroll to `.matrix-wrap` upon search completion.
+
+---
+
+#### 3. `F3F4-d-light.png`
+- **Element:** Booking submit button (`[data-testid="booking-submit"]`)
+- **What is wrong:** The booking form's primary action button ("Request these tables") is clipped at the bottom of the 1280x900 viewport. The button begins at $y = 898\text{px}$, exposing only a 2-pixel sliver at the viewport edge while the label text and click area are cut off.
+- **Concrete fix:** In [`revealOutcome`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/staging/stage-2/web/src/lib/motion.ts), adjust the scroll delta calculation for `kind === 'form'` so that the entire height of `[data-testid="booking-form"]` plus bottom padding ($16\text{px}-24\text{px}$) is brought within `window.innerHeight`.
+
+---
+
+#### 4. `F3F4-d-dark.png`
+- **Element:** Booking form controls (`[data-testid="booking-form"]`, `[data-testid="party-size-input"]`, `[data-testid="booking-submit"]`)
+- **What is wrong:** After selecting the 6:00 PM paired slot, the booking form is almost entirely below the fold. Only the card heading "Hold these tables" is visible at $y \approx 880\text{px}-895\text{px}$. The party size input field, helper text, and submit button are completely pushed off-screen.
+- **Concrete fix:** Ensure that selecting a slot on desktop scrolls the entire booking form card into view (`rect.bottom <= viewH - margin`) rather than aligning only to the top edge of the card.
+
+---
+
+#### 5. `F3F4-p-light.png`
+- **Element:** Booking form container (`[data-testid="booking-form"]`)
+- **What is wrong:** After tapping the held pair slot at 6:00 PM, the booking form is 100% off-screen below the 900px fold. The viewport displays only the list of time slot buttons, giving no visible indication that the booking form has opened.
+- **Concrete fix:** Programmatically scroll `[data-testid="booking-form"]` into view immediately upon cell selection on mobile viewports so that the form heading and inputs are in view.
+
+---
+
+#### 6. `F3F4-p-dark.png`
+- **Element:** Booking form container (`[data-testid="booking-form"]`)
+- **What is wrong:** After tapping the held pair slot at 6:00 PM in dark mode, the booking form is 100% off-screen below the 900px fold. The user sees only the list of time slot buttons.
+- **Concrete fix:** Scroll `[data-testid="booking-form"]` into view on mobile slot selection (`revealOutcome(formNode)`).
+
+---
+
+#### 7. `F2-confirmation-d.png`
+- **Element:** Confirmation card table list (`[data-testid="confirmation-tables"]`)
+- **What is wrong:** Immediate verbatim repetition of table names. Line 2 displays `Zum Anker · Table Window alcove and Table Garden corner · Thursday 17 June 2027 at 6:00 PM (18:00)`, and line 3 repeats `Table Window alcove and Table Garden corner` directly underneath without a label.
+- **Concrete fix:** Remove the redundant standalone table line, or label it clearly with structured text (e.g. `Reserved Tables: Window alcove & Garden corner`).
+
+---
+
+#### 8. `F2-confirmation-p.png`
+- **Element:** Confirmation card table list (`[data-testid="confirmation-tables"]`)
+- **What is wrong:** Verbatim duplicate table naming on consecutive lines (`Zum Anker · Table Window alcove and Table Garden corner ...` followed immediately by `Table Window alcove and Table Garden corner`).
+- **Concrete fix:** Remove the duplicate `<p data-testid="confirmation-tables">` paragraph or style it with a distinct key/value descriptor label.
+
+---
+
+#### 9. `F2-409-p.png`
+- **Element:** Booking error banner (`[data-testid="booking-error"]`)
+- **What is wrong:** Displays a raw unformatted backend error string `the table is taken for that interval` in lowercase without initial capitalization or terminating punctuation.
+- **Concrete fix:** Capitalize and format user-facing error messages in [`LiveSearch.svelte`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/staging/stage-2/web/src/lib/components/LiveSearch.svelte) (e.g., "The table is taken for that interval.").
+
+---
+
+### VERDICT-CRITICAL
+
+The following problems would block a product demo:
+
+1. **Search Results Hidden Below the Fold on Desktop (`measure-dense-15.png`, `measure-dense-5.png`):**
+   - Submitting a search on a 1280x900 viewport displays the floor plan while the entire dense availability grid is pushed 100% off-screen below the fold, giving the impression that the search produced no bookable times.
+
+2. **Booking Form Completely Off-Screen on Mobile Viewport (`F3F4-p-light.png`, `F3F4-p-dark.png`):**
+   - Selecting a time slot fails to bring the booking form into view on mobile. The form is positioned entirely below the 900px fold, making the slot selection feel unresponsive.
+
+3. **Booking Form Clipped or Inaccessible on Desktop Viewport (`F3F4-d-dark.png`, `F3F4-d-light.png`):**
+   - Selecting a slot leaves the booking form cut off at the bottom edge. In `F3F4-d-dark.png`, both the party size input and submit button are below the fold; in `F3F4-d-light.png`, the submit button is clipped at $y = 898\text{px}$, preventing form submission without manual scrolling.
+exit=0
+
+### [04:34:45Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes:/probes:ro df-harness-runner python /probes/r2_refute.py 2>&1 | tee /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes/refute-run.log; echo REFUTE_EXIT=${PIPESTATUS[0]}
+  ok dense slot15: caption in view after reveal
+  ok dense slot15: actionable available cells visible after reveal
+  ok dense slot5: caption in view after reveal
+  ok dense slot5: actionable available cells visible after reveal
+  ok form fully visible after settle (d-light)
+  ok submit fully visible after settle (d-light)
+  ok form fully visible after settle (d-dark)
+  ok submit fully visible after settle (d-dark)
+  ok form fully visible after settle (p-light)
+  ok submit fully visible after settle (p-light)
+  ok form fully visible after settle (p-dark)
+  ok submit fully visible after settle (p-dark)
+REFUTE RESULT pass=12 fail=0
+REFUTE_EXIT=0
+exit=0
+
+### [04:36:29Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker rm -f s2r2-def s2r2-alt s2r2-off s2r2-donor s2r2-dest2 >/dev/null 2>&1; docker network rm s2r2off >/dev/null 2>&1; echo cleaned
+cleaned
+exit=0
+
+### [04:36:30Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c git -C /home/nryn/work/seatright/runs/tablekeeper2/wt/review rev-parse HEAD; git -C /home/nryn/work/seatright/runs/tablekeeper2/wt/review status --short | wc -l; df -h /var/lib/docker | tail -1; du -sh /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/checks /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/shots /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes 2>/dev/null
+8812cdeaaa993cd944493c654e51d355cdd6b676
+0
+/dev/vdd        9.8G  7.4G  2.0G  80% /var/lib/docker
+28K	/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/checks
+28M	/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/shots
+76K	/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/notes
+exit=0
+S2-R2 REVIEW END 2026-10-05T04:36:30Z
