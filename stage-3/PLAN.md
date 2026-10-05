@@ -1,6 +1,6 @@
 # Tablekeeper stage 3: policies, history and recurring reservations
 
-Status: stage2 accepted and copied forward; first independent S3-P/S3-H/S3-G wave queued. Stage3 is not accepted. Earlier stage folders are immutable.
+Status: stage2 accepted and copied forward; S3-P (OMP/shared32), S3-H (OpenCode/shared33) and S3-G (Grok/shared34) are in progress from integrated base1dd5e0ec555216d3607374cbf251bf2c637335c5. Stage3 is not accepted. Earlier stage folders are immutable.
 
 ## Requirements ledger
 
