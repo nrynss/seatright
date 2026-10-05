@@ -171,6 +171,8 @@ S4-P/shared51 and S4-M/shared52 are accepted and integrated after the final live
 
 OpenCode/shared54 owns manager seating previews and their exact HTTP route; OMP/shared55 owns recurring clock amendments in two new service files only. Both are in progress from verified base **727eae17559928196cc7f3f5c7dc8967b0d7088e**. Complete single-message handoffs were accepted: preview 5ba35ade-763f-47c8-9313-329c61c20796; amendments a006af16-14f4-4148-809b-145869cd5ce7. Router integration for amendments remains serial, so the owners do not overlap. Grok/shared53 continues fixture compatibility independently. Stage 4 remains unaccepted.
 
+Grok/shared53 fixture report passed 100 unit tests (also verified on host) and 90 browser checks, with no component change. It is under a narrow same-base correction: the 60-minute clock policy needs version 1, an 18:30 exception needs a matching 19:30 end, and the simulated 409 must use an edited party within the selected pair capacity. Full correction 99cb53ba-06dc-4f1e-8c33-bd671000b8f0 is delivered; original evidence remains untouched and the new proof is still fixture transport only. No G commit yet. Backend shared54/55 continue independently.
+
 Historical foundation handoffs at bda7c43023123bd8c96809d2c2f8066f1f81bdae: S4-P 58aa1df7-5be2-42aa-93f4-077f0c133e23; S4-M 72120fff-a6c8-4fd6-b5a6-53a51307b228; S4-G 7e47c02b-4aea-447e-8dd7-555ba8f80ea4. P and M are completed; G is active. Final endpoint handoff bases are recorded after their metadata commits exist.
 
 
