@@ -1,6 +1,30 @@
 # Tablekeeper stage 3: policies, history and recurring reservations
 
-Status: stages1/2 accepted immutable. S3 P/H/G/M/D/B1/B2/S/G2A/C/I1 owner items complete. S3-I2/OMP/shared44 and S3-G2B/Grok/shared45 begin in parallel on integrated strict I1+C. S3-P1/OpenCode/shared43 final race-state comparisons pending, one liveness retry. P2 delivery and formal exact-SHA reviewer acceptance follow. Stage3 not accepted.
+Status: stages1/2 accepted immutable. S3 P/H/G/M/D/B1/B2/S/G2A/C/I1/P1/G2B owner items complete. P1 full complete race-state comparisons pass245/0/0 on host and image; G2B live UI and both same-document upgrades pass33/33 on strict I1+C image. S3-I2/OMP/shared44 remains in proof repair: actual mutation, original-byte transfer, full record/history/receipt agreement and effective failure guards required. S3-P2A/OpenCode/shared46 proceeds independently on documentation and packaged/offline delivery. P2B final migration/harness and formal exact-SHA review follow I2 acceptance. Stage3 not accepted.
+
+## S3-P2A — stage-3 guide and independent packaged delivery
+Owner: Seatright-OpenCode; shared46. Approximately 20–30 minutes, one foreground DONE or concrete BLOCKED report.
+Components: delivery, service_image, api, snapshot_store
+
+Own only stage-3/RUN.md plus evidence/seatright-opencode/S3-P2A/**. No Go, tests, Dockerfile, web, package files, PLAN, other probes, stage-1/2 or Git mutation. Mandate: /home/nryn/work/seatright/runs/tablekeeper2/result/mandates/seatright-opencode.md. Fixed worktree: /home/nryn/work/seatright/runs/tablekeeper2/wt/seatright-opencode. Coordinator supplies the new clean integrated base in the handoff.
+
+Replace the copied stage-2 RUN guide with accurate stage-3 build/start, default/nondefault PORT, WEB_DIR/source web-then-Go startup, stack versions, ephemeral state/reset/replacement semantics and offline runtime. Verify facts read-only against Dockerfile/router/pclient/package/go.mod/source. Explain dated manager policy publication/public listing, original detail versus selected dated rules/capacities, explanations, accepted terms/revisions/no-ops/accepted cutoff, owner-only history/decision privacy, series adoption/calendar/current exceptions, collective moves/counters and idempotency. Old receipt replay is immutable original JSON and can omit modern fields; current records have normalized metadata. Do not add stage-4 replan behavior, fabricated pass counts, acceptance claims, credentials or revision claims.
+
+Document available stage3-api.sh and genuine two-source stage3-donor.sh interfaces exactly. The six-argument stage3-import.sh SRC1 SRC2 DST PEER DONORS WORK contract is under S3-I2 repair and is not yet present in this base: label it pending integration, do not call it or imply a completed runnable migration gate. S3-P2B will update this section and run final transfer/implementer harness once I2 lands. P2A is independent; no waiting or polling for I2.
+
+Exact independent gates (derive private fixtures/argv from the specification; never invent probe flags):
+1. Worktree root: git diff --check. Documentation scope requires no Go/UI source gate repetition.
+2. Worktree root: docker build -t tablekeeper:s3-p2a-stage3 stage-3. Retain actual command/CWD/UTC/effective exit.
+3. docker run -d --name tk-s3-p2a-default --cpus 2 --memory 2g -p 9171:8080 tablekeeper:s3-p2a-stage3 (NO PORT env override). Inspect full Id/Image/Name/Config.Env and caps. GET http://127.0.0.1:9171/health: exact 200, 15-byte status-ok JSON and application/json; charset=utf-8. Record readiness elapsed. Distinguish mapped reachability from source-inspected bind address.
+4. docker run -d --name tk-s3-p2a-live --cpus 2 --memory 2g -e PORT=9170 -p 9170:9170 tablekeeper:s3-p2a-stage3. Same inspect/health/readiness, verify 0.0.0.0 through the actual container IP or an in-container request in addition to mapped reachability.
+5. CWD stage-3: sh probes/stage3-api.sh http://127.0.0.1:9170 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-opencode/S3-P2A/api-work (245 checks currently, report actual counts).
+6. CWD stage-3: sh probes/stage1-html.sh http://127.0.0.1:9170 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-opencode/S3-P2A/html-work (inherited HTML/assets smoke, currently16; report actual).
+7. docker run -d --name tk-s3-p2a-offline --network none --cpus 2 --memory 2g -e PORT=9172 tablekeeper:s3-p2a-stage3. Use bundled /app/probe inside the offline container, starting with docker exec tk-s3-p2a-offline /app/probe -method GET -url http://localhost:9172/health. Its read-only source is stage-3/probes/pclient/main.go; flags -method, -url, -body STRING, -token, -key, -timeout GoDuration. Capture bodies/tokens privately, print names/statuses/content-types/hash bytes only. Prove explicit reset fixture, signup/manager login, dated policy publication, pair availability/booking, history/decision and series adoption/get under network-none. Prove HTML/CSS/JS and all five local font files by status/type/hash, plus outbound DNS/network-unreachable with effective nonzero exit. This is actual offline function, not health-only.
+8. Stop/remove only the three owned containers; exact runnable lifecycle commands and full IDs/image/PORT/resources must appear in fresh command-headed logs. No unowned cache/image deletion on disk failure. Record concrete environmental blocker and finish other available gates.
+
+Use umask077 and 0700 work dirs/0600 private files from creation; never print credentials, token-bearing bodies or exports. Secret args may be redacted explicitly in public evidence, exact private argv remains private. Full commands without secrets, CWD, UTC-start/end, effective exit/raw output; no summary-only 'run three containers' headers. No supplied harness, browser, full race or genuine cross-version transfer claim in P2A. If a product defect appears, report exact reproduction to coordinator; do not expand owned scope.
+
+Report once in foreground: item/shared card, exact base/HEAD/worktree, owned-file diff/status and older-stage trees, requirement→actual proof map, commands/raw paths/exits/counts, real image/container IDs and PORT, documented pending interface, gaps/failures honestly, own cleanup, measured interval and visible usage (unavailable if absent). No Git operations.
 
 ## Requirements ledger
 
