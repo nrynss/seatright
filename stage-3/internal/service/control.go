@@ -73,6 +73,9 @@ func (s *Service) Import(raw []byte) Result {
 	if err := validateState(&st); err != nil {
 		return validationFailed(err.Error())
 	}
+	if err := validateVersionState(&st); err != nil {
+		return validationFailed(err.Error())
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.state = st

@@ -221,7 +221,10 @@ func seedVersionIsolationExtras(t *testing.T, s *Service) {
 		st.Policies["r1"] = []policy.Policy{{EffectiveFrom: "2026-09-28", Terms: fixtureTerms(st.Restaurants[0])}}
 		st.Policies["r1"][0].PolicyVersion = 1
 		st.Series["sz1"] = Series{ID: "sz1", UserID: "u1", RestaurantID: "r1", Revision: 1, IntervalWeeks: 1,
-			Members: []SeriesMember{{Index: 0, Reference: "SEEDCF", ScheduledDate: "2027-05-06", Exception: false}}}
+			Members: []SeriesMember{
+				{Index: 0, Reference: "SEEDCF", ScheduledDate: "2027-05-06", Exception: false},
+				{Index: 1, Reference: "SEED02", ScheduledDate: "2027-05-13", Exception: false},
+			}}
 	})
 }
 
@@ -241,7 +244,9 @@ const verManagersFixture = `{"users":[{"id":"u1","email":"a@b","password":"passw
 	"manager_user_ids":["u1"]}],
 	"reservations":[
 		{"id":"s1","reference":"SEEDCF","user_id":"u1","restaurant_id":"r1",
-		"table_ids":["t_2","t_1"],"starts_at_local":"2027-05-06T19:00","party_size":4}]}`
+		"table_ids":["t_2","t_1"],"starts_at_local":"2027-05-06T19:00","party_size":4},
+		{"id":"s2","reference":"SEED02","user_id":"u1","restaurant_id":"r1",
+		"table_id":"t_2","starts_at_local":"2027-05-13T20:30","party_size":1}]}`
 
 func TestVersionBeyondMaximaProducer(t *testing.T) {
 	// Genuine above-publication-maxima fixture config stays usable: reset
@@ -268,7 +273,6 @@ func TestVersionPartialMetadataRejected(t *testing.T) {
 	// history is rejected atomically; revision zero must not erase modern
 	// terms/history. Genuine absent legacy shapes still normalize.
 	base := resetVersion(t, versionFixture)
-	before := string(exportBytes(t, base))
 	mutate := func(t *testing.T, change func(env map[string]any)) {
 		t.Helper()
 		env := exportEnvelope(t, base)
@@ -317,49 +321,53 @@ func TestVersionPartialMetadataRejected(t *testing.T) {
 			res["accepted_terms"] = map[string]any{}
 		})
 	})
-	// Valid modern accepted duration differing from the fixture is kept
-	// verbatim: byte-identical round trip, not rewritten to fixture duration.
-	t.Run("modern duration roundtrip", func(t *testing.T) {
-		env := exportEnvelope(t, base)
-		st := env["state"].(map[string]any)
-		res := st["reservations"].(map[string]any)["SEEDCF"].(map[string]any)
-		res["accepted_terms"].(map[string]any)["reservation_duration_minutes"] = float64(60)
-		res["ends_at"] = "2027-05-06T20:00:00+02:00"
-		raw, _ := json.Marshal(env)
+	// Genuine publish+write selected v1 duration: publish a 60-minute policy
+	// and create under it, so the stored v1 terms are producer-real rather
+	// than hand-rewritten v0 bytes.
+	t.Run("published v1 duration roundtrip", func(t *testing.T) {
+		s := resetVersion(t, versionFixture)
+		tok := versionLoginToken(t, s)
+		s.mu.Lock()
+		for i := range s.state.Restaurants {
+			if s.state.Restaurants[i].ID == "r1" {
+				s.state.Restaurants[i].ManagerUserIDs = []string{"u1"}
+			}
+		}
+		s.mu.Unlock()
+		pub := `{"effective_from":"2027-05-06","slot_minutes":30,"reservation_duration_minutes":60,"cancellation_cutoff_minutes":60,"opening_hours":[{"weekday":"thu","opens":"18:00","closes":"23:00"}],"capacities":{"t_1":2,"t_2":4}}`
+		if res := s.PublishPolicy(tok, "r1", "v1dur", []byte(pub)); res.Status != 201 {
+			t.Fatalf("publish: %d %v", res.Status, res.Body)
+		}
+		body := `{"restaurant_id":"r1","table_id":"t_1","starts_at_local":"2027-05-06T20:30","party_size":1}`
+		if res := s.CreateReservation(tok, "v1c", []byte(body)); res.Status != 201 {
+			t.Fatalf("create: %d %v", res.Status, res.Body)
+		}
+		ref := ""
+		s.mu.Lock()
+		for r, res := range s.state.Reservations {
+			if r != "SEEDCF" && r != "SEEDCN" && r != "SEEDOFF" && r != "SEEDOVER" && res.StartsAtLocal == "2027-05-06T20:30" {
+				ref = r
+			}
+		}
+		s.mu.Unlock()
+		if ref == "" {
+			t.Fatal("v1 record not found")
+		}
+		s.mu.Lock()
+		kept := s.state.Reservations[ref]
+		s.mu.Unlock()
+		if kept.AcceptedTerms.PolicyVersion != 1 || kept.AcceptedTerms.ReservationDurationMinutes != 60 {
+			t.Fatalf("v1 terms = %+v", kept.AcceptedTerms)
+		}
+		before := string(exportBytes(t, s))
 		dst := New()
-		if rec := serveRequest(dst, http.MethodPost, "/_test/import", raw, nil); rec.Code != 204 {
-			t.Fatalf("modern duration import = %d", rec.Code)
+		if rec := serveRequest(dst, http.MethodPost, "/_test/import", []byte(before), nil); rec.Code != 204 {
+			t.Fatalf("v1 import = %d", rec.Code)
 		}
-		// JSON equality (marshal sorts map keys; byte order differs from the
-		// struct-ordered export), then byte stability across a second import.
-		var want, have map[string]any
-		if err := json.Unmarshal(raw, &want); err != nil {
-			t.Fatal(err)
-		}
-		if err := json.Unmarshal(exportBytes(t, dst), &have); err != nil {
-			t.Fatal(err)
-		}
-		wb, _ := json.Marshal(want)
-		hb, _ := json.Marshal(have)
-		if string(wb) != string(hb) {
-			t.Fatal("modern duration round trip changed state")
-		}
-		second := string(exportBytes(t, dst))
-		dst2 := New()
-		if rec := serveRequest(dst2, http.MethodPost, "/_test/import", []byte(second), nil); rec.Code != 204 {
-			t.Fatalf("modern duration reimport = %d", rec.Code)
-		}
-		if got := string(exportBytes(t, dst2)); got != second {
-			t.Fatal("modern duration reimport not byte-stable")
-		}
-		dst.mu.Lock()
-		kept := dst.state.Reservations["SEEDCF"]
-		dst.mu.Unlock()
-		if kept.AcceptedTerms.ReservationDurationMinutes != 60 || kept.EndsAt != "2027-05-06T20:00:00+02:00" {
-			t.Fatalf("modern duration rewritten: %+v", kept)
+		if got := string(exportBytes(t, dst)); got != before {
+			t.Fatal("v1 round trip changed state")
 		}
 	})
-	_ = before
 }
 
 func TestVersionModernRoundtrip(t *testing.T) {
