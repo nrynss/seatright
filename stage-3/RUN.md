@@ -296,11 +296,31 @@ then writes `stage1/export.json` + `manifest.json` and
 `stage2/export.json` + `manifest.json` under a `0700` directory (`0600`
 files). Stdout carries names, codes, counts and provenance only.
 
-The six-argument transfer script
-`stage3-import.sh SRC1 SRC2 DST PEER DONORS WORK` (old-source imports,
-modern collective/exception portability, receipt replay, atomicity guards)
-is **pending integration** under a separate repair item and is not present in
-this tree. Do not treat the same-image roundtrip inside `stage3-api.sh` as a
-cross-version upgrade proof; only a two-process import run proves migration.
+`probes/stage3-import.sh SRC1 SRC2 DST PEER DONORS WORK` (from `stage-3`)
+is the transfer probe: `SRC1`/`SRC2` are independently running accepted
+stage-1/stage-2 processes, `DST`/`PEER` are two independent current-stage-3
+processes (four distinct local base URLs), `DONORS` holds the
+`stage1/`+`stage2` export/manifest pairs produced **first** by
+`stage3-donor.sh`, and `WORK` is a private output directory (`0700`, files
+`0600`). Only `WORK` is written; reset/import on these disposable services is
+destructive by design. It exercises original file-byte old transfer into a
+pre-seeded destination with replacement semantics, modern
+independent-process portability (policy supersession, pair history, adopted
+series with exception/cancel behavior, mixed-member collective batches) and
+immutable original receipt replays, plus unreachable/sabotage guards with
+nonzero counted failures. Phase `gate` markers confirm phase completion, not
+additional coverage. Optional provenance comes from actual inspected
+deployment values via `SRC1_IMAGE`/`SRC1_CONTAINER`/`SRC1_PORT` (+`_CID`)
+and the matching `SRC2_*`, `DST_*`, `PEER_*` variables — the strings only
+label the evidence, they do not establish identity by themselves.
+`SKIP_LIVE_SOURCE=1` skips only the live-source divergence check for
+prior-process canonical artifacts; a fresh donor run leaves it unset.
+`STAGE3_IMPORT_SABOTAGE=1` injects one deliberately failing expectation as a
+guard self-check, not a production config. These probes demonstrate
+capabilities (same-image smoke vs genuine old-source transfer, old receipts
+replayed byte-identical while current records carry normalized metadata);
+they are not stage acceptance. Do not treat the same-image roundtrip inside
+`stage3-api.sh` as a cross-version upgrade proof; only a multi-process
+`stage3-import.sh` run proves migration.
 `stage1-api.sh`, `stage1-html.sh` and `stage1-export.sh` remain for inherited
 single-table, page and export scope; they are not full stage-3 coverage.
