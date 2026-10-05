@@ -167,6 +167,10 @@ Stage 4 starts from the untouched accepted stage-3 tree, copied in **4f52394728a
 
 ## Current work
 
+S4-M/shared52 is under a small test-only verification repair: owned foundation source and recorded gates pass, but public-map alias checks, complete nil/empty clone shapes, old receipt retention and reassigned-entry isolation must be effective. No M commit or dependent S4-A assignment yet. No product defect found; Grok/shared53 continues independently.
+
+S4-P is in a bounded verification repair after its first report: host fmt/vet/race16 tests pass and the pure exhaustive source matches the contract, but objective/oracle/greedy-trap/isolation tests must prove their stated behavior. Shared51 remains in progress; no solver commit yet. S4-M/shared52 and S4-G/shared53 remain independent active items.
+
 OpenCode/shared51 implements the pure global seating solver. OMP/shared52 implements the small closure/plan state and reassigned-history foundation. Grok/shared53 validates existing screens with an actual working Transport fixture for current repaired assignments and amended clocks while preserving original retry receipts. Each starts independently from the committed stage-4 plan base.
 
 All three are in progress from verified clean base **bda7c43023123bd8c96809d2c2f8066f1f81bdae**. Full self-contained handoffs were accepted: S4-P 58aa1df7-5be2-42aa-93f4-077f0c133e23; S4-M 72120fff-a6c8-4fd6-b5a6-53a51307b228; S4-G 7e47c02b-4aea-447e-8dd7-555ba8f80ea4. Initial audit/archive/copy/plan/dispatch are complete; integration waits for actual reports between turns. No stage-4 acceptance is claimed.
