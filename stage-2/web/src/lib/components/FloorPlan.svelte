@@ -1,6 +1,6 @@
 <script lang="ts">
   import { flip } from 'svelte/animate';
-  import { layoutRoom, type PlacedTable } from '../floor';
+  import { roomForPairs, type PlacedTable } from '../floor';
   import { formatClock, tablePhrase } from '../format';
   import { motionDuration } from '../motion';
   import type { PreviewTable } from '../preview';
@@ -56,7 +56,14 @@
     return () => query.removeEventListener('change', sync);
   });
 
-  const scene = $derived(layoutRoom(tables, { maxColumns: narrow ? 1 : 0 }));
+  const fitted = $derived(
+    roomForPairs(
+      tables,
+      pairs.map((pair) => ({ ids: pair.ids, caption: pair.labels.join(' · ') })),
+      { maxColumns: narrow ? 1 : 0 },
+    ),
+  );
+  const scene = $derived(fitted.scene);
   const pickedIds = $derived(selectedIds != null ? [...selectedIds] : selectedId ? [selectedId] : []);
   const ordered = $derived.by(() => {
     if (pickedIds.length === 0) return [...tables];
@@ -70,26 +77,14 @@
     return { x: place.x + place.drawing.size / 2, y: place.y + place.drawing.size / 2 };
   }
 
-  function badgeBox(x: number, y: number, width: number, height: number): { x: number; y: number; w: number; h: number } {
-    const w = 92;
-    const h = 28;
-    return {
-      x: Math.min(Math.max(10, x - w / 2), Math.max(10, width - w - 10)),
-      y: Math.min(Math.max(10, y - h / 2), Math.max(10, height - h - 10)),
-      w,
-      h,
-    };
-  }
-
   const marks = $derived.by(() => {
-    return pairs.flatMap((pair) => {
+    return pairs.flatMap((pair, index) => {
       const left = scene.tables.find((place) => place.id === pair.ids[0]);
       const right = scene.tables.find((place) => place.id === pair.ids[1]);
-      if (!left || !right) return [];
+      const badge = fitted.badges[index];
+      if (!left || !right || !badge) return [];
       const a = center(left);
       const b = center(right);
-      const midX = (a.x + b.x) / 2;
-      const midY = (a.y + b.y) / 2;
       const names = tablePhrase(pair.labels);
       const state = sameMembers(pair.ids, pickedIds) ? 'Selected' : pair.available ? 'Available' : 'Unavailable';
       return [
@@ -100,8 +95,8 @@
           y1: a.y,
           x2: b.x,
           y2: b.y,
-          badge: badgeBox(midX, midY, scene.width, scene.height),
-          caption: pair.labels.join(' · '),
+          badge: { x: badge.x, y: badge.y, w: badge.w, h: badge.h },
+          caption: badge.text,
           available: pair.available,
           selected: sameMembers(pair.ids, pickedIds),
           testId: pairPlanTestId(pair.ids),
