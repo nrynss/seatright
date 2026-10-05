@@ -32,6 +32,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+
+	"tablekeeper/internal/history"
+	"tablekeeper/internal/policy"
 )
 
 // Confirmation statuses for a reservation.
@@ -67,6 +70,7 @@ type Restaurant struct {
 	OpeningHours               []OpeningHour `json:"opening_hours"`
 	Tables                     []Table       `json:"tables"`
 	Combinable                 [][]string    `json:"combinable"`
+	ManagerUserIDs             []string      `json:"manager_user_ids"`
 }
 
 // User is an account. PasswordHash is a bcrypt hash; plaintext passwords are
@@ -84,18 +88,20 @@ type User struct {
 // TableIDs holds the canonical stored set; legacy TableID is retained for
 // stage-1 records and equals the single member iff the set has one member.
 type Reservation struct {
-	ReservationID string   `json:"reservation_id"`
-	Reference     string   `json:"reference"`
-	UserID        string   `json:"user_id"`
-	RestaurantID  string   `json:"restaurant_id"`
-	TableID       string   `json:"table_id"`
-	TableIDs      []string `json:"table_ids"`
-	PartySize     int      `json:"party_size"`
-	Status        string   `json:"status"`
-	StartsAtLocal string   `json:"starts_at_local"`
-	StartsAt      string   `json:"starts_at"`
-	EndsAt        string   `json:"ends_at"`
-	CreatedAt     string   `json:"created_at"`
+	ReservationID string       `json:"reservation_id"`
+	Reference     string       `json:"reference"`
+	UserID        string       `json:"user_id"`
+	RestaurantID  string       `json:"restaurant_id"`
+	TableID       string       `json:"table_id"`
+	TableIDs      []string     `json:"table_ids"`
+	PartySize     int          `json:"party_size"`
+	Status        string       `json:"status"`
+	StartsAtLocal string       `json:"starts_at_local"`
+	StartsAt      string       `json:"starts_at"`
+	EndsAt        string       `json:"ends_at"`
+	CreatedAt     string       `json:"created_at"`
+	Revision      int          `json:"revision"`
+	AcceptedTerms policy.Terms `json:"accepted_terms"`
 }
 
 // Public renders the reservation exactly as ordinary API responses carry it:
@@ -103,6 +109,7 @@ type Reservation struct {
 // and carry table_id only when the set has exactly one member.
 func (r Reservation) Public() map[string]any {
 	ids := append([]string(nil), reservationTableIDs(r)...)
+	terms := policy.CloneTerms(r.AcceptedTerms)
 	out := map[string]any{
 		"reservation_id":  r.ReservationID,
 		"reference":       r.Reference,
@@ -114,11 +121,37 @@ func (r Reservation) Public() map[string]any {
 		"starts_at":       r.StartsAt,
 		"ends_at":         r.EndsAt,
 		"created_at":      r.CreatedAt,
+		"revision":        r.Revision,
+		"accepted_terms":  termsToPublic(terms),
 	}
 	if len(ids) == 1 {
 		out["table_id"] = ids[0]
 	}
 	return out
+}
+
+// termsToPublic renders accepted terms with the exact specification JSON
+// names: policy_version plus the full selected policy snapshot, never
+// effective_from.
+func termsToPublic(t policy.Terms) map[string]any {
+	hours := make([]any, 0, len(t.OpeningHours))
+	for _, h := range t.OpeningHours {
+		hours = append(hours, map[string]any{
+			"weekday": h.Weekday, "opens": h.Opens, "closes": h.Closes,
+		})
+	}
+	caps := make(map[string]any, len(t.Capacities))
+	for k, v := range t.Capacities {
+		caps[k] = v
+	}
+	return map[string]any{
+		"policy_version":               t.PolicyVersion,
+		"slot_minutes":                 t.SlotMinutes,
+		"reservation_duration_minutes": t.ReservationDurationMinutes,
+		"cancellation_cutoff_minutes":  t.CancellationCutoffMinutes,
+		"opening_hours":                hours,
+		"capacities":                   caps,
+	}
 }
 
 // Receipt is one successful idempotent write: who called, where, under which
@@ -137,11 +170,36 @@ type Receipt struct {
 // for export/import; future stages extend these types without renaming or
 // dropping existing fields.
 type State struct {
-	Users        map[string]User        `json:"users"`
-	Tokens       map[string]string      `json:"tokens"`
-	Restaurants  []Restaurant           `json:"restaurants"`
-	Reservations map[string]Reservation `json:"reservations"`
-	Receipts     map[string]Receipt     `json:"receipts"`
+	Users               map[string]User            `json:"users"`
+	Tokens              map[string]string          `json:"tokens"`
+	Restaurants         []Restaurant               `json:"restaurants"`
+	Reservations        map[string]Reservation     `json:"reservations"`
+	Receipts            map[string]Receipt         `json:"receipts"`
+	Policies            map[string][]policy.Policy `json:"policies"`
+	Histories           map[string][]history.Entry `json:"histories"`
+	Series              map[string]Series          `json:"series"`
+	RestaurantRevisions map[string]int             `json:"restaurant_revisions"`
+}
+
+// Series is one recurring agreement: ordered members with their scheduled
+// dates and diner-exception flags. No series operations or public routes
+// exist yet; later ownership resolves ordered Members.
+type Series struct {
+	ID            string         `json:"series_id"`
+	UserID        string         `json:"user_id"`
+	RestaurantID  string         `json:"restaurant_id"`
+	Revision      int            `json:"revision"`
+	IntervalWeeks int            `json:"interval_weeks"`
+	Members       []SeriesMember `json:"members"`
+}
+
+// SeriesMember is one occurrence of a series: its index, booking reference,
+// original scheduled local date and permanent diner-exception flag.
+type SeriesMember struct {
+	Index         int    `json:"index"`
+	Reference     string `json:"reference"`
+	ScheduledDate string `json:"scheduled_date"`
+	Exception     bool   `json:"exception"`
 }
 
 // ReceiptKey scopes an idempotency key to the calling user, method and path,

@@ -7,6 +7,8 @@ import (
 
 	"github.com/nrynss/keel/id"
 	"tablekeeper/internal/clock"
+	"tablekeeper/internal/history"
+	"tablekeeper/internal/policy"
 )
 
 // This file implements the reservation write core: creation, amendment
@@ -253,7 +255,12 @@ func (s *Service) createReservationLocked(st *State, userID string, obj map[stri
 	if conflictingReservation(st, candidate, nil) {
 		return conflict("table_unavailable", "the table is taken for that interval")
 	}
+	candidate.Revision = 1
+	candidate.AcceptedTerms = policy.CloneTerms(fixtureTerms(*vb.restaurant))
+	snap := reservationSnapshot(candidate)
+	st.Histories[reference] = []history.Entry{history.Created(snap, candidate.CreatedAt)}
 	st.Reservations[reference] = candidate
+	st.RestaurantRevisions[vb.restaurant.ID]++
 	return created(candidate.Public())
 }
 

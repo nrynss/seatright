@@ -67,6 +67,9 @@ func (s *Service) Import(raw []byte) Result {
 			st.Reservations[ref] = res
 		}
 	}
+	if err := normalizeVersionState(&st); err != nil {
+		return validationFailed(err.Error())
+	}
 	if err := validateState(&st); err != nil {
 		return validationFailed(err.Error())
 	}
@@ -354,7 +357,14 @@ func validateReservationTimes(st *State, res Reservation) error {
 	} else if !start.Equal(startLocal) {
 		return errInvalid("invalid reservation time")
 	}
-	if !end.Equal(start.Add(time.Duration(restaurant.ReservationDurationMinutes) * time.Minute)) {
+	duration := restaurant.ReservationDurationMinutes
+	if res.Revision != 0 {
+		if res.AcceptedTerms.ReservationDurationMinutes <= 0 {
+			return errInvalid("invalid reservation terms")
+		}
+		duration = res.AcceptedTerms.ReservationDurationMinutes
+	}
+	if !end.Equal(start.Add(time.Duration(duration) * time.Minute)) {
 		return errInvalid("invalid reservation time")
 	}
 	if _, err := parseImportedInstant(res.CreatedAt); err != nil {

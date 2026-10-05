@@ -75,6 +75,12 @@ func seededSource(t *testing.T) (*Service, string) {
 	first := s.Idempotent(tok, "POST", "/reservations", "ship", []byte(`{"v":1}`), func(st *State, uid string, obj map[string]any) Result {
 		rec01 := Reservation{ReservationID: "res_9", Reference: "ORIG01", UserID: uid, RestaurantID: "r1", PartySize: 2, Status: StatusConfirmed, StartsAtLocal: "2026-09-24T19:00", StartsAt: "2026-09-24T19:00:00+02:00", EndsAt: "2026-09-24T20:30:00+02:00", CreatedAt: "2026-09-21T11:04:03+00:00"}
 		setReservationTables(&rec01, []string{"t1"})
+		if err := initializeReservationMetadata(st, &rec01); err != nil {
+			t.Fatalf("synthetic metadata: %v", err)
+		}
+		if len(st.Histories["ORIG01"]) != 1 {
+			t.Fatalf("synthetic history not initialized")
+		}
 		st.Reservations["ORIG01"] = rec01
 		return created(map[string]any{"reference": "ORIG01", "status": StatusConfirmed, "created_at": "2026-09-21T11:04:03+00:00"})
 	})

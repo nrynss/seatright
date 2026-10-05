@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"tablekeeper/internal/clock"
+	"tablekeeper/internal/history"
+	"tablekeeper/internal/policy"
 )
 
 // Reset atomically replaces all service state with the fixture in the request
@@ -23,6 +25,9 @@ func (s *Service) Reset(raw []byte) Result {
 		return rerr.Result()
 	}
 	next.Restaurants = restaurants
+	for _, r := range restaurants {
+		next.RestaurantRevisions[r.ID] = 0
+	}
 	if err := applyFixtureReservations(obj, &next); err != nil {
 		return err.Result()
 	}
@@ -206,6 +211,10 @@ func parseFixtureRestaurant(e map[string]any) (Restaurant, *codedError) {
 	if cerr != nil {
 		return r, cerr
 	}
+	managers, cerr := parseFixtureManagers(e)
+	if cerr != nil {
+		return r, cerr
+	}
 	r = Restaurant{
 		ID:                         id,
 		Name:                       name,
@@ -216,8 +225,33 @@ func parseFixtureRestaurant(e map[string]any) (Restaurant, *codedError) {
 		OpeningHours:               hours,
 		Tables:                     tables,
 		Combinable:                 combinable,
+		ManagerUserIDs:             managers,
 	}
 	return r, nil
+}
+
+// parseFixtureManagers parses the optional manager_user_ids fixture field:
+// absent defaults to an allocated empty array. Present values must be
+// strings following the opaque-id shape; unknown ids are preserved (they
+// simply cannot authenticate as managers).
+func parseFixtureManagers(e map[string]any) ([]string, *codedError) {
+	raw, ok := e["manager_user_ids"]
+	if !ok {
+		return []string{}, nil
+	}
+	list, ok := raw.([]any)
+	if !ok {
+		return nil, malformedErr()
+	}
+	out := make([]string, 0, len(list))
+	for _, v := range list {
+		id, cerr := checkID(v)
+		if cerr != nil {
+			return nil, cerr
+		}
+		out = append(out, id)
+	}
+	return out, nil
 }
 
 // parseFixtureCombinable parses the optional combinable fixture field:
@@ -461,6 +495,10 @@ func applyFixtureReservations(obj map[string]any, next *State) *codedError {
 			CreatedAt:     formatTimestamp(time.Now().UTC()),
 		}
 		setReservationTables(&rec, ids)
+		rec.Revision = 1
+		rec.AcceptedTerms = policy.CloneTerms(fixtureTerms(*restaurant))
+		snap := reservationSnapshot(rec)
+		next.Histories[rec.Reference] = []history.Entry{history.Created(snap, rec.CreatedAt)}
 		next.Reservations[reference] = rec
 	}
 	return nil
