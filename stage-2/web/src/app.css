@@ -516,6 +516,13 @@ select {
   background: var(--accent-soft);
 }
 
+/* The available-pair wash outranks a plain selected cell, so a held pair names accent itself. */
+.cell.together[data-available="true"][data-selected="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
 .cell {
   position: relative;
   display: grid;
@@ -557,6 +564,10 @@ select {
 }
 
 .cell[data-selected="true"] .state-word {
+  color: var(--on-accent);
+}
+
+.cell.together[data-selected="true"] .state-word {
   color: var(--on-accent);
 }
 
