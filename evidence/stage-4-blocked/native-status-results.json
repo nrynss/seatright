@@ -1,0 +1,14 @@
+[
+  {
+    "name": "genuine-zero-move-apply-then-real-patch",
+    "expected": 204,
+    "actual": 422,
+    "destination_retained": true
+  },
+  {
+    "name": "native-preview-receipt-missing-plan-id",
+    "expected": 422,
+    "actual": 204,
+    "destination_retained": false
+  }
+]
