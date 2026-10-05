@@ -115,7 +115,7 @@ Stages are implemented and independently accepted in order. Stage 1 and stage 2 
 
 # Tablekeeper stage 3: policies, history and recurring reservations
 
-Status: stage2 accepted and copied forward; first independent S3-P/S3-H/S3-G wave queued. Stage3 is not accepted. Earlier stage folders are immutable.
+Status: stage2 accepted and copied forward; S3-P (OMP/shared32), S3-H (OpenCode/shared33) and S3-G (Grok/shared34) are in progress from integrated base1dd5e0ec555216d3607374cbf251bf2c637335c5. Stage3 is not accepted. Earlier stage folders are immutable.
 
 ## Requirements ledger
 
@@ -514,4 +514,3 @@ Expected stages1–3 pass, claimedstage3/highest3, stage4 fails. Own image/resou
 ## Bookkeeping and private progress fallback
 
 Coordinator accepts stage2/archive/copy complete; stage3 planning/handoffs in progress; stage3 implementation/review and stage4 pending. Native private task creation was blocked by approval_policy=never earlier; this PLAN and RUNLOG are a lossy private fallback without native task ids/dependency history. Shared cards are only actual seat assignments. Every handoff/report/verdict/retry/blocker records UTC, evidence paths and visible elapsed/usage; invisible tokens/costs are marked unavailable. No human input or approval is sought.
-
