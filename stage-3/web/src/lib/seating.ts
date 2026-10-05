@@ -55,3 +55,23 @@ export function listedPairAvailable(
   if (!options || declared.length < 2) return false;
   return options.some((option) => option.tableIds.length === declared.length && sameMembers(option.tableIds, declared));
 }
+
+/**
+ * Seat text for a declared pair. A returned option capacity above zero is authoritative.
+ * Zero is the placeholder synthesized from a legacy singles-only slot, so the fixture sum remains.
+ * This never splits a pair sum back into individual table capacities.
+ */
+export function explicitPairCapacity(
+  slots: readonly { options?: readonly SeatingOption[] }[],
+  ids: readonly string[],
+  fallback: number,
+): number {
+  for (const slot of slots) {
+    for (const option of slot.options ?? []) {
+      if (option.tableIds.length === ids.length && sameMembers(option.tableIds, ids) && option.capacity > 0) {
+        return option.capacity;
+      }
+    }
+  }
+  return fallback;
+}
