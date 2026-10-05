@@ -35,6 +35,10 @@ export interface ReservationRecord {
   starts_at: string;
   ends_at: string;
   created_at: string;
+  /** Present only when the response itself named a positive integer revision. */
+  revision?: number;
+  /** Opaque copy of the response's accepted_terms. Absent when that field is absent. */
+  acceptedTerms?: Record<string, unknown>;
 }
 
 export type BookingOutcome =
@@ -114,6 +118,14 @@ function requiredText(source: Record<string, unknown>, key: string, message: str
   return value;
 }
 
+/** A private copy of a current response object. Missing or non-object values stay omitted. */
+function opaqueObject(value: unknown): Record<string, unknown> | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+  const clone = JSON.parse(JSON.stringify(value)) as unknown;
+  if (!clone || typeof clone !== 'object' || Array.isArray(clone)) return undefined;
+  return clone as Record<string, unknown>;
+}
+
 export function parseReservation(body: unknown): ReservationRecord {
   const root = record(body, 'The reservation response was not usable.');
   const status = requiredText(root, 'status', 'The reservation response was not usable.');
@@ -143,7 +155,7 @@ export function parseReservation(body: unknown): ReservationRecord {
     tableIds = [requiredText(root, 'table_id', 'The reservation response was not usable.')];
   }
   const single = tableIds.length === 1 ? tableIds[0] : '';
-  return {
+  const parsed: ReservationRecord = {
     reservation_id: requiredText(root, 'reservation_id', 'The reservation response was not usable.'),
     reference: requiredText(root, 'reference', 'The reservation response was not usable.'),
     restaurant_id: requiredText(root, 'restaurant_id', 'The reservation response was not usable.'),
@@ -156,6 +168,11 @@ export function parseReservation(body: unknown): ReservationRecord {
     ends_at: requiredText(root, 'ends_at', 'The reservation response was not usable.'),
     created_at: requiredText(root, 'created_at', 'The reservation response was not usable.'),
   };
+  const revision = root.revision;
+  if (typeof revision === 'number' && Number.isInteger(revision) && revision >= 1) parsed.revision = revision;
+  const acceptedTerms = opaqueObject(root.accepted_terms);
+  if (acceptedTerms) parsed.acceptedTerms = acceptedTerms;
+  return parsed;
 }
 
 /** A completed 4xx is a refusal. A lost response, a 5xx, or an unreadable body is not. */

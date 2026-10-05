@@ -391,3 +391,86 @@ func TestPairSequentialConflictRollback(t *testing.T) {
 		t.Fatal("no confirmed holder after sequential conflict")
 	}
 }
+
+func TestModernExportRoundtripVersionState(t *testing.T) {
+	// Modern exports carry version metadata: revision1, complete fixture0
+	// terms, one created history per record, counters and unknown-manager
+	// preservation survive a byte-identical round trip.
+	s, _, _ := versionImportModern(t)
+	before := string(exportBytes(t, s))
+	dst := New()
+	if rec := serveRequest(dst, http.MethodPost, "/_test/import", []byte(before), nil); rec.Code != 204 {
+		t.Fatalf("import: %d %q", rec.Code, rec.Body.String())
+	}
+	dst.mu.Lock()
+	for ref, res := range dst.state.Reservations {
+		if res.Revision < 1 {
+			t.Fatalf("%s revision = %d", ref, res.Revision)
+		}
+		if len(dst.state.Histories[ref]) == 0 {
+			t.Fatalf("%s has no history", ref)
+		}
+	}
+	dst.mu.Unlock()
+	if got := string(exportBytes(t, dst)); got != before {
+		t.Fatal("modern version round trip changed state")
+	}
+}
+
+func TestVersionHistoryForgedValuesRejected(t *testing.T) {
+	// Host F2 repro: singleton->pair genuine history imports; forging the
+	// CREATED party To or an earlier terms duration is 422 with the
+	// destination unchanged.
+	s := resetVersion(t, versionFixture)
+	tok := versionLoginToken(t, s)
+	body := `{"restaurant_id":"r1","table_id":"t_1","starts_at_local":"2027-05-06T20:30","party_size":1}`
+	res := s.CreateReservation(tok, "f2perm", []byte(body))
+	if res.Status != 201 {
+		t.Fatalf("create: %d %v", res.Status, res.Body)
+	}
+	ref := res.Body.(map[string]any)["reference"].(string)
+	if rec := serveRequest(s, http.MethodPatch, "/reservations/"+ref, []byte(`{"table_ids":["t_1","t_2"]}`),
+		map[string]string{"Authorization": "Bearer " + tok}); rec.Code != 200 {
+		t.Fatalf("amend to pair: %d %s", rec.Code, rec.Body.String())
+	}
+	forge := func(t *testing.T, change func(env map[string]any)) {
+		t.Helper()
+		env := exportEnvelope(t, s)
+		change(env["state"].(map[string]any))
+		raw, _ := json.Marshal(env)
+		dst := New()
+		pre := string(exportBytes(t, dst))
+		if rec := serveRequest(dst, http.MethodPost, "/_test/import", raw, nil); rec.Code != 422 {
+			t.Fatalf("forged import = %d, want 422", rec.Code)
+		}
+		if got := string(exportBytes(t, dst)); got != pre {
+			t.Fatal("rejected import mutated destination")
+		}
+	}
+	t.Run("forged created party", func(t *testing.T) {
+		forge(t, func(st map[string]any) {
+			h := st["histories"].(map[string]any)[ref].([]any)
+			h[0].(map[string]any)["changes"].([]any)[2].(map[string]any)["to"] = float64(99)
+		})
+	})
+	t.Run("forged earlier duration", func(t *testing.T) {
+		forge(t, func(st map[string]any) {
+			h := st["histories"].(map[string]any)[ref].([]any)
+			h[0].(map[string]any)["accepted_terms"].(map[string]any)["reservation_duration_minutes"] = float64(-9)
+		})
+	})
+	t.Run("genuine pair back to singleton", func(t *testing.T) {
+		if rec := serveRequest(s, http.MethodPatch, "/reservations/"+ref, []byte(`{"table_id":"t_1"}`),
+			map[string]string{"Authorization": "Bearer " + tok}); rec.Code != 200 {
+			t.Fatalf("amend back: %d %s", rec.Code, rec.Body.String())
+		}
+		full := string(exportBytes(t, s))
+		dst := New()
+		if rec := serveRequest(dst, http.MethodPost, "/_test/import", []byte(full), nil); rec.Code != 204 {
+			t.Fatalf("genuine round trip = %d %s", rec.Code, rec.Body.String())
+		}
+		if got := string(exportBytes(t, dst)); got != full {
+			t.Fatal("genuine round trip not stable")
+		}
+	})
+}
