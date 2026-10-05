@@ -270,3 +270,72 @@ func TestPolicyRoutesHTTP(t *testing.T) {
 		t.Fatalf("no-explain response carries explain")
 	}
 }
+
+func TestSeriesHTTPRoutes(t *testing.T) {
+	s := New()
+	fix := `{"users":[{"id":"u1","email":"a@b","password":"password1","display_name":"A"}],
+		"restaurants":[{"id":"r1","name":"N","timezone":"Europe/Berlin","slot_minutes":30,
+		"reservation_duration_minutes":90,"cancellation_cutoff_minutes":120,
+		"opening_hours":[{"weekday":"thu","opens":"18:00","closes":"23:00"}],
+		"tables":[{"id":"t_1","label":"1","capacity":2}]}],"reservations":[]}`
+	if rec := serveRequest(s, http.MethodPost, "/_test/reset", []byte(fix), nil); rec.Code != 204 {
+		t.Fatalf("reset: %d", rec.Code)
+	}
+	login, _ := json.Marshal(map[string]any{"email": "a@b", "password": "password1"})
+	lr := serveRequest(s, http.MethodPost, "/auth/login", login, nil)
+	var lb map[string]any
+	if err := json.Unmarshal(lr.Body.Bytes(), &lb); err != nil {
+		t.Fatal(err)
+	}
+	tok := lb["token"].(string)
+	auth := map[string]string{"Authorization": "Bearer " + tok, "Idempotency-Key": "http-anchor"}
+	ar := serveRequest(s, http.MethodPost, "/reservations", []byte(`{"restaurant_id":"r1","table_id":"t_1","starts_at_local":"2027-05-06T19:00","party_size":1}`), auth)
+	if ar.Code != 201 {
+		t.Fatalf("anchor: %d %s", ar.Code, ar.Body.String())
+	}
+	var ab map[string]any
+	if err := json.Unmarshal(ar.Body.Bytes(), &ab); err != nil {
+		t.Fatal(err)
+	}
+	ref := ab["reference"].(string)
+	// POST /series through the router.
+	sr := serveRequest(s, http.MethodPost, "/series", []byte(`{"anchor_reference":`+quote(ref)+`,"count":2,"interval_weeks":1}`),
+		map[string]string{"Authorization": "Bearer " + tok, "Idempotency-Key": "http-series"})
+	if sr.Code != 201 {
+		t.Fatalf("series: %d %s", sr.Code, sr.Body.String())
+	}
+	var sb map[string]any
+	if err := json.Unmarshal(sr.Body.Bytes(), &sb); err != nil {
+		t.Fatal(err)
+	}
+	sid, _ := sb["series_id"].(string)
+	if sid == "" {
+		t.Fatal("no series_id")
+	}
+	// Replay through the router is 200 identical.
+	rp := serveRequest(s, http.MethodPost, "/series", []byte(`{"anchor_reference":`+quote(ref)+`,"count":2,"interval_weeks":1}`),
+		map[string]string{"Authorization": "Bearer " + tok, "Idempotency-Key": "http-series"})
+	if rp.Code != 200 || rp.Body.String() != sr.Body.String() {
+		t.Fatalf("replay: %d", rp.Code)
+	}
+	// GET /series/{id} through the router.
+	gr := serveRequest(s, http.MethodGet, "/series/"+sid, nil, map[string]string{"Authorization": "Bearer " + tok})
+	if gr.Code != 200 {
+		t.Fatalf("get: %d %s", gr.Code, gr.Body.String())
+	}
+	// No token is 404, not 401.
+	nt := serveRequest(s, http.MethodGet, "/series/"+sid, nil, nil)
+	if nt.Code != 404 {
+		t.Fatalf("no token = %d", nt.Code)
+	}
+	// Unknown series is 404.
+	un := serveRequest(s, http.MethodGet, "/series/nosuch", nil, map[string]string{"Authorization": "Bearer " + tok})
+	if un.Code != 404 {
+		t.Fatalf("unknown = %d", un.Code)
+	}
+}
+
+func quote(s string) string {
+	b, _ := json.Marshal(s)
+	return string(b)
+}
