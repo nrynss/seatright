@@ -1,6 +1,6 @@
 {
   "kind": "layered",
-  "title": "Tablekeeper: dated policy decisions and atomic recurring reservations",
+  "title": "Tablekeeper: atomic seating repair and recurring clock amendments",
   "layers": [
     {
       "id": "browser",
@@ -31,11 +31,21 @@
         },
         {
           "id": "series_engine",
-          "label": "Recurring agreements and exceptions"
+          "label": "Recurring agreements, exceptions and atomic clock amendments"
         },
         {
           "id": "clock_engine",
           "label": "IANA wall times and half-open intervals"
+        },
+        {
+          "id": "planner_engine",
+          "label": "Pure global lexicographic seating optimizer",
+          "detail": "Own accepted capacities; fixed occupancy; closures; deterministic reference-ranked options"
+        },
+        {
+          "id": "replan_engine",
+          "label": "Manager preview and atomic apply",
+          "detail": "Revision-bound plans; immutable replay; one restaurant counter; moved member history"
         }
       ]
     },
@@ -50,6 +60,14 @@
         {
           "id": "receipt_store",
           "label": "Immutable idempotency receipts and sessions"
+        },
+        {
+          "id": "closure_store",
+          "label": "Applied half-open table closures"
+        },
+        {
+          "id": "replan_store",
+          "label": "Detached preview plans and application status"
         }
       ]
     },
@@ -103,6 +121,36 @@
       "from": "service_image",
       "to": "review_gate",
       "label": "Frozen revision acceptance"
+    },
+    {
+      "from": "replan_engine",
+      "to": "planner_engine",
+      "label": "Pure preview from immutable booking inputs"
+    },
+    {
+      "from": "replan_engine",
+      "to": "closure_store",
+      "label": "Atomic closure plus assignments"
+    },
+    {
+      "from": "replan_engine",
+      "to": "replan_store",
+      "label": "Revision-bound preview and applied marker"
+    },
+    {
+      "from": "replan_engine",
+      "to": "history_engine",
+      "label": "One reassigned entry per moved booking"
+    },
+    {
+      "from": "replan_engine",
+      "to": "series_engine",
+      "label": "Preserve exception flags; increment affected series once"
+    },
+    {
+      "from": "reservation_engine",
+      "to": "closure_store",
+      "label": "Creates, amendments and availability exclude closed members"
     }
   ]
 }
