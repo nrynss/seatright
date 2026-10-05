@@ -6,6 +6,8 @@ Current checkpoint: S3-G2A/shared40 is complete and integrated at candidate merg
 
 S3-S/shared39 and S3-C/shared41 are complete. C owner05b35ec766c3a8e91dd58914c2aee5c650cc1916 mergedec5e50e63141240b834a74d4fcab2917161908bc; host vet/build/full unit suite and race25 top-level plus2 subtests passed. S3-I1/shared42 remains in bounded correction: live host proof found genuine singleton-to-pair history export rejected and corrupt historical values accepted. The historical consistency validator must preserve valid producer transitions while rejecting corrupted state atomically; no I1 commit yet. S3-P1/shared43 starts independently on real stage3 API probes only, with genuine migration and final packaging claims reserved for later lanes. I2 full collective/exception portability follows corrected I1 plus C, then final UI recheck, P2 packaging and exact-SHA formal review. Stage3 is not accepted; stages1/2 remain immutable and stage4 has not started.
 
+Probe checkpoint: S3-P1/shared43 remains in progress. The host verified 157 implemented assertions against the real source service, but the first report overstated cutoff, long-anchor, explain and rollback coverage. A bounded same-base correction now strengthens the assertions and reports omissions accurately. No P1 commit or stage3 acceptance; I1 import consistency repair continues independently.
+
 ```arch
 {
   "kind": "layered",
