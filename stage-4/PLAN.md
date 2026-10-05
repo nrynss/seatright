@@ -504,7 +504,7 @@ All work is restricted to stage-4. Stages 1–3 are immutable. Coordinator owns 
 | S4-R2 | OpenCode | After R1: apply implementation/tests plus narrow reservations.go conflict and availability.go explanation seams; preserve existing write helpers | R334–350, R377–379 | Real apply/closure/state/counter/series/replay/concurrency matrices, regression/races |
 | S4-W | Assigned after R2+A | Serial narrow http.go/http_test.go series-amend dispatch and integration checks; no router ownership overlap | R351, R370 | HTTP auth/privacy/body/path/idempotency semantics plus final all-source gates |
 | S4-I1 | OMP | After R2+A+W: native import validation extension and corrupt-state/producer tests, owned paths frozen at handoff | R380–382, R339, R342, R376 | Strict legitimate reassigned history/closure/plan/series acceptance, atomic corruption rejection, all-source races |
-| S4-D | OpenCode | Separate genuine stages 1–3 donor producer; new stage4-donor probe only | R380–382 donor preparation | Inspected independent old processes, raw receipt bindings, sabotage guards, private evidence |
+| S4-D | OMP, shared58 | Separate genuine stages 1–3 donor producer; new stage4-donor probe only; reassigned while R2 remains active | R380–382 donor preparation | Inspected independent old processes, raw receipt bindings, sabotage guards, private evidence |
 | S4-I2 | OMP | After I1 and D: new transfer tests + stage4-import probe only | R380–382, R377, R376, R339 | Genuine old sources → current and modern current → peer, full state/receipt/metadata/session agreement |
 | S4-P1 | OpenCode | After integrated endpoints: new stage4-api probe only | R304–382 API surface | Independent exhaustive optimization examples, race-state deltas, guards and truthful counts |
 | S4-G2 | Grok | After real integrated endpoints/import: web live probe only unless a demonstrated product defect | R305–306, R382 plus inherited browser/design | Real repair + recurring amendment, three true old-document upgrades, current assignment/clock + immutable retry, screenshots/videos |
@@ -841,3 +841,67 @@ go vet ./...
 go test -count=1 ./...
 go test -race -count=1 -v ./internal/service -run '^TestSeriesAmend'
 No product-build/Docker/UI/harness repeat if product unchanged; r2 binary/ownedPIDsmoke stand separately. ONE foreground final DONE/BLOCKED report shared55/fullbase/onlyownedpaths/P1–P5 named effective proofs/counts/exits/evidencepaths and actual remaining deferredW/I interactions. No acknowledgment-only turn or acceptance claim. Usage/elapsed when visible. Components: series_engine, reservation_engine, history_engine, closure_store.
+
+
+## S4-A accepted core and independent S4-D queue
+
+Shared55 finalreport305c6374 accepted: author ec3253596130e4542a9ab693483647b1526f5340 mergeddf703c2b4bc155259f9ddf503ff7db2cf006d8c4. Hostfinal4race4.567s0, prior21race22.080s0, integratedvet/fullnormal0. Twoownednewfilesonly/no conflict/productdefect/coordinatorproduct/testedit. W alone wiresHTTP+repair interactions; I laterimport. Stage4unaccepted.
+
+Shared58/S4-D moves fromOpenCode toOMP whileR2active. OneNEWdonorprobe, three immutable acceptedoldsourceprocesses; no R2 dependency or stage4destinationclaim. FixedcleanOMPworktree resets at dispatch to actualfullintegratedmetadataSHA.
+
+ACTIONABLE S4-D — genuine stage-1/2/3 donor preparation (OMP)
+Role: backend implementer; mandate /home/nryn/work/seatright/runs/tablekeeper2/result/mandates/seatright-omp.md. Fixed worktree /home/nryn/work/seatright/runs/tablekeeper2/wt/seatright-omp. This starts AFTER the coordinator commits/merges S4-A and resets your clean fixed worktree to the full base supplied in this message. No state-changing Git commands by you. Owned ONLY one NEW executable file stage-4/probes/stage4-donor.sh. Do not edit Go/tests/model/state/validator/router/web/Docker/RUN/PLAN/RUNLOG/locks/any existing probe/accepted stages1–3. No destination stage4 import or acceptance claim.
+
+Why this independent queue item now: your S4-A two-file service core is accepted and integrated; router and actual repair interactions remain W/I. OpenCode is still correcting R2 and must retain its active worktree. S4-D moves from the planned OpenCode queue to OMP to keep the independent old-source lane moving; the shared plan records this reassignment. This donor needs no R2 or stage4 endpoint and no invented stub.
+
+Freeze interface:
+sh stage-4/probes/stage4-donor.sh SRC1_URL SRC2_URL SRC3_URL OUT_DIR
+Exactly FOUR positional arguments, three genuine independently running immutable accepted older services plus private directory. The script resets and mutates those disposable sources; document this destructive fixture-only lifecycle. POSIX sh + curl + python3 stdlib, no jq/new dependency. curl connect-timeout5/max-time25, validate URL scheme/host and writable private output, umask077. Only OUT_DIR writes; exports/manifests0600, dirs0700, tmp beneathOUT own cleanup, diagnostics retained beneathOUT/diag. All Python stderr private; stdout only safe test names/statuses/counts, no credentials/tokens/bodies/exports/tracebacks/xtrace.
+
+Provenance ENV schema: STAGE1_IMAGE/STAGE1_CONTAINER/STAGE1_PORT/STAGE1_CID and same STAGE2/STAGE3 names. IMAGE is ACTUAL deployed full sha256, CID actual full container.Id, name/port from inspect. reviewed_revision and stage_tree below are fixed accepted Git IDs, not current stage4HEAD:
+stage1 revision b298700f790c166cf7ce8d98d731c80093ecb9af/tree8b8b28da1d7772bbc443ed4fccb57d8e5ed8530c
+stage2 revision8812cdeaaa993cd944493c654e51d355cdd6b676/tree9fee3dc7d0766091b3fb7cdbb521c6dfaf652b7f
+stage3 revisione13272d90213be0914211ae6f6f0bfd5888900ff/treec783f9e08522a04a62bb11f9a0e3c485d077684f
+Known accepted source folders at your worktree remain byte-immutable. Reuse only proven images from your own daemon whose build provenance+folder tree agree; otherwise build ONLY older folders. Never use stage4 as old source. No prune/sharedbase/runner/unowned image removal. If disk blocks build, report quantified infrastructure blocker and complete source/syntax/guard work possible.
+
+Output OUT/stage1,stage2,stage3/{export.json,manifest.json}; opaque export is exact HTTP file bytes, never rewritten. Existing accepted stage-3/probes/stage3-donor.sh can be invoked read-only to produce stage1/2 donors (forward its documented provenance environment); alternatively reuse its logic inside the NEW script, without editing it. Retain its mature real5/8receipt assertions, owner-record/list/export/fullprojection/raw-binding/sabotage checks and genuine pair batch. Stage1/2 original manifest_version1 schema remains compatible.
+
+Stage3 manifest_version1 EXTENDS the same schema:
+source {stage:3,reviewed_revision,stage_tree,image,container,container_id,port}
+fixture {date,past_seed_date,restaurant FULL original fixture incl hours/capacities/combinable/managers,seeds full reset request records}
+users [{id,email,password,display_name,tokens:[two distinct live tokens]}] private only
+records {ada_list,bea_list,by_reference} full CURRENT owner public list+GET matching stored export public projection, singleton table_id iff exactly1, modern revision/complete six-key terms
+receipts [{key,user_id,method,path,body parsed,body_raw exact sent,response parsed,response_raw exact first201 received,status:201}], scoped record matches export canonical Body and raw Response; single framing newline allowance only if documented, genuine source normally none.
+pending_retry {role,reference,key,owner,method,path,body,response,current} genuine committed receipt+same-ref retry after current mutation, no fabricated receipt.
+failed_keys {reused:{...},absent:[{...}]} distinguish actual failed key reuse from a genuinely absent unclaimed key.
+metadata {policies: FULL export policies map,histories:FULL per-reference frozen entries,series:FULL map,restaurant_revisions:FULL map}; captured before snapshot divergence, no stage4 plan/closure data invented.
+post_snapshot_write {reference,excluded_from_export:true}, current_lists_before_post_snapshot_write:true.
+Additional fields only if documented, future I2 consumes this schema. Bind all named reference/owner/map sets exactly; do not conflate current records with immutable old receipt bodies. Full token/user metadata in export versus private manifest, no plaintext keys invented into export.
+
+Stage3 real workflow via HTTP:
+- genuine fixture manager plus two owners, two live tokens each+hash-password logins, owner cross-access404/no token401.
+- include past/offgrid/above-maxima/cancelled original-fixture0 seeds (full retained fields/terms/history; no invented business validation for historical producer seeds).
+- publish two valid dated policies with supersession (real manager POST201 on actual /restaurants/id/policies, versions/order/frozen snapshots), unchanged public detail.
+- create one canonical pair anchor and a second separate singleton anchor using selected policy capacities/date/duration; adopt TWO real series201, original anchor identity/history/accepted terms retained.
+- individual PATCH one generated member → exception=true; cancel that same member → flag remains true; cancel another unexceptioned generated member → no new exception.
+- real idempotent POST /reservation-moves affecting members from both series, current records rev/history each+1, restaurant fullmap+1 exactly once, each affected series+1 exactly once, schedules/flags retained; all inherited namespaces detached. Avoid own deliberate conflicts by appropriate dates/tables/clock/party under actual policies.
+- capture raw FIRST201 receipt for each keyed successful write on FOUR actual paths: /restaurants/id/policies, /reservations, /series, /reservation-moves. Declare exact expected counts from the named workflow and require equality, never only >=. Stage1 exactly5, stage2 exactly8; stage3 count follows a documented deterministic write ledger.
+- after capture perform REAL mutation/cancel on a booked record; require current differs from original receipt; replay ALL stored receipts200 raw-byte exact with export unchanged. Publication/series/moves original responses remain old after evolution.
+- one genuine failed idempotent key, required expected failure/no record/export change, then reusable with successful body201 + same body replay200 bytes. Keep one genuinely absent failed key for future destination retry proof.
+- create a pending retry reference with original receipt; source has only one corresponding booking. All current owner lists+GET/history/decision/series views agree with entire export metadata and manifests at capture.
+- save original export then make one actual post-snapshot booking: present in live source, absent saved bytes; sha file remains identical; preserve live source and artifact distinction.
+
+Copied-artifact validator required for all THREE donors, accepts genuine files, rejects labelled COPY corruptions while originals remain untouched: changed identity/local clock, raw-only request-body mismatch, whitespace-only response raw mismatch despite equal parsed JSON, and stage3 history/series metadata mismatch. Exact raw/parsed/canonical binding, exact owner/ref/receipt sets, expected revision/terms shapes, declared pair order. Never pass a sabotage copy off as producer data.
+Guards: unreachable-source subprocess countsFAIL/ABORT nonzero; wrong shape/reset-status guard honestly labelled; final script sabotage flag STAGE4_DONOR_SABOTAGE=1 injects a wrong expectation through its real counter/exit path, must countedFAIL+nonzero. No hardcoded success markers or vacuous conditions.
+
+Acceptance commands:
+CWD worktree root:
+sh -n stage-4/probes/stage4-donor.sh
+python3 stdlib compile all embedded static heredocs (read source; no bad quote-splitting)
+If needed ONLY docker build -t tablekeeper:s4-d-stage1 stage-1; corresponding stage2/stage3.
+Own new containers tk-s4-d-src1 --cpus2 --memory2g -e PORT=9185 -p9185:9185, src2PORT9186,src3PORT9187 (normal properly separated flags, no invented APIs). Document literal argv/cwd; inspect full .Id/.Image/.Name/Env/ports/caps, health200 exact15Bbody+charset, inject actual provenanceenv.
+sh stage-4/probes/stage4-donor.sh http://127.0.0.1:9185 http://127.0.0.1:9186 http://127.0.0.1:9187 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-omp/S4-D/donors
+Guard each failed attempt fresh evidence path; own stop/rm per container, absence proven; images may stay. No Go/UI/harness reruns for probe-only scope.
+
+Evidence /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-omp/S4-D/: executable actual lifecycle/gate driver, raw per-attempt quoted argv/absoluteCWD/UTC-start/end/effectiveEXIT, command/provenance/donor/validator/guards/cleanup logs, private artifacts0700/0600. Every claim needs retained raw evidence; preserve failed attempts separately, never overwrite then claim preserved, no reconstruction. Counts describe actual assertions vs phase markers honestly.
+Report ONE foreground DONE/BLOCKED item/card/fullbase/owned-file Gitstatus/requirement→effective named assertion/commandscounts/exits/evidencepaths/provenance/cleanup/gaps/elapsed/usage. No acknowledgment-only turn. No destination import/browser/currentstage4packaging/acceptance claims. Components: snapshot_store, receipt_store, history_engine, series_engine, migration_gate.
