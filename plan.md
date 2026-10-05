@@ -4,7 +4,7 @@ Stages are implemented and independently accepted in order. Stage 1 and stage 2 
 
 Current checkpoint: S3-G2A/shared40 is complete and integrated at candidate merge eff1749266be57ce05a95f476b0cbc509dc07dd6 (probe owner c1ddeab901c6a22b58af50c495587dd3eb2cffac). The existing UI passed real policy flows and both same-document stage-1/2 to stage-3 upgrades. The frontend item changed one probe script and no product source; final exact-SHA reviewer acceptance remains pending.
 
-S3-S/shared39 remains in progress. Host verification reproduced two defects: adoption excluded the confirmed anchor from occupancy, and local-midnight date arithmetic shifted a Santiago recurrence to the previous calendar day. OMP has bounded correction handoff ebb1675b-1093-47aa-be2f-0d40ede3bada on the existing dirty base, with effective rollback/calendar/receipt/counter tests and fresh image evidence required before commit. S3-C waits for corrected S integration; modern migration, packaging, and formal stage-3 review follow. No stage-3 acceptance or stage-4 copy is authorized by this checkpoint.
+S3-S/shared39 remains in progress pending a final test-only repair. Host vet, full tests, build, and 22 series race tests pass; the rebuilt source binary now rejects long-anchor overlap with byte-identical rollback and generates the correct Santiago calendar date. Those two product defects are fixed. Correction handoff 30a85612-c4e8-45ab-b8ab-e8b8db0316a6 requires effective competing-error precedence and actual cancellation/replay assertions before commit. S3-C waits for corrected S integration; modern migration, packaging, and formal stage-3 review follow. No stage-3 acceptance or stage-4 copy is authorized by this checkpoint.
 
 ```arch
 {
