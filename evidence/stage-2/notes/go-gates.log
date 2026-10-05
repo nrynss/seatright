@@ -1,0 +1,11 @@
+GO GATES 2026-10-05T04:11:05Z go version go1.27.1 linux/amd64
+$ go vet ./...
+vet_exit=0
+$ go build ./...
+build_exit=0
+$ go test ./...
+?   	tablekeeper/cmd/tablekeeper	[no test files]
+ok  	tablekeeper/internal/clock	0.080s
+ok  	tablekeeper/internal/service	57.541s
+?   	tablekeeper/probes/pclient	[no test files]
+test_exit=0

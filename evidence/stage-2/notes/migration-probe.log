@@ -1,0 +1,6 @@
+== phase 1: build state in fresh stage-1 donor
+donor state: refs YV23GBE5,QKF4KX5B; receipt keys leg-K1..K4 (tokens masked 01d676...)
+== phase 2: import donor export into stage-2 destination 1 (replacement)
+== phase 3: modern pair/mixed receipts stage-2 -> stage-2 (distinct processes)
+
+RESULT pass=38 fail=0

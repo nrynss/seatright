@@ -1,0 +1,37 @@
+PASS src-health-200
+PASS dst-health-200
+PASS donor-present
+PASS dst-unrelated-reset-204
+PASS dst-prior-token
+PASS donor-import-204
+PASS donor-reimport-204
+PASS receipt-count-5
+PASS receipts-byte-identical-5
+PASS old-sessions-4-valid
+PASS repeat-import-stable-204
+PASS export-stable-repeat
+PASS ada-hash-login-200
+PASS bea-hash-login-200
+PASS current-records-survive
+PASS all-receipts-replay-200-identical
+PASS failed-key-absent
+PASS failed-key-first-201
+PASS failed-key-replay-200
+PASS failed-key-identical
+PASS dst-prior-removed-401
+PASS dst-prior-token-dead
+PASS reset-clears-204
+PASS reset-clears-state
+PASS donor-restore-204
+PASS snapshot-immutable
+SKIP live-source-divergence (canonical input: prior-process artifact, no live source)
+PASS corrupt-receipt-422
+PASS malformed-400
+PASS invalid-atomic
+PASS pair-seed-204
+PASS pair-batch-201
+PASS pair-reimport-204
+PASS pair-batch-replay-200
+PASS pair-mutated-replay-and-records
+
+RESULT pass=34 fail=0 skip=1

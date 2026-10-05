@@ -1,0 +1,77 @@
+### Visual Design Critique
+
+#### 1. `measure-dense-15.png`
+- **Element:** Availability grid container (`[data-testid="availability-grid"]` / `.matrix-wrap`)
+- **What is wrong:** The 15-slot dense availability grid resulting from the search is completely missing from the viewport (100% off-screen below the 900px fold). The 680px tall SVG floor plan is stacked vertically above the grid, pushing all bookable time slots off-screen so the screen appears empty of results upon search execution.
+- **Concrete fix:** Place the floor plan and availability grid side-by-side on desktop viewports ($\ge 1024\text{px}$) via CSS grid (`grid-template-columns: 1fr 1fr; gap: var(--space-4)`), or ensure the auto-scroll reveal scrolls the availability grid caption into the top half of the viewport.
+
+---
+
+#### 2. `measure-dense-5.png`
+- **Element:** Availability grid container (`[data-testid="availability-grid"]` / `.matrix-wrap`)
+- **What is wrong:** The 43-slot dense availability grid is completely hidden below the 900px fold. As in the 15-minute density test, the vertically stacked floor plan pushes the entire grid of bookable times out of view.
+- **Concrete fix:** Use a two-column desktop layout (`grid-template-columns: 1.1fr 1fr`) so the availability grid is visible alongside the floor plan, or trigger an immediate reveal scroll to `.matrix-wrap` upon search completion.
+
+---
+
+#### 3. `F3F4-d-light.png`
+- **Element:** Booking submit button (`[data-testid="booking-submit"]`)
+- **What is wrong:** The booking form's primary action button ("Request these tables") is clipped at the bottom of the 1280x900 viewport. The button begins at $y = 898\text{px}$, exposing only a 2-pixel sliver at the viewport edge while the label text and click area are cut off.
+- **Concrete fix:** In [`revealOutcome`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/staging/stage-2/web/src/lib/motion.ts), adjust the scroll delta calculation for `kind === 'form'` so that the entire height of `[data-testid="booking-form"]` plus bottom padding ($16\text{px}-24\text{px}$) is brought within `window.innerHeight`.
+
+---
+
+#### 4. `F3F4-d-dark.png`
+- **Element:** Booking form controls (`[data-testid="booking-form"]`, `[data-testid="party-size-input"]`, `[data-testid="booking-submit"]`)
+- **What is wrong:** After selecting the 6:00 PM paired slot, the booking form is almost entirely below the fold. Only the card heading "Hold these tables" is visible at $y \approx 880\text{px}-895\text{px}$. The party size input field, helper text, and submit button are completely pushed off-screen.
+- **Concrete fix:** Ensure that selecting a slot on desktop scrolls the entire booking form card into view (`rect.bottom <= viewH - margin`) rather than aligning only to the top edge of the card.
+
+---
+
+#### 5. `F3F4-p-light.png`
+- **Element:** Booking form container (`[data-testid="booking-form"]`)
+- **What is wrong:** After tapping the held pair slot at 6:00 PM, the booking form is 100% off-screen below the 900px fold. The viewport displays only the list of time slot buttons, giving no visible indication that the booking form has opened.
+- **Concrete fix:** Programmatically scroll `[data-testid="booking-form"]` into view immediately upon cell selection on mobile viewports so that the form heading and inputs are in view.
+
+---
+
+#### 6. `F3F4-p-dark.png`
+- **Element:** Booking form container (`[data-testid="booking-form"]`)
+- **What is wrong:** After tapping the held pair slot at 6:00 PM in dark mode, the booking form is 100% off-screen below the 900px fold. The user sees only the list of time slot buttons.
+- **Concrete fix:** Scroll `[data-testid="booking-form"]` into view on mobile slot selection (`revealOutcome(formNode)`).
+
+---
+
+#### 7. `F2-confirmation-d.png`
+- **Element:** Confirmation card table list (`[data-testid="confirmation-tables"]`)
+- **What is wrong:** Immediate verbatim repetition of table names. Line 2 displays `Zum Anker · Table Window alcove and Table Garden corner · Thursday 17 June 2027 at 6:00 PM (18:00)`, and line 3 repeats `Table Window alcove and Table Garden corner` directly underneath without a label.
+- **Concrete fix:** Remove the redundant standalone table line, or label it clearly with structured text (e.g. `Reserved Tables: Window alcove & Garden corner`).
+
+---
+
+#### 8. `F2-confirmation-p.png`
+- **Element:** Confirmation card table list (`[data-testid="confirmation-tables"]`)
+- **What is wrong:** Verbatim duplicate table naming on consecutive lines (`Zum Anker · Table Window alcove and Table Garden corner ...` followed immediately by `Table Window alcove and Table Garden corner`).
+- **Concrete fix:** Remove the duplicate `<p data-testid="confirmation-tables">` paragraph or style it with a distinct key/value descriptor label.
+
+---
+
+#### 9. `F2-409-p.png`
+- **Element:** Booking error banner (`[data-testid="booking-error"]`)
+- **What is wrong:** Displays a raw unformatted backend error string `the table is taken for that interval` in lowercase without initial capitalization or terminating punctuation.
+- **Concrete fix:** Capitalize and format user-facing error messages in [`LiveSearch.svelte`](file:///home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/staging/stage-2/web/src/lib/components/LiveSearch.svelte) (e.g., "The table is taken for that interval.").
+
+---
+
+### VERDICT-CRITICAL
+
+The following problems would block a product demo:
+
+1. **Search Results Hidden Below the Fold on Desktop (`measure-dense-15.png`, `measure-dense-5.png`):**
+   - Submitting a search on a 1280x900 viewport displays the floor plan while the entire dense availability grid is pushed 100% off-screen below the fold, giving the impression that the search produced no bookable times.
+
+2. **Booking Form Completely Off-Screen on Mobile Viewport (`F3F4-p-light.png`, `F3F4-p-dark.png`):**
+   - Selecting a time slot fails to bring the booking form into view on mobile. The form is positioned entirely below the 900px fold, making the slot selection feel unresponsive.
+
+3. **Booking Form Clipped or Inaccessible on Desktop Viewport (`F3F4-d-dark.png`, `F3F4-d-light.png`):**
+   - Selecting a slot leaves the booking form cut off at the bottom edge. In `F3F4-d-dark.png`, both the party size input and submit button are below the fold; in `F3F4-d-light.png`, the submit button is clipped at $y = 898\text{px}$, preventing form submission without manual scrolling.

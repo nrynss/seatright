@@ -1,0 +1,43 @@
+donor date: 2027-06-17
+PASS: donor date is Thursday
+PASS: reset fixture
+PASS: ada login 1
+PASS: ada login 2
+PASS: bea login 1
+PASS: bea login 2
+PASS: distinct session tokens
+PASS: lost booking create
+PASS: create A
+PASS: create B
+PASS: swap batch
+PASS: amend A
+PASS: cancel B
+PASS: failed create 422
+PASS: failed key reused 201
+PASS: stuck key stays failed
+PASS: replay lost identical
+PASS: replay create-a identical
+PASS: replay create-b identical
+PASS: replay batch identical
+PASS: replay fail-reuse identical
+PASS: lost lookup
+PASS: lost status confirmed
+PASS: A lookup
+PASS: A current values
+PASS: B lookup
+PASS: B current cancelled
+PASS: all tokens valid
+PASS: second ada token valid
+PASS: bea token valid
+PASS: second bea token valid
+PASS: export
+PASS: export envelope
+PASS: stuck key absent from receipts
+PASS: five completed receipts
+PASS: post-snapshot write
+PASS: saved snapshot unchanged by later write
+PASS: final ada list
+PASS: final bea list
+PASS: manifest shape
+PASS: manifest/export agreement
+donor checks passed: 41 failed: 0
