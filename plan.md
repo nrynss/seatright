@@ -178,6 +178,10 @@ Grok/shared53 is completed and integrated: author commit **851ecb367a5a3c5912c8c
 Historical foundation handoffs at bda7c43023123bd8c96809d2c2f8066f1f81bdae: S4-P 58aa1df7-5be2-42aa-93f4-077f0c133e23; S4-M 72120fff-a6c8-4fd6-b5a6-53a51307b228; S4-G 7e47c02b-4aea-447e-8dd7-555ba8f80ea4. P, M and fixture G are completed. Final endpoint handoff bases are recorded after their metadata commits exist.
 
 
+## S4-A residual proof repair in progress
+
+OMP/shared55's repair now proves both accepted-cutoff directions, a real New York fold amendment, exact Berlin gap rejection, immutable first replay after mutation and live response isolation. Host **21 amendment race tests**, full normal regression, vet and build passed. The core remains uncommitted for a narrow test-only correction **50a7fcd8-7ede-402f-b85c-c4532cfb2ec0**: the no-op cutoff setup must perform an actual terms-adopting change, stale precedence needs an already blocked record, and nonoccupancy precedence plus race/receipt/history comparisons must establish their claimed competing outcomes and exact changes. The same dirty base is retained; no product defect is established. OpenCode's independent S4-R2 repair continues.
+
 ## S4-R2 proof repair in progress
 
 OpenCode/shared56 reported its atomic apply and common closure integration on the same base **267f71e74767764d84dbbad121680c09fd8be972**. Host formatting, vet, **37 scoped race tests**, full normal regression and build passed. No product defect was established. The work remains uncommitted for effective complete-state, exact-once race, closure boundary, series and replay proofs. The recorded build retry passed after an initial ENOSPC failure; prior container identity and image deletion claims need retained evidence or qualification. Full bounded correction **123197e5-3592-4423-a106-6f330ceeb4bb** was sent on the existing dirty base, with fresh lifecycle and negative-guard evidence required. OMP/shared55 continues its independent amendment proof repair. Stage 4 remains unaccepted.
