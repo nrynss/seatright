@@ -1,0 +1,32 @@
+{
+  "name": "tablekeeper-web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=26 <27"
+  },
+  "scripts": {
+    "check": "svelte-check --tsconfig ./tsconfig.json --threshold error",
+    "test": "vitest run",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort"
+  },
+  "dependencies": {
+    "@fontsource/source-code-pro": "^5.2.7",
+    "@fontsource/source-serif-4": "^5.2.9",
+    "@nrynss/chaaya": "0.3.0",
+    "svelte": "^5.57.0"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "@types/node": "^26.0.0",
+    "axe-core": "^4.13.0",
+    "jsdom": "^30.0.1",
+    "playwright": "1.63.0",
+    "svelte-check": "^4.7.6",
+    "typescript": "^5.9.3",
+    "vite": "^8.2.2",
+    "vitest": "^5.0.1"
+  }
+}
