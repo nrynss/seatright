@@ -339,3 +339,68 @@ func quote(s string) string {
 	b, _ := json.Marshal(s)
 	return string(b)
 }
+
+func TestReplanPreviewHTTPRoutes(t *testing.T) {
+	s := New()
+	if rec := serveRequest(s, http.MethodPost, "/_test/reset", []byte(replanFixture), nil); rec.Code != 204 {
+		t.Fatalf("reset: %d", rec.Code)
+	}
+	login, _ := json.Marshal(map[string]any{"email": "ada@example.com", "password": "correct horse"})
+	lr := serveRequest(s, http.MethodPost, "/auth/login", login, nil)
+	var lb map[string]any
+	if err := json.Unmarshal(lr.Body.Bytes(), &lb); err != nil {
+		t.Fatal(err)
+	}
+	tok := lb["token"].(string)
+	auth := map[string]string{"Authorization": "Bearer " + tok, "Idempotency-Key": "http-rp-1"}
+	first := serveRequest(s, http.MethodPost, "/restaurants/r_anker/replans", []byte(replanClosure), auth)
+	if first.Code != 201 {
+		t.Fatalf("preview route: %d %s", first.Code, first.Body.String())
+	}
+	var fb map[string]any
+	if err := json.Unmarshal(first.Body.Bytes(), &fb); err != nil {
+		t.Fatal(err)
+	}
+	for _, k := range []string{"plan_id", "restaurant_revision", "closure", "assignments", "moved_count", "unused_seats"} {
+		if _, ok := fb[k]; !ok {
+			t.Fatalf("missing key %q in %v", k, fb)
+		}
+	}
+	if len(fb) != 6 {
+		t.Fatalf("shape must have exactly 6 keys: %v", fb)
+	}
+	// Replay through the router is 200 with identical bytes.
+	rp := serveRequest(s, http.MethodPost, "/restaurants/r_anker/replans", []byte(replanClosure), auth)
+	if rp.Code != 200 || rp.Body.String() != first.Body.String() {
+		t.Fatalf("replay: %d", rp.Code)
+	}
+	// Routing matrix: wrong method, trailing slash, deeper paths, empty id
+	// and the future apply path are all 404.
+	for _, tc := range []struct {
+		method, path string
+	}{
+		{http.MethodGet, "/restaurants/r_anker/replans"},
+		{http.MethodPut, "/restaurants/r_anker/replans"},
+		{http.MethodPost, "/restaurants/r_anker/replans/"},
+		{http.MethodPost, "/restaurants/r_anker/replans/abc/apply"},
+		{http.MethodPost, "/restaurants//replans"},
+		{http.MethodPost, "/restaurants/r_anker/replans/abc"},
+	} {
+		rec := serveRequest(s, tc.method, tc.path, []byte(replanClosure), auth)
+		if rec.Code != 404 {
+			t.Fatalf("%s %s = %d, want 404", tc.method, tc.path, rec.Code)
+		}
+	}
+	// Missing key through the router is 400.
+	nk := serveRequest(s, http.MethodPost, "/restaurants/r_anker/replans", []byte(replanClosure),
+		map[string]string{"Authorization": "Bearer " + tok})
+	if nk.Code != 400 {
+		t.Fatalf("missing key = %d", nk.Code)
+	}
+	// Missing token through the router is 401.
+	nt := serveRequest(s, http.MethodPost, "/restaurants/r_anker/replans", []byte(replanClosure),
+		map[string]string{"Idempotency-Key": "http-rp-2"})
+	if nt.Code != 401 {
+		t.Fatalf("missing token = %d", nt.Code)
+	}
+}
