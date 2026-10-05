@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { untrack } from 'svelte';
+  import { tick, untrack } from 'svelte';
   import { fade } from 'svelte/transition';
   import AvailabilityGrid from './AvailabilityGrid.svelte';
   import BookingForm from './BookingForm.svelte';
@@ -18,7 +18,7 @@
   } from '../booking';
   import { rememberHold, rememberSearch, type HeldSelection } from '../hold';
   import { bookingSummary, formatLongDate, tablePhrase, timezoneLabel } from '../format';
-  import { motionDuration } from '../motion';
+  import { motionDuration, revealOutcome } from '../motion';
   import { go } from '../nav';
   import type { PreviewSlot } from '../preview';
   import {
@@ -71,6 +71,34 @@
   let generation = 0;
   let attemptSeq = 0;
   let refreshSeq = 0;
+  let revealSerial = 0;
+  let routeEl = $state<HTMLElement | null>(null);
+
+  const revealPortion = 220;
+
+  function revealTarget(root: ParentNode, kind: string): Element | null {
+    if (kind === 'results') return root.querySelector('.grid-caption');
+    if (kind === 'empty') return root.querySelector('[data-testid="no-slots"]');
+    if (kind === 'search-error') return root.querySelector('[data-testid="search-error"]');
+    if (kind === 'auth-error') return root.querySelector('[data-testid="auth-error"]');
+    if (kind === 'form') return root.querySelector('[data-testid="booking-form"]');
+    if (kind === 'confirm') return root.querySelector('[data-testid="confirmation"]');
+    if (kind === 'booking-error') return root.querySelector('[data-testid="booking-error"]');
+    if (kind === 'uncertain') return root.querySelector('[data-testid="booking-uncertain"]');
+    return null;
+  }
+
+  function publishReveal(kind: string, gen: number): void {
+    const serial = ++revealSerial;
+    void tick().then(() => {
+      if (serial !== revealSerial || gen !== generation) return;
+      const root = routeEl;
+      if (!root) return;
+      const node = revealTarget(root, kind);
+      if (!node) return;
+      revealOutcome(node, kind === 'results' ? revealPortion : 0);
+    });
+  }
 
   $effect(() => {
     const attempt = catalogTick;
@@ -175,11 +203,13 @@
     } catch (error) {
       searchError = errorText(error);
       phase = 'error';
+      publishReveal('search-error', generation);
       return;
     }
     if (!query.restaurantId) {
       searchError = 'Choose a restaurant.';
       phase = 'error';
+      publishReveal('search-error', generation);
       return;
     }
     generation += 1;
@@ -196,11 +226,13 @@
     if (loaded.status === 'error') {
       searchError = errorText(loaded.error);
       phase = 'error';
+      publishReveal('search-error', mine);
       return;
     }
     result = loaded.search;
     rememberSearch(loaded.search);
     phase = loaded.search.availability.slots.length === 0 ? 'empty' : 'ready';
+    publishReveal(phase === 'empty' ? 'empty' : 'results', mine);
   }
 
   function selectSeating(rawIds: readonly string[], time: string, available: boolean): void {
@@ -215,6 +247,7 @@
     if (!allowed) return;
     if (!signedIn) {
       authError = 'Sign in to hold a table.';
+      publishReveal('auth-error', generation);
       return;
     }
     const detail = result.detail;
@@ -240,6 +273,7 @@
     rememberHold(next);
     partyDraft = result.query.partySize;
     authError = null;
+    publishReveal('form', generation);
   }
 
   function selectCell(tableId: string, time: string, available: boolean): void {
@@ -322,11 +356,13 @@
     if (!held || !signedIn || !token) {
       bookingError = 'Sign in to request this table.';
       uncertain = false;
+      publishReveal('booking-error', generation);
       return;
     }
     const body = draftBody(size);
     if (!body) {
       bookingError = 'Party size must be a whole number.';
+      publishReveal('booking-error', generation);
       return;
     }
     const next = attemptFor(pending, body, newIdempotencyKey());
@@ -349,23 +385,28 @@
       receipt = outcome.reservation;
       bookingError = null;
       uncertain = false;
+      publishReveal('confirm', searchGeneration);
       return;
     }
     if (outcome.kind === 'uncertain') {
       bookingError = null;
-      if (!receipt) uncertain = true;
+      if (!receipt) {
+        uncertain = true;
+        publishReveal('uncertain', searchGeneration);
+      }
       return;
     }
     uncertain = false;
     bookingError = outcome.message;
     receipt = null;
+    publishReveal('booking-error', searchGeneration);
     if (outcome.code === 'table_unavailable' && query) {
       void refreshAvailability(searchGeneration, query);
     }
   }
 </script>
 
-<section class="route">
+<section class="route" bind:this={routeEl}>
   <header>
     {#if result}
       <p class="kicker">Seating</p>

@@ -22,6 +22,11 @@
     { href: '/signup', label: 'Create account' },
   ];
 
+  // A blank display name is still a signed-in session. Only a null user is signed out.
+  const shown = $derived(
+    links.filter((link) => user === null || (link.href !== '/login' && link.href !== '/signup')),
+  );
+
   function follow(event: MouseEvent, href: string): void {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
@@ -38,7 +43,7 @@
       <span>Tablekeeper</span>
     </a>
     <nav class="nav" aria-label="Primary">
-      {#each links as link (link.href)}
+      {#each shown as link (link.href)}
         <a
           href={link.href}
           aria-current={path === link.href ? 'page' : undefined}

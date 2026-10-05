@@ -86,7 +86,7 @@ describe('floor plate geometry', () => {
 });
 
 describe('floor plate control', () => {
-  it('shows the short numeral on the plate and the full name beside it', async () => {
+  it('shows the short numeral on the plate and the full name on the button and place card', async () => {
     const view = render(FloorPlan, {
       tables: [
         { id: 't_1', label: '1', capacity: 2 },
@@ -100,9 +100,11 @@ describe('floor plate control', () => {
     });
     const first = view.target.querySelector('[data-testid="plan-t_1"]');
     const plates = [...(first?.querySelectorAll('.plate-label') ?? [])].map((node) => node.textContent?.trim());
-    const names = [...(first?.querySelectorAll('.plan-name') ?? [])].map((node) => node.textContent?.trim());
     expect(plates).toEqual(['1']);
-    expect(names).toEqual(['Table 1']);
+    expect(first?.querySelector('.plan-name')).toBeNull();
+    expect(first?.querySelector('.plan-seats')?.textContent?.trim()).toBe('2 seats');
+    expect(Number(first?.querySelector('.plan-seats')?.getAttribute('font-size'))).toBeGreaterThanOrEqual(13);
+    expect(first?.textContent).not.toContain('Table 1');
     expect(first?.getAttribute('aria-label')).toContain('Table 1');
     expect(first?.getAttribute('data-available')).toBe('true');
     expect(first?.getAttribute('data-selected')).toBe('false');
@@ -115,7 +117,7 @@ describe('floor plate control', () => {
     await view.cleanup();
   });
 
-  it('wraps a long plate name and keeps that name on the button, caption and place card', async () => {
+  it('wraps a long plate name and keeps that name on the button and place card', async () => {
     const view = render(FloorPlan, {
       tables: longTables,
       availableIds: [],
@@ -129,10 +131,12 @@ describe('floor plate control', () => {
     });
     const first = view.target.querySelector('[data-testid="plan-t_1"]');
     const plate = [...(first?.querySelectorAll('.plate-label') ?? [])].map((node) => node.textContent?.trim()).join(' ');
-    const caption = [...(first?.querySelectorAll('.plan-name') ?? [])].map((node) => node.textContent?.trim()).join(' ');
     expect(plate).toBe('Window alcove');
-    expect(caption).toBe('Table Window alcove');
+    expect(first?.querySelector('.plan-name')).toBeNull();
+    expect(first?.textContent).not.toContain('Table Window');
+    expect(first?.querySelector('.plan-seats')?.textContent?.trim()).toBe('2 seats');
     expect(Number(first?.querySelector('.plate-label')?.getAttribute('font-size'))).toBeGreaterThanOrEqual(13);
+    expect(Number(first?.querySelector('.plan-seats')?.getAttribute('font-size'))).toBeGreaterThanOrEqual(13);
     expect(first?.getAttribute('aria-label')).toContain('Window alcove');
     expect(first?.getAttribute('data-selected')).toBe('true');
     expect(first?.getAttribute('data-available')).toBe('false');
@@ -140,6 +144,33 @@ describe('floor plate control', () => {
     expect(view.target.querySelector('.place-cards')?.textContent).toContain('Table Window alcove');
     expect(view.target.querySelector('.place-cards')?.textContent).toContain('Table Garden corner');
     expect(view.target.querySelector('[data-testid="plan-t_1+t_2"]')?.textContent).toContain('Window alcove');
+    const scene = view.target.querySelector('svg.room-scene');
+    const nodes = [...(scene?.querySelectorAll('.pair-link, .table-top, .plate-label, .plan-seats, .pair-badge') ?? [])];
+    const kindOf = (node: Element) =>
+      node.classList.contains('pair-link')
+        ? 'link'
+        : node.classList.contains('table-top')
+          ? 'top'
+          : node.classList.contains('plate-label')
+            ? 'plate'
+            : node.classList.contains('plan-seats')
+              ? 'seats'
+              : 'badge';
+    const order = nodes.map(kindOf);
+    const lastLink = order.lastIndexOf('link');
+    const firstTop = order.indexOf('top');
+    const firstPlate = order.indexOf('plate');
+    const lastPlate = order.lastIndexOf('plate');
+    const firstBadge = order.indexOf('badge');
+    expect(lastLink).toBeGreaterThanOrEqual(0);
+    expect(firstTop).toBeGreaterThan(lastLink);
+    expect(firstPlate).toBeGreaterThan(firstTop);
+    expect(firstBadge).toBeGreaterThan(lastPlate);
+    const link = scene?.querySelector('.pair-link');
+    const plateNode = scene?.querySelector('.plate-label');
+    const badge = scene?.querySelector('.pair-badge');
+    expect(link && plateNode && (link.compareDocumentPosition(plateNode) & Node.DOCUMENT_POSITION_FOLLOWING)).toBeTruthy();
+    expect(plateNode && badge && (plateNode.compareDocumentPosition(badge) & Node.DOCUMENT_POSITION_FOLLOWING)).toBeTruthy();
     await view.cleanup();
   });
 });

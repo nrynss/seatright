@@ -124,6 +124,22 @@
     <rect class="room-door" x={scene.door.x} y={scene.door.y} width={scene.door.w} height={scene.door.h} rx="4" />
     <text class="room-note" x={scene.aisle.x + scene.aisle.w / 2} y={scene.aisle.y - 10} text-anchor="middle">Aisle</text>
     <text class="room-note" x={scene.door.x + scene.door.w / 2} y={scene.door.y - 8} text-anchor="middle">Entrance</text>
+    {#each marks as mark (mark.key)}
+      <PairMark
+        layer="link"
+        x1={mark.x1}
+        y1={mark.y1}
+        x2={mark.x2}
+        y2={mark.y2}
+        badge={mark.badge}
+        caption={mark.caption}
+        available={mark.available}
+        selected={mark.selected}
+        testId={mark.testId}
+        label={mark.label}
+        onSelect={() => onSelectPair?.(mark.ids)}
+      />
+    {/each}
     {#each scene.tables as place (place.id)}
       <PlanTable
         {place}
@@ -133,8 +149,9 @@
         {onSelect}
       />
     {/each}
-    {#each marks as mark (mark.key)}
+    {#each marks as mark (`badge-${mark.key}`)}
       <PairMark
+        layer="badge"
         x1={mark.x1}
         y1={mark.y1}
         x2={mark.x2}

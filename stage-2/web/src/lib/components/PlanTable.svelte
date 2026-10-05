@@ -33,6 +33,7 @@
   );
   const plate = $derived(plateLayout(place.label, drawing));
   const caption = $derived(captionLayout(place.label, drawing));
+  const seatsLabel = $derived(`${place.capacity} ${place.capacity === 1 ? 'seat' : 'seats'}`);
   const hitHeight = $derived(
     Math.max(drawing.size + 28, drawing.size + 6 + caption.lines.length * caption.lineHeight),
   );
@@ -96,16 +97,14 @@
       {line}
     </text>
   {/each}
-  {#each caption.lines as line, index (`name-${index}`)}
-    <text
-      class="plan-name"
-      x={drawing.cx}
-      y={drawing.size + 6 + index * caption.lineHeight}
-      text-anchor="middle"
-      dominant-baseline="hanging"
-      font-size={caption.fontSize}
-    >
-      {line}
-    </text>
-  {/each}
+  <text
+    class="plan-seats"
+    x={drawing.cx}
+    y={drawing.size + 6}
+    text-anchor="middle"
+    dominant-baseline="hanging"
+    font-size="16"
+  >
+    {seatsLabel}
+  </text>
 </g>

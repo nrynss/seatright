@@ -340,7 +340,8 @@ select {
   font-weight: 650;
 }
 
-.plan-name {
+.plan-name,
+.plan-seats {
   fill: var(--text);
   font-family: var(--font-ui);
   font-weight: 650;
@@ -357,7 +358,8 @@ select {
 }
 
 .table-on-plan[data-available="false"] .plate-label,
-.table-on-plan[data-available="false"] .plan-name {
+.table-on-plan[data-available="false"] .plan-name,
+.table-on-plan[data-available="false"] .plan-seats {
   fill: var(--dim);
 }
 
