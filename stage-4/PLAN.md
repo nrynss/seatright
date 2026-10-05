@@ -2,6 +2,14 @@
 
 
 
+## S4-R0 readiness verified — shared57 completed
+
+Reviewer report b53cbcb4-231f-4f24-a696-fc872cad007c and retained PREFLIGHT.md/preflight.log have been read. The separate reviewer daemon has 1.8G free on its 9.8G Docker volume, a present 1.93GB runner with the recorded 1.24GB layer, healthy interpreter/import/CLI and build-time egress. Expected peak writes0.8–1.1GB and warm-cache/runner content-equivalence are estimates, not executed guarantees; the changed runner ID is recorded. A cold ~1.25GB base pull could require safe owned reclamation first. No deletion/prune/reconfigure/lifecycle or harness run occurred or is authorized by this readiness acceptance.
+
+The preflight saw context0191aee2 with coordinator RUNLOG.md dirty, correctly disclosed; it was not frozen and metadata has since been committed. Accepted stages1–3 trees remain immutable. Shared57 is completed for read-only readiness only. S4-R1 requires the final clean frozen integrated SHA and complete original-task/spec/ledger/design/source/migration/browser/strict-isolated handoff. S4-A/shared55 and S4-R2/shared56 remain inprogress with final narrow corrections; no stage4 acceptance. Reviewer measured raw probes13:33:17–13:33:40 UTC and reported overall window13:33:17–13:34:10 plus writing (~4min); usage unavailable. Evidence absolute paths: /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R0/PREFLIGHT.md and preflight.log.
+
+
+
 ## S4-A r3 residual audit and final narrow test repair
 
 Report 5872b4db is audited against the current two owned new files. Real terms adoption, genuine fold/gap, later non-occupancy precedence and exact receipt binding now work; host 21 amendment races pass. No-op cutoff claim is still false: from_index1 selects tomorrow+7days outside10080-minute cutoff. Race full-state comments still exceed assertions. Final test-only correction c934bcf6-39b6-4b09-ac2d-f320e6957e9b stays on existing dirty base727eae17559928196cc7f3f5c7dc8967b0d7088e. No commit/reset/acceptance; W and migration interactions remain deferred.
