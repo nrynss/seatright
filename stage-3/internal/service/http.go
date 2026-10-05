@@ -76,6 +76,10 @@ func (s *Service) serve(w http.ResponseWriter, r *http.Request) {
 		res = s.reservationRoute(r, path)
 	case path == "/reservation-moves" && method == http.MethodPost:
 		res = s.MoveReservations(bearerTokenString(r), r.Header.Get("Idempotency-Key"), readBody(r))
+	case path == "/series" && method == http.MethodPost:
+		res = s.AdoptSeries(bearerTokenString(r), r.Header.Get("Idempotency-Key"), readBody(r))
+	case strings.HasPrefix(path, "/series/") && method == http.MethodGet:
+		res = s.GetSeries(bearerTokenString(r), strings.TrimPrefix(path, "/series/"))
 	case method == http.MethodGet && isPageRoute(path):
 		s.serveStatic(w, r)
 		return
