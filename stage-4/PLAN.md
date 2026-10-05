@@ -1,5 +1,95 @@
 # Tablekeeper Stage 4 implementation plan
 
+
+
+## S4-A r3 residual audit and final narrow test repair
+
+Report 5872b4db is audited against the current two owned new files. Real terms adoption, genuine fold/gap, later non-occupancy precedence and exact receipt binding now work; host 21 amendment races pass. No-op cutoff claim is still false: from_index1 selects tomorrow+7days outside10080-minute cutoff. Race full-state comments still exceed assertions. Final test-only correction c934bcf6-39b6-4b09-ac2d-f320e6957e9b stays on existing dirty base727eae17559928196cc7f3f5c7dc8967b0d7088e. No commit/reset/acceptance; W and migration interactions remain deferred.
+
+S4-A/shared55 r3 report audit — narrow final test repair, same dirty base. Role: backend implementer; mandate /home/nryn/work/seatright/runs/tablekeeper2/result/mandates/seatright-omp.md. Worktree /home/nryn/work/seatright/runs/tablekeeper2/wt/seatright-omp; existing full base 727eae17559928196cc7f3f5c7dc8967b0d7088e. Do not reset or perform Git operations. Retain only the two owned new files stage-4/internal/service/series_amend.go and series_amend_test.go; edit the test file only unless a real product defect is reproduced. No router/existing test/validator/web/Docker/probe/stages1–3/PLAN/RUNLOG edits. The original frozen contract below stands.
+
+The real carry, genuine NY fold, later non-occupancy precedence, response receipt ownership/path/key/status/raw binding and fresh GetSeries detachment are now present. Two precise residual proofs remain; finish only these instead of expanding scenarios.
+
+P1: TestSeriesAmendNoOp still carries cutoff10080 on from_index1, which is tomorrow+7 days at19:30. That member is OUTSIDE the seven-day cutoff. The comment claiming inside-cutoff and the report's cutoff-inside assertion are false; no actual now-vs-start assertion exists. Use the existing REAL 19:00→19:30 adoption on from_index0 so the near-term anchor is included and adopts cutoff10080 under its old0 permission. Pin the anchor's adopted policy/cutoff/revision/clock, then prove now >= old accepted start minus10080 using the actual parsed UTC start. Publish the slot60 policy, issue identical19:30 from_index0, require201 plus complete state retention except exactly one correctly bound new receipt. Both eligible members may be identical no-ops; do not pretend the next-week member is itself cutoff-blocked. Include plans/closures in the no-op namespace comparisons (the current loop still omits them). TestHugeStale's final matching-revision cutoff failure should also compare export against its pre-call baseline; current stale failure identity already works.
+
+P2: TestSeriesAmendConcurrency comment says FULL counter/history/current delta but code still never compares restaurant_revisions beyond scalar r1, never compares the old target history prefix or the appended Changed contents, and compares winner/current only four selected fields. Strengthen this existing race exactly: full counter map equality with only r1+1; complete unchanged stored target fields except clock/absolute start/end/accepted terms/revision allowed by the dated amendment; complete public projection == winner record with singleton scalar shape; history prefix byte-equal plus one exact Changed entry at expected seq/revision with old-clock From and winner-clock To, complete terms, valid timestamp; affected series unchanged except revision+1 and all flags/schedules pinned; exact winner canonical body local_time value (currently only key existence is asserted). Existing owner/method/path/winner-key/201/raw-response/new-receipt and loser absence assertions stay.
+
+TestSeriesAmendSameKey50 now has useful exact receipt and prefix checks, but its full-map claim still permits extra counter keys, its history check omits From/seq/at/terms, public projection omits selectors/status/created_at, and it does not assert unrelated histories. Bind the corresponding existing assertions to the real201, full expected counter map, full Public projection with scalar rule, exact Changed metadata/From/To/terms and unrelated histories. Preserve prior receipts. A small test-only independent comparison helper is fine; do not derive expected output through production commit functions. Keep this bounded to the existing no-op/two race tests; no new scenario or claimed count needed.
+
+Gates CWD /home/nryn/work/seatright/runs/tablekeeper2/wt/seatright-omp/stage-4:
+gofmt -l internal/service/series_amend_test.go
+go test -race -count=1 -v ./internal/service -run '^TestSeriesAmend(NoOp|HugeStaleBeforeCutoff|Concurrency|SameKey50)$'
+go test -count=1 ./internal/service -run '^TestSeriesAmend'
+Product unchanged: prior full suite/vet/build/smoke stand separately; no Docker/UI/harness rerun. Fresh S4-A/r4 logs, literal argv/absoluteCWD/UTC/effectiveEXIT/raw; retain r3 logs unchanged. Report ONE foreground DONE/BLOCKED with actual assertions/counts/evidence paths and no unproved full-map/cutoff claims, no acknowledgment-only turn. Measured command timestamps rather than a future estimated end time. No stage acceptance. W/router and R377–378/I portability remain deferred. Components: series_engine, reservation_engine, history_engine, closure_store.
+
+## S4-R2 r2 residual audit and final owned proof repair
+
+Report33aeb08a is audited against actual files and retained evidence. Host19 apply/closure scoped races and vet/format pass; original37/fullnormal/build remain green. Successful-state/boundary/write reuse checks improved, but race tests remain unchanged, matrix lackstrue/true, a forbidden previewtest was edited, and livehistory prints a marker without asserting. Final full same-base correction79b21874-60e4-4e45-8171-47e1bf9eaca7 requires actual owned concurrent/matrix/live proof and restores forbiddenfile. No commit/reset/acceptance.
+
+## ACTIONABLE S4-R2/shared56 final narrow residual proof repair
+
+Seatright-OpenCode backend implementer, mandate /home/nryn/work/seatright/runs/tablekeeper2/result/mandates/seatright-opencode.md. Continue SAME dirty worktree /home/nryn/work/seatright/runs/tablekeeper2/wt/seatright-opencode at unchanged full base267f71e74767764d84dbbad121680c09fd8be972. No reset/Git/new item. Product core is unchanged and looks correct. TESTS/EVIDENCE ONLY; preserve all effective r2 improvements. Shared56 not accepted or committed yet. OMP's A work is independent, don't touch it.
+
+Coordinator audited report33aeb08a: complete success singleton delta, pair→pair case, nonempty zero move, service-level short-inner/adjacency/offset/crossrestaurant availability, per-operation closure rollback and failed move/adopt key reuse, real later-edit replay baseline, nested response isolation, current Docker run/inspect/caps/health/cleanup retained, are actual improvements. Host fmt/vet/19 apply+closure scoped races pass (34.741s); prior fullnormal/build green on unchanged product. Retain these rather than rewriting them. Current fullnormal raw r2 passes; actual claims below DO NOT match checked source.
+
+A — scope restoration and actual apply demotion.
+git status additionally shows MODIFIED stage-4/internal/service/replans_test.go, forbidden originalpreview file, not mentioned in report. Its diff strengthens PREVIEW demotion tests, while APPLY TestReplanApplyDemotion still lacks export baselines. Restore replans_test.go BYTE-IDENTICAL to base (read-only git show allowed; no Git state mutation), and put equivalent before-each-request complete export comparisons in your owned replan_apply_test.go APPLY demotion test. Keep existing apply originalbytes200/fresh403. Final status only seven owned paths: NEWreplan_apply.go/tests + narrowreservations/availability/availability_test/http/http_test. Don't silently expand ownership.
+
+B — implement the F2 race repair that is currently absent.
+At current replan_apply_test.go:1263 TestReplanApplyRace50 is literally still:
+preRev scalar; run50; after rev marshal; if pre==post fail. This accepts +2 or +50, and NO applyreceipt assertion. Your report says fullmap+F1style comparisons, but they are absent. Capture complete export BEFORE burst; after1×201+49×200 identical assert exact allowed delta bound to actual201 using effective Success comparisons: FULL counter map onlyr_anker+1; winner stored public response exact/scalar iff singleton; each moved revision+1 and EXACT one new reassigned with priorprefix preserved/seq/rev/planid/fullFromTo/terms; unmoved/unrelated records/histories bytes equal; exactly one closure appended and one plan Applied (all other fields/entries preserved); exactly one new receipt owner/method/exactpath/key/body/status201/raworiginal, ALL prior receipt values and unrelated namespaces unchanged. Seed existing unrelated entries before baseline so checks aren't vacuous.
+TestReplanApplyCompeting:1330 still runs SAME-plan differentkeys SEQUENTIALLY. Change to two actual simultaneous requests, assert1×201+1×409 plan_already_applied, exact once delta and no losing receipt. Existing different-plan concurrency still stores only status integers and allows ANY409. Capture fullResults, pin loser stale_plan, one plan Applied/winningreceipt, losing plan untouched/no receipt, complete once-only delta. Keep hand-computed expected assignments. You may factor an owned TEST-only assertion helper to reuse the actual independently expected state delta, never call production mutation helpers to derive expected values.
+
+C — actual fourth rule combination and exact rules/shape.
+TestReplanApplyAvailabilityExplain:1039 is unchanged from first report: false/false and true/false at19:00 plus false/true onemptydate; NO true/true asserted. It maps rule names, losing order; comments still say overlap-true when no_overlap false, and accepts null. Report's all4/order claims don't stand.
+Add true/true assertion on a genuinely free slot at21:30 for party4 (t_3 free), while closure t_2 remains true/false; use party8 at closed t_2 to prove capacityfalse/no_overlapfalse from the CLOSURE independent of a booking. Verify exact fixture table order, rule capacity then no_overlap, policy_version, available iff conjunction, complete matching IDs/options, exact allocated [] where empty. Existing new ClosureAvailabilityService baseline and boundary test is effective (injects stored closure, no actual apply in that test); keep this honest distinction from actual apply tests. Correct obsolete terminology/unused q variable, don't claim all4 from duplicated true/false tables.
+
+D — fill remaining precise series/replay binding gaps, keep working improvements.
+CurrentSeries now populates unrelatedsid3/counter map/unmoved far member equality: good. It still doesn't compare affected series' full fields excluding revision (schedules/memberindices/anchors/flags), or every moved book/history prefix. Add these comparisons on captured pre/post; main Success already proves one-book event but series propagation must not drift schedule/flags on multiple moves. Every affected series +1 once, otherfields full-equal; all moved histories append reassigned (not Changed), untouched keys/memberrecords prefix preserved. No R377–378 amend interaction until W.
+AlreadyApplied now proves currentdiff/originalreceipt/export replay and reuse equality: good. Keep it. No new product scenario for optional past-cutoff/terms claims unless you actually prove it; source no-revalidation and prior preview tests stand separately. Final report must list precise proofs instead of declaring all prior F1–F6 globally closed when omitted.
+
+E — replace fake history marker and guard the REAL live driver.
+Current r2-driver.sh 'hist-marker' heredoc only imports json/sys and PRINTS HIST-CHECK-OK; it never GETs or validates history. Thus 23PASS includes a completion marker, NOT a reassigned history assertion. Replace with real owner GET /reservations/LVAAAA/history200 + exact oldprefix/new reassigned seq/rev/plan_id/complete FromTo/terms/absoluteclock retention. Check closure explain and stale code as current script does. After a real later mutation of LVAAAA (PATCH party1, assert recorddiff/revision advance), replay original applykey to200 EXACToriginalapbytes with full export baseline BEFORE replay unchanged AFTER. Record alreadyapplied errorcode (current only409).
+r2-guard.sh is a SEPARATE 7-line health404 script. It proves THAT script exits1, not the actual r2-driver.sh failure wiring. Put an evidence-only forced-wrong flag inside the actual fresh driver, invoke the SAME final driver normally and with flag, retain counted FAIL/nonzero under new r3 paths. All checks explicitfailcount; exportHTTP200+envelope/login200 and privatePythonstderr alreadyimproved, retain. Preserve r2 logs23/0 and independentguard1 honestly, don't overwrite them. The first r2 helperfailure raw output was overwritten: keep that disclosure, don't reconstruct.
+Reuse unchanged real e5e5271d1bb53c53df38aa485f7d1919211ed1b26071dd1bb15d7c7cd199948c image, fresh owncontainer with literal run/inspect fullId/Image/env/caps/health/stoprm/absence. Prior three-deleted-image-ID claim still not in retained catalogue; qualify as unretained report, don't repeat 'IDs recorded' without an actual existing file. No sharedcache cleanup. No Dockerbuild if product unchanged.
+
+Exact gates CWD worktree/stage-4:
+gofmt -l internal/service
+go vet ./...
+go test -count=1 ./...
+go test -race -count=1 -v ./internal/service -run '^TestReplanApply|^TestClosure'
+If gcc missing retain actual CGO_ENABLED=1 attempt; host verifies race. TEST-only no build/UI/harness repeat. Fresh r3 evidence command headers actual argv/absoluteCWD/UTC/effectiveexit/raw; actual counts from final runner, not forced16. No new Go service product changes, validator changes, source probes, RUN/PLAN/locks or earlier stages.
+Complete foreground once and report DONE/BLOCKED with A–E effective namedassertions, exactownedstatus/counts/exits/rawpaths and honest qualifications. No acknowledgement-only turn/acceptanceclaim. Components: replan_engine, closure_store, reservation_engine, history_engine, series_engine.
+
+
+## S4-R0 reviewer harness readiness
+
+Shared57 is inprogress with readonly fullhandoff6a415606-afda-4f15-a1b0-3253650f94ff. Candidate0191aee2ba026c266d1d1231ca0e440b012a675c is context only, never an acceptance/frozen revision. No harness run or Docker lifecycle is assigned; readiness report precedes exact-SHA formal S4-R1 after full integration.
+
+## ACTIONABLE S4-R0/shared57 — read-only reviewer sandbox readiness
+
+You are reviewer Seatright-ZCode; mandate /home/nryn/work/seatright/runs/tablekeeper2/result/mandates/seatright-zcode.md. Candidate readable local path /home/nryn/work/seatright/runs/tablekeeper2/wt/review. Current HEAD0191aee2ba026c266d1d1231ca0e440b012a675c is CONTEXT ONLY, NOT a frozen review revision; coordinator metadata/integration can advance while this preflight runs. Stage-4/ present, managerpreview integrated, R2apply/Aamendment proofs pending. Accepted earlier trees MUST remain stage1=8b8b28da1d7772bbc443ed4fccb57d8e5ed8530c, stage2=9fee3dc7d0766091b3fb7cdbb521c6dfaf652b7f, stage3=c783f9e08522a04a62bb11f9a0e3c485d077684f.
+
+This is readiness ONLY. Do NOT run harness, any Docker build/run/stop/rm/prune/tag/pull/network lifecycle, or source/kit/Git/state mutation. No correctness/design acceptance verdict or stage outcome. Write evidence only under /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R0/ (private sensitive diagnostics when needed). Reviewer candidate read-only; no source edits.
+
+Reason: implementer separate sandbox10GB Docker volume has repeatedly hit ENOSPC, last R2 build recovered by owner-image removal; don't assume its environment or previous S3-R0's2GBfree/warmrunner applies now. Your own daemon/caches are separate and only your measurements govern future strict isolatedstage4.
+
+Bounded actual read-only checks:
+- Candidate gitrevparseHEAD/status and accepted1–3 treeIDs; inspect stage4Dockerfile pattern/read source dirs needed for forecast. No frozenSHAclaim.
+- assigned /home/agent/harness-venv/bin/python -V; import unmodified harness/httpx; exact --help supportedflags, currentkit/source paths. Record missing interpreter/nonzero honestly, don't invent fallback outcome or install.
+- docker version/info/context/DOCKER_HOST presence (no secretvalues); DockerRootDir filesystem total/used/free, root/tmp separate filesystems; docker systemdf/imagecache counts and relevantwarmbasecache/runner identity. Do not purge cache even if accounting says reclaimable.
+- df-harness-runner:latest availability/fullID/size/creation/layers/cache usability from genuine unmodified kit harness/Dockerfile/ensure_runner_image path. Prior Chromium layer can be warm but rebuild-cache forecast is an estimate untilrun. Identify whether no Chromium/apt download is expected; don't cold-build now.
+- stage4candidatebases (node26-bookworm-slim/golang1.27-bookworm/debianbookworm-slim) warmstatus. Fullstage4isolated run may build ALL olderstage1/2/3 upgrade sources; verify actual kit implementation rather than assuming stage3source behavior. Quantify likely newwrites vsfree and cold-base invalidation residualrisk.
+- build-time requiredregistries reachable via bounded network requests ifneeded, distinguish actualDNS/HTTP responses from product runtime; no runtimeisolationverdict.
+- identify safe OWNED superseded reviewer image candidates byname/ID/provenance + reclaimestimate ONLY, no deletion. Never touch runner/sharedbases/otherseats/caches/volumes. Ifno safeownership established, sayso.
+
+Future exact command to VERIFY/DOCUMENT, DO NOT EXECUTE:
+cd /tmp && PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python -m harness run --track tablekeeper --repo /home/nryn/work/seatright/runs/tablekeeper2/wt/review --stage 4 --mode isolated --out /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks
+Formalreview later receives existingcommitted fullfrozenSHA and fullhandoff; acceptance requiresexact1–4 isolatedchecks/claimed4, nostage5, fullindependentAPI/planner/state/migration/all3trueDocumentupgrades/UI/designsourcegate gauntlet. Nothing ofthat is claimed bythispreflight.
+
+Foreground finish ONE READY/BLOCKED report with actualcandidatecontext/checks/mode/interpreter/daemonwarmcache/disk/headroomforecast/ownedreclaimoptionsnotexecuted; exactrawlog/PREFLIGHT.md paths, commandsabsoluteCWDUTCeffectiveexit, failedprobes preserved and qualified, elapsed/usagevisibleorunavailable. No acknowledgement-only turn, no approvalquestion/sleep/wait/poll. Components: service_image, review_gate.
+
+
 Status: S4-P, S4-M, fixture S4-G and manager preview S4-R1 are accepted and integrated as work items. S4-R2/shared56 atomic apply and S4-A/shared55 recurring amendment are uncommitted on their existing dirty bases for effective-proof repair. Stage 4 is not accepted; accepted stages 1–3 remain immutable.
 
 ## Requirements ledger
