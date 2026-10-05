@@ -1,4 +1,8 @@
-# Tablekeeper final outcome: stages 1–3 accepted; stage 4 blocked
+# Tablekeeper stage 4 reopened: one native fix attempt, then formal review
+
+**Operator clarification, 2026-10-05T19:07:05Z:** the three-round limit counts ZCode’s formal CHANGES reviews, not coordinator integration audits. Stage4 has had **zero formal review rounds**. The earlier closing disposition is superseded. New **S4-I1F/shared68**, owned by OMP, carries both remaining native-import findings into **one fix attempt**. Preserve the prior implementation, add effective regressions, integrate the reported result after scope/gate verification, then freeze for ZCode’s **first formal S4-R1 review** even if findings remain open. Known native and delivery evidence findings must be explicitly listed; ZCode decides whether they block acceptance. Target full formal handoff by **2026-10-05T22:07:05Z** (within3hours). No pre-review audit loop or presumed review-round exhaustion.
+
+**S4-R1P/shared69** gives ZCode bounded independent checklist/readiness preparation; the actual formal review starts only after the full exact frozen SHA handoff. Stages1–3 remain accepted and immutable. Prior FINAL-OUTCOME.md and evidence/stage-4-blocked/ remain historical snapshots, superseded by this authorized continuation; no stage4 acceptance has yet occurred.
 
 **Final disposition:** highest independently accepted stage is **3**, exact revision **e13272d90213be0914211ae6f6f0bfd5888900ff**. Stages1–3 are unchanged and available on main. Stage4 is partial and unaccepted; no formal stage4 isolated acceptance run or accepted SHA. Functional native item63 and evidence item67 each reached their three-audit limit and are blocked. No fourth correction, stage4 product merge to main, or human-input dependency. Durable full outcome: **FINAL-OUTCOME.md**; sanitized partial archive: **evidence/stage-4-blocked/**. Historical work queues below are superseded by this closing disposition.
 
