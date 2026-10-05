@@ -1,0 +1,352 @@
+{
+  "accepted_revision": "a37befe400bd0e5686af7b47dbe417ad4a433c4e",
+  "accepted_merge": "c8b19b40d6fb9c05df26b4b03695427566f70fb3",
+  "formal_round": 1,
+  "verdict": "ACCEPT",
+  "files": [
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/REVIEW-RECONCILED.md",
+      "archived": "REVIEW.md",
+      "source_sha256": "c2a6d07c4a8bacb72b504aa7db3495cff36c8d018058b1a34c3199dd1506a146",
+      "archived_sha256": "c2a6d07c4a8bacb72b504aa7db3495cff36c8d018058b1a34c3199dd1506a146",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/REVIEW.md",
+      "archived": "REVIEW-INITIAL-SUPERSEDED.md",
+      "source_sha256": "5aa9ae695016094695c309a5b3a23c415aff77b97536dcbfda32c3ffbc7fb6f2",
+      "archived_sha256": "5aa9ae695016094695c309a5b3a23c415aff77b97536dcbfda32c3ffbc7fb6f2",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/review.log",
+      "archived": "review-sanitized.log",
+      "source_sha256": "99efbc24dbddf51728f4a8b31fd60f00c64f31eb67dfea8e451916016046b2e6",
+      "archived_sha256": "eab8bbd3271efca76713286b0cc6f7ddd76c25ff044cb39bc0335ea0a2300bec",
+      "redactions": 2,
+      "byte_exact": false
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks-serial/report.json",
+      "archived": "checks/report.json",
+      "source_sha256": "66ba31bdab7e188d8bfdea92e2aa46975af56f1e66974844dcfae14cf6f050e6",
+      "archived_sha256": "66ba31bdab7e188d8bfdea92e2aa46975af56f1e66974844dcfae14cf6f050e6",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks-serial/stage-1.counts.json",
+      "archived": "checks/stage-1.counts.json",
+      "source_sha256": "b18fabdbadab8f1094c6b47d09dd89a3e3215cb6c471340343c5f8787e30b77b",
+      "archived_sha256": "b18fabdbadab8f1094c6b47d09dd89a3e3215cb6c471340343c5f8787e30b77b",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks-serial/stage-1.log",
+      "archived": "checks/stage-1.log",
+      "source_sha256": "deae34fb90e3883f84ab499c7ce5efd50bfe4059def1136a3d9aad567a16286d",
+      "archived_sha256": "deae34fb90e3883f84ab499c7ce5efd50bfe4059def1136a3d9aad567a16286d",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks-serial/stage-2.counts.json",
+      "archived": "checks/stage-2.counts.json",
+      "source_sha256": "5e7ced47a9492a568aec12049d401867a868110520ced788cfc9976f400e4b0a",
+      "archived_sha256": "5e7ced47a9492a568aec12049d401867a868110520ced788cfc9976f400e4b0a",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks-serial/stage-2.log",
+      "archived": "checks/stage-2.log",
+      "source_sha256": "932bae2e2faaa7ff7077d7ea180e70a79f75770574b6d0319060e1bab9edecb3",
+      "archived_sha256": "932bae2e2faaa7ff7077d7ea180e70a79f75770574b6d0319060e1bab9edecb3",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks-serial/stage-3.counts.json",
+      "archived": "checks/stage-3.counts.json",
+      "source_sha256": "0690b4b540761c4ee3ae249853e6a8a3bdc4210f686645f4612e3c336d716713",
+      "archived_sha256": "0690b4b540761c4ee3ae249853e6a8a3bdc4210f686645f4612e3c336d716713",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks-serial/stage-3.log",
+      "archived": "checks/stage-3.log",
+      "source_sha256": "ba73eaa3c3881c649819f46a561873a81206ac7abfc51eaaa85a2750e13c9885",
+      "archived_sha256": "ba73eaa3c3881c649819f46a561873a81206ac7abfc51eaaa85a2750e13c9885",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks-serial/stage-4.counts.json",
+      "archived": "checks/stage-4.counts.json",
+      "source_sha256": "9634baaeda23ab472e0fe8359c728ccd2fc1c62cf467b7ffdc8c4685446b4089",
+      "archived_sha256": "9634baaeda23ab472e0fe8359c728ccd2fc1c62cf467b7ffdc8c4685446b4089",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks-serial/stage-4.log",
+      "archived": "checks/stage-4.log",
+      "source_sha256": "32135584d32a2fa8c4f2f2061251d3b9eac28612159e8bab74bd60c89b8cc021",
+      "archived_sha256": "32135584d32a2fa8c4f2f2061251d3b9eac28612159e8bab74bd60c89b8cc021",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks/report.json",
+      "archived": "checks-initial-failed/report.json",
+      "source_sha256": "3357701a970be8742187de30d5fcbb9a4885cde98f67467bbbef760ddb2839ef",
+      "archived_sha256": "3357701a970be8742187de30d5fcbb9a4885cde98f67467bbbef760ddb2839ef",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks/stage-1.counts.json",
+      "archived": "checks-initial-failed/stage-1.counts.json",
+      "source_sha256": "b18fabdbadab8f1094c6b47d09dd89a3e3215cb6c471340343c5f8787e30b77b",
+      "archived_sha256": "b18fabdbadab8f1094c6b47d09dd89a3e3215cb6c471340343c5f8787e30b77b",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks/stage-1.log",
+      "archived": "checks-initial-failed/stage-1.log",
+      "source_sha256": "862b4c60b6744e65a436e136844bca86708a6c20c16b951dc77885e2a74380c7",
+      "archived_sha256": "862b4c60b6744e65a436e136844bca86708a6c20c16b951dc77885e2a74380c7",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks/stage-2.counts.json",
+      "archived": "checks-initial-failed/stage-2.counts.json",
+      "source_sha256": "c3ee8f38fc14d82af2ad3663b197f22e0ddfcfc683b08606c784fb2cabbf655b",
+      "archived_sha256": "c3ee8f38fc14d82af2ad3663b197f22e0ddfcfc683b08606c784fb2cabbf655b",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks/stage-2.log",
+      "archived": "checks-initial-failed/stage-2.log",
+      "source_sha256": "ef194f89b2706a34a5630a0b276ed627af3e14f15fb26b9404a123d2a3c994ee",
+      "archived_sha256": "c42c7b13d16da3d5e10d0e8d182b455b17179691857605e77d6202bbf38aed6e",
+      "redactions": 5,
+      "byte_exact": false
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks/stage-3.counts.json",
+      "archived": "checks-initial-failed/stage-3.counts.json",
+      "source_sha256": "0690b4b540761c4ee3ae249853e6a8a3bdc4210f686645f4612e3c336d716713",
+      "archived_sha256": "0690b4b540761c4ee3ae249853e6a8a3bdc4210f686645f4612e3c336d716713",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks/stage-3.log",
+      "archived": "checks-initial-failed/stage-3.log",
+      "source_sha256": "fc5e4507044921185bc3f652cc19d7ec9b649c392b931dc5a35a9541336d6aa3",
+      "archived_sha256": "fc5e4507044921185bc3f652cc19d7ec9b649c392b931dc5a35a9541336d6aa3",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks/stage-4.counts.json",
+      "archived": "checks-initial-failed/stage-4.counts.json",
+      "source_sha256": "9634baaeda23ab472e0fe8359c728ccd2fc1c62cf467b7ffdc8c4685446b4089",
+      "archived_sha256": "9634baaeda23ab472e0fe8359c728ccd2fc1c62cf467b7ffdc8c4685446b4089",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/checks/stage-4.log",
+      "archived": "checks-initial-failed/stage-4.log",
+      "source_sha256": "fef685f206b5021ad896f58a264c1865358c68cffac021d822e5068a64a0f58a",
+      "archived_sha256": "fef685f206b5021ad896f58a264c1865358c68cffac021d822e5068a64a0f58a",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/go-gates.log",
+      "archived": "notes/go-gates.log",
+      "source_sha256": "26e8f298066c3c69076c3ab09254614b30096c2f72b66b022d36892b0a034a88",
+      "archived_sha256": "26e8f298066c3c69076c3ab09254614b30096c2f72b66b022d36892b0a034a88",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/go-race.log",
+      "archived": "notes/go-race.log",
+      "source_sha256": "7bd07de1634308312e83f21e704d5819c75f4f0cbfeef521fd5ad8776aa07b72",
+      "archived_sha256": "7bd07de1634308312e83f21e704d5819c75f4f0cbfeef521fd5ad8776aa07b72",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/ui-gates.log",
+      "archived": "notes/ui-gates.log",
+      "source_sha256": "852e76140a5cc70b50fdc09316f5f089c1e6092a483e7882e20c04a42a159c72",
+      "archived_sha256": "852e76140a5cc70b50fdc09316f5f089c1e6092a483e7882e20c04a42a159c72",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/harness-serial.log",
+      "archived": "notes/harness-serial.log",
+      "source_sha256": "90ae5af1e243870d27cd287acdf031b8614e902947679069e1c7484bc955447e",
+      "archived_sha256": "90ae5af1e243870d27cd287acdf031b8614e902947679069e1c7484bc955447e",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/harness-stdout.log",
+      "archived": "notes/harness-stdout.log",
+      "source_sha256": "e32e623ee80547b7bd7910cebc66ed67fe5b8d98bc00bcec473466d0373e897c",
+      "archived_sha256": "e32e623ee80547b7bd7910cebc66ed67fe5b8d98bc00bcec473466d0373e897c",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/s4-api-probe.log",
+      "archived": "notes/s4-api-probe.log",
+      "source_sha256": "6430d9ff9c2ca44be3463e511018b134e5753438f5652516c252888885e86836",
+      "archived_sha256": "6430d9ff9c2ca44be3463e511018b134e5753438f5652516c252888885e86836",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/s2-regression.log",
+      "archived": "notes/s2-regression.log",
+      "source_sha256": "486047326f7a9427eb1e8fef40d11ab2e5a13edf31c78f49fb77daaaebc5256a",
+      "archived_sha256": "486047326f7a9427eb1e8fef40d11ab2e5a13edf31c78f49fb77daaaebc5256a",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/s3-regression.log",
+      "archived": "notes/s3-regression.log",
+      "source_sha256": "9f29eb078da8e19823b4b511f1dbaf07fdc64b19de8e2d7800f981ad43d20ced",
+      "archived_sha256": "9f29eb078da8e19823b4b511f1dbaf07fdc64b19de8e2d7800f981ad43d20ced",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/closure-run.log",
+      "archived": "notes/closure-run.log",
+      "source_sha256": "0e61be9a989296934f2924d0298f7e881598bf073c170c05dfa6cca32f043f33",
+      "archived_sha256": "0e61be9a989296934f2924d0298f7e881598bf073c170c05dfa6cca32f043f33",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/states-run.log",
+      "archived": "notes/states-run.log",
+      "source_sha256": "1f53d594f66ed3541518e77217aeaba18cb0b938b78fe73d85dde6a3d5764ef3",
+      "archived_sha256": "1f53d594f66ed3541518e77217aeaba18cb0b938b78fe73d85dde6a3d5764ef3",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/measure-run.log",
+      "archived": "notes/measure-run.log",
+      "source_sha256": "b0b6fca93a19f0c0fbab181c8571909b63f96ecd47fa48bfe525b1e796801111",
+      "archived_sha256": "b0b6fca93a19f0c0fbab181c8571909b63f96ecd47fa48bfe525b1e796801111",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/upgrade-s1-run.log",
+      "archived": "notes/upgrade-s1-run.log",
+      "source_sha256": "9144e8a52808359e6e7c0774f5f945ed3165f04ed10d6438b87c789f3bf39afd",
+      "archived_sha256": "9144e8a52808359e6e7c0774f5f945ed3165f04ed10d6438b87c789f3bf39afd",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/upgrade-s2-run.log",
+      "archived": "notes/upgrade-s2-run.log",
+      "source_sha256": "6987c64c27b065f8e9ceeff0f07a89b3217285192c654d02661b662209db52ed",
+      "archived_sha256": "6987c64c27b065f8e9ceeff0f07a89b3217285192c654d02661b662209db52ed",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/upgrade-s3-run.log",
+      "archived": "notes/upgrade-s3-run.log",
+      "source_sha256": "9c00ea758e9eb05ba63fc57a9f99bfcb2e8292de7b316e3b6b7500237d3fe79c",
+      "archived_sha256": "9c00ea758e9eb05ba63fc57a9f99bfcb2e8292de7b316e3b6b7500237d3fe79c",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/design-critic.log",
+      "archived": "notes/design-critic.log",
+      "source_sha256": "384cf78ef8173436b9834a0e09c348bbf8f37c78a67ec4364358cdf7b81ade96",
+      "archived_sha256": "384cf78ef8173436b9834a0e09c348bbf8f37c78a67ec4364358cdf7b81ade96",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/offline-gate2.log",
+      "archived": "notes/offline-gate2.log",
+      "source_sha256": "81d28d3bd0e2c01b7d993dad6a4171b8d6b5e4524f660e0890ff1536414bb534",
+      "archived_sha256": "81d28d3bd0e2c01b7d993dad6a4171b8d6b5e4524f660e0890ff1536414bb534",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/notes/ui-test-standalone.log",
+      "archived": "reconcile/notes/ui-test-standalone.log",
+      "source_sha256": "6aa9c009a938ec5eed229ebf6ce51032bf3220644567ebec38d06177e4a670da",
+      "archived_sha256": "6aa9c009a938ec5eed229ebf6ce51032bf3220644567ebec38d06177e4a670da",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/notes/ui-test-standalone.raw.txt",
+      "archived": "reconcile/notes/ui-test-standalone.raw.txt",
+      "source_sha256": "590bf24ba43d853089014cb66a7455789b21c079752ef9a9ecfc7627cf8a2d03",
+      "archived_sha256": "590bf24ba43d853089014cb66a7455789b21c079752ef9a9ecfc7627cf8a2d03",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/notes/e2-preview-bind.log",
+      "archived": "reconcile/notes/e2-preview-bind.log",
+      "source_sha256": "e7e98e39c5cd673c059e36d5fcc34d0c6dbe73d7e5440ebffe15da1591e5d34e",
+      "archived_sha256": "e7e98e39c5cd673c059e36d5fcc34d0c6dbe73d7e5440ebffe15da1591e5d34e",
+      "redactions": 0,
+      "byte_exact": true
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/notes/e3-migration.log",
+      "archived": "reconcile/notes/e3-migration.log",
+      "source_sha256": "f054fc1a4eb46f94db45266ef18005d7417199549d853870b76bafeffe921536",
+      "archived_sha256": "6f3c060d8c2adb5ad4ba2ccab3d54b91aa225a1f0c7a197e048c56e10a898604",
+      "redactions": 4,
+      "byte_exact": false
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/notes/e4-offline.log",
+      "archived": "reconcile/notes/e4-offline.log",
+      "source_sha256": "9c6ece405a70a03c61d0a1fa25da538a81f181828e88ad14e341753524074f70",
+      "archived_sha256": "875213a0b507d24868e446a9d3c76af3aca85501cb916fa55b0f8a4068a3a889",
+      "redactions": 18,
+      "byte_exact": false
+    },
+    {
+      "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-codex/S4-R1/reconcile-adoption/AUDIT.md",
+      "archived": "COORDINATOR-ADOPTION-AUDIT.md",
+      "source_sha256": "f2e3fa0723c95018e7f19c83bb283ba8c85a6786a88b6d58e1d8fdec7f73a336",
+      "archived_sha256": "f2e3fa0723c95018e7f19c83bb283ba8c85a6786a88b6d58e1d8fdec7f73a336",
+      "redactions": 0,
+      "byte_exact": true
+    }
+  ]
+}

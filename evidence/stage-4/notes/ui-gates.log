@@ -1,0 +1,42 @@
+UI GATES 2026-10-05T19:39:14Z node v26.10.0
+$ npm ci
+
+added 117 packages in 21s
+ci_exit=0
+$ npm run check
+Loading svelte-check in workspace: /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/staging/stage-4/web
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings
+check_exit=0
+$ npm test
+    [90m130|[39m describe('live search', () => {
+    [90m131|[39m   it('fills restaurant ids and compares every cell with the returned m…
+    [90m   |[39m   [31m^[39m
+    [90m132|[39m     const queued = queueTransport();
+    [90m133|[39m     const view = render(LiveSearch, { transport: queued.transport, sig…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m13 passed[39m[22m[90m (15)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m98 passed[39m[22m[90m (100)[39m
+[2m   Start at [22m 19:40:06
+[2m   Duration [22m 523.63s[2m (tests 49%, environment 37%, import 9%, transform 4%, worker 1%)[22m
+
+[2mEnvironment [22m [33mjsdom was created 15 times[39m[2m · 181.41s total, 37% of tracked time[22m
+[2m            [22m [2mcreate it once per worker with [22m[33mpool: 'vmThreads'[39m[2m (keeps per-file isolation) or [22m[33misolate: false[39m[2m (shares it across files)[22m
+[2m            [22m [2mlearn more: https://vitest.dev/guide/improving-performance#test-environments[22m
+
+test_exit=1
+$ npm run build
+dist/index.html                   0.84 kB │ gzip:  0.52 kB
+dist/assets/index-DoSv5bVs.css   14.56 kB │ gzip:  3.58 kB
+dist/assets/index-CCGk2hmV.js   107.47 kB │ gzip: 37.73 kB
+
+✓ built in 2.06s
+build_exit=0
+$ node --check scripts/s4-g2-live.mjs
+s4g2live-ok
+$ node --check scripts/s4-g2-clock.mjs
+s4g2clock-ok

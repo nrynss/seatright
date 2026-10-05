@@ -1,0 +1,21 @@
+  ok destination prestate ready (different tenant)
+  ok stage-1 UI signed in
+  ok source committed 201 then response dropped
+  ok stage-2 receipt authentic (scalar+array, no modern fields)
+  ok uncertain shown, no confirmation/error
+  ok source export 200
+  ok destination rejects junk import first
+  ok destination import 204
+  ok destination replaced prestate tenant
+  ok retry forwarded exactly once
+  ok retry same key across upgrade
+  ok retry same body across upgrade
+  ok destination returned 200 original receipt
+  ok forwarded receipt EXACT original legacy JSON
+  ok original reference shown, uncertainty cleared
+  ok session survived upgrade (current-user present)
+  ok old session token works on destination via page fetch
+  ok destination lookup carries table_ids + singleton table_id
+  ok destination holds exactly one booking
+
+UPGRADE RESULT pass=19 fail=0

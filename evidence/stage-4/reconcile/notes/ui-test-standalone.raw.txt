@@ -1,0 +1,156 @@
+
+> tablekeeper-web@0.0.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.0.3 [39m[90m/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/staging/stage-4/web[39m
+
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+ [32m✓[39m src/test/booking.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 2038[2mms[22m[39m
+   [32m✓[39m live booking [2m(6)[22m
+     [33m[2m✓[22m[39m keeps the sent body when the party input changes and replays that same key[33m 368[2mms[22m[39m
+   [32m✓[39m live accessibility [2m(1)[22m
+     [33m[2m✓[22m[39m passes confirmed, uncertain, refused and lookup presentations[33m 1390[2mms[22m[39m
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+ [32m✓[39m src/test/live.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 534[2mms[22m[39m
+ [32m✓[39m src/test/a11y.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 3951[2mms[22m[39m
+   [32m✓[39m accessibility gate [2m(2)[22m
+     [33m[2m✓[22m[39m passes the search presentations in light and dark[33m 2986[2mms[22m[39m
+     [33m[2m✓[22m[39m passes signup, login and lookup in light and dark[33m 963[2mms[22m[39m
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+ [32m✓[39m src/test/combinations.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 4102[2mms[22m[39m
+   [32m✓[39m combined table screen [2m(7)[22m
+     [33m[2m✓[22m[39m offers declared pairs by label, ignores an unavailable pair, and posts the canonical set once[33m 493[2mms[22m[39m
+     [33m[2m✓[22m[39m passes pair confirmed, refused, uncertain and lookup through the contrast gate[33m 3274[2mms[22m[39m
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+ [32m✓[39m src/test/s3-g.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 702[2mms[22m[39m
+   [32m✓[39m policy-shaped responses on the existing screens [2m(8)[22m
+     [33m[2m✓[22m[39m offers a party of 8 the returned pair even when the original sum is 6[33m 390[2mms[22m[39m
+ [32m✓[39m src/test/s2-f.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 436[2mms[22m[39m
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+Not implemented: Window's scrollBy() method
+ [32m✓[39m src/test/s4-g.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 2337[2mms[22m[39m
+   [32m✓[39m applied repair and server clock on the existing screens [2m(10)[22m
+     [33m[2m✓[22m[39m mirrors returned closure membership on the floor and the grid[33m 355[2mms[22m[39m
+     [33m[2m✓[22m[39m passes repaired grid, confirmation and lookup through the contrast gate[33m 1615[2mms[22m[39m
+ [32m✓[39m src/test/dense-grid.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 792[2mms[22m[39m
+   [32m✓[39m dense availability grids [2m(2)[22m
+     [33m[2m✓[22m[39m renders every returned 5-minute slot[33m 602[2mms[22m[39m
+ [32m✓[39m src/test/foundation.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 54[2mms[22m[39m
+ [32m✓[39m src/test/screens.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 644[2mms[22m[39m
+   [32m✓[39m search floor and grid [2m(2)[22m
+     [33m[2m✓[22m[39m mirrors the preview fixture and keeps state ahead of motion[33m 441[2mms[22m[39m
+ [32m✓[39m src/test/login-copy.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 90[2mms[22m[39m
+ [32m✓[39m src/test/floor-label.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 112[2mms[22m[39m
+ [32m✓[39m src/test/pair-badge.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 96[2mms[22m[39m
+ [32m✓[39m src/test/search.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m src/test/selection-contrast.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m15 passed[39m[22m[90m (15)[39m
+[2m      Tests [22m [1m[32m100 passed[39m[22m[90m (100)[39m
+[2m   Start at [22m 20:33:58
+[2m   Duration [22m 38.34s[2m (tests 45%, environment 40%, transform 8%, import 6%, setup 1%)[22m
+
+[2mEnvironment [22m [33mjsdom was created 15 times[39m[2m · 14.29s total, 40% of tracked time[22m
+[2m            [22m [2mcreate it once per worker with [22m[33mpool: 'vmThreads'[39m[2m (keeps per-file isolation) or [22m[33misolate: false[39m[2m (shares it across files)[22m
+[2m            [22m [2mlearn more: https://vitest.dev/guide/improving-performance#test-environments[22m
+

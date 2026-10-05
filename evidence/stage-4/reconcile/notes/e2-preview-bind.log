@@ -1,0 +1,65 @@
+== E2 genuine capture 2026-10-05T20:37:56Z
+genuine bind exit=0
+genuine_exit=0
+== E2 corruption receipt-owner 2026-10-05T20:37:56Z
+import PRE -> 204
+import mutated POST (receipt-owner) -> 422
+Traceback (most recent call last):
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e2_preview_bind.py", line 208, in <module>
+    main()
+    ~~~~^^
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e2_preview_bind.py", line 196, in main
+    assert r2.status_code == 204, f"corruption not applied: {r2.status_code} {r2.text[:150]}"
+           ^^^^^^^^^^^^^^^^^^^^^
+AssertionError: corruption not applied: 422 {"error":{"code":"validation_failed","message":"invalid receipt"}}
+corrupt_receipt-owner_exit=1
+== E2 corruption receipt-canonical-body 2026-10-05T20:37:56Z
+import PRE -> 204
+import mutated POST (receipt-canonical-body) -> 204
+BIND-FAIL rcpt-body==canonical-request-string: {"from":"2027-06-17T18:00:00+02:00","table_id":"t_1","to":"2027-06-17T22:00:00+02:00"}
+BIND-FAIL rcpt-body-parses-to-request: 
+corrupt receipt-canonical-body bind exit=1 (nonzero required)
+corrupt_receipt-canonical-body_exit=1
+== E2 corruption receipt-raw-response 2026-10-05T20:37:57Z
+import PRE -> 204
+import mutated POST (receipt-raw-response) -> 422
+Traceback (most recent call last):
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e2_preview_bind.py", line 208, in <module>
+    main()
+    ~~~~^^
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e2_preview_bind.py", line 196, in main
+    assert r2.status_code == 204, f"corruption not applied: {r2.status_code} {r2.text[:150]}"
+           ^^^^^^^^^^^^^^^^^^^^^
+AssertionError: corruption not applied: 422 {"error":{"code":"validation_failed","message":"plan totals contradict original receipt"}}
+corrupt_receipt-raw-response_exit=1
+== E2 corruption plan-restaurant 2026-10-05T20:37:57Z
+import PRE -> 204
+import mutated POST (plan-restaurant) -> 422
+Traceback (most recent call last):
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e2_preview_bind.py", line 208, in <module>
+    main()
+    ~~~~^^
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e2_preview_bind.py", line 196, in main
+    assert r2.status_code == 204, f"corruption not applied: {r2.status_code} {r2.text[:150]}"
+           ^^^^^^^^^^^^^^^^^^^^^
+AssertionError: corruption not applied: 422 {"error":{"code":"validation_failed","message":"plan restaurant unknown"}}
+corrupt_plan-restaurant_exit=1
+E2-VERDICT: PASS
+== E2b ingestible-corruption attempts 2026-10-05T20:40:11Z
+genuine2 bind exit=0
+genuine2_exit=0
+== E2b corruption plan-restaurant-known
+import mutated POST (plan-restaurant-known) -> 422
+BIND-FAIL delta-namespaces==plans+receipts: []
+corrupt plan-restaurant-known applied=False bind exit=1 (nonzero required)
+corrupt_plan-restaurant-known_exit=1
+== E2b corruption receipt-raw-response-consistent
+import PRE -> 204
+import mutated POST (receipt-raw-response-consistent) -> 422
+corruption rejected at import boundary; destination byte-retained=True
+corrupt_receipt-raw-response-consistent_exit=1
+== E2b corruption receipt-owner-ghost
+import PRE -> 204
+import mutated POST (receipt-owner-ghost) -> 422
+corruption rejected at import boundary; destination byte-retained=True
+corrupt_receipt-owner-ghost_exit=1

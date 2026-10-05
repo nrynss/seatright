@@ -1,0 +1,11 @@
+RACE 2026-10-05T19:39:12Z CGO_ENABLED=1
+go: downloading github.com/nrynss/keel v0.5.0
+go: downloading golang.org/x/crypto v0.57.0
+?   	tablekeeper/cmd/tablekeeper	[no test files]
+ok  	tablekeeper/internal/clock	1.390s
+ok  	tablekeeper/internal/history	1.169s
+ok  	tablekeeper/internal/planner	9.490s
+ok  	tablekeeper/internal/policy	1.264s
+ok  	tablekeeper/internal/service	1078.529s
+?   	tablekeeper/probes/pclient	[no test files]
+race_exit=0

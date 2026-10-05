@@ -1,0 +1,16 @@
+GO GATES 2026-10-05T19:39:11Z go version go1.27.1 linux/amd64
+$ gofmt -l internal cmd probes/pclient
+gofmt_exit=0 (empty list = clean)
+$ go vet ./...
+vet_exit=0
+$ go test -count=1 -timeout 40m ./...
+?   	tablekeeper/cmd/tablekeeper	[no test files]
+ok  	tablekeeper/internal/clock	0.028s
+ok  	tablekeeper/internal/history	0.004s
+ok  	tablekeeper/internal/planner	1.731s
+ok  	tablekeeper/internal/policy	0.018s
+ok  	tablekeeper/internal/service	365.849s
+?   	tablekeeper/probes/pclient	[no test files]
+test_exit=0
+$ go build -o /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/notes/tablekeeper-bin ./cmd/tablekeeper
+build_exit=0

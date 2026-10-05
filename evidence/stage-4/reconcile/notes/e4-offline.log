@@ -1,0 +1,127 @@
+== E4 offline 2026-10-05T20:56:35Z
+precheck: container s4r1c-rc-off absent?
+precheck-absent-ok
+b2a78e2f72309dd020574b746ea605a21395ebc1207fc5bf5c62ac760e22c8f5
+0bb0019f2a6f7654c11abf38f0e117d1257af499800ab233fa4011be39ee7fc8
+-- service inspect (id/network/ports/caps):
+0bb0019f2a6f7654c11abf38f0e117d1257af499800ab233fa4011be39ee7fc8 s4r1-rc-internal ports=map[8080/tcp:<nil>] capadd=<no value>
+== offline hand world: caps 4/6/4, P party 8 pair [t_1,t_2], close t_1, repair [t_2,t_3]
+  ok hand-computed plan bind (moved 1, unused 2, rev3)
+    bind-fail moved: 1
+  ok FORCED-WRONG control: same binder expects moved 2 -> nonzero
+  ok apply: P repaired to [t_2,t_3] rev2 terms frozen (policy0 dur 90)
+  ok amend on SAME repaired P: 20:00, dated policy dur 60 adopted, rev3
+  ok history frozen prefix + appended changed entry
+  ok series bound: rev3, both occurrences at 20:00, no exceptions
+  FAIL counter bound: 5 writes (create,series,policy,apply,amend): {"error":{"code":"no_feasible_plan","message":"no feasible seating plan"}}
+== raw-byte replays after evolution
+  ok replay reservations key=[REDACTED] 200
+  ok replay series key=[REDACTED] 200
+  ok replay policies key=[REDACTED] 200
+  ok replay replans key=[REDACTED] 200
+  ok replay apply key=[REDACTED] 200
+  ok replay amend key=[REDACTED] 200
+  ok raw replay create byte-identical
+  ok raw replay series byte-identical
+  ok raw replay policy byte-identical
+  ok raw replay preview byte-identical
+  ok raw replay apply byte-identical
+  ok raw replay amend byte-identical
+  ok export byte-stable across all offline replays
+== assets fully typed from inside the offline network
+  FAIL / 200 text/html nonempty: 200 text/html; charset=utf-8
+  FAIL >=3 referenced assets: ['/assets/index-CCGk2hmV.js', '/assets/index-DoSv5bVs.css']
+  ok js /assets/index-CCGk2hmV.js 200 javascript nonempty
+  ok css /assets/index-DoSv5bVs.css 200 text/css nonempty
+  FAIL 5 distinct font bodies: 0 urls 0 hashes
+== egress really refused
+  ok egress fails with dial reason
+  dial reason: ConnectError: [Errno -3] Temporary failure in name resolution
+E4 offline: pass=22 fail=4
+probe_exit=1
+-- service stop/rm/absence:
+service-absent-ok
+== E4 end 2026-10-05T20:56:38Z
+== E4 offline r2 2026-10-05T20:57:21Z
+precheck-absent-ok
+svc=e3dafefe1da9cb148656a5c4dacbc2341ee4d6e5fcf41a498975b5877e3219a1 nets=s4r1-rc-internal ports=map[8080/tcp:<nil>]
+== offline hand world: caps 4/6/4, P party 8 pair [t_1,t_2], close t_1, repair [t_2,t_3]
+  ok hand-computed plan bind (moved 1, unused 2, rev3)
+    bind-fail moved: 1
+  ok FORCED-WRONG control: same binder expects moved 2 -> nonzero
+  ok apply: P repaired to [t_2,t_3] rev2 terms frozen (policy0 dur 90)
+  ok amend on SAME repaired P: 20:00, dated policy dur 60 adopted, rev3
+  ok history frozen prefix + appended changed entry
+  ok series bound: rev3, both occurrences at 20:00, no exceptions
+  ok counter bound: 5 writes (create,series,policy,apply,amend)
+== raw-byte replays after evolution
+  ok replay reservations key=[REDACTED] 200
+  ok replay series key=[REDACTED] 200
+  ok replay policies key=[REDACTED] 200
+  ok replay replans key=[REDACTED] 200
+  ok replay apply key=[REDACTED] 200
+  ok replay amend key=[REDACTED] 200
+  ok raw replay create byte-identical
+  ok raw replay series byte-identical
+  ok raw replay policy byte-identical
+  ok raw replay preview byte-identical
+  ok raw replay apply byte-identical
+  ok raw replay amend byte-identical
+  ok export byte-stable across all offline replays
+== assets fully typed from inside the offline network
+  ok / 200 text/html doctype nonempty
+  ok >=2 referenced assets (js+css)
+  ok js /assets/index-CCGk2hmV.js 200 javascript nonempty
+  ok css /assets/index-DoSv5bVs.css 200 text/css nonempty
+  FAIL 5 distinct font bodies: 0 urls 0 hashes
+== egress really refused
+  ok egress fails with dial reason
+  dial reason: ConnectError: [Errno -3] Temporary failure in name resolution
+E4 offline: pass=25 fail=1
+probe_exit=1
+service-absent-ok
+== E4 r2 end 2026-10-05T20:57:24Z
+== E4 offline r3 2026-10-05T20:58:18Z
+precheck-absent-ok
+svc=3363a38cf49883339caa63cecee87572fe7034aec8b6c77551702995bf945bd4 nets=s4r1-rc-internal ports=map[8080/tcp:<nil>]
+== offline hand world: caps 4/6/4, P party 8 pair [t_1,t_2], close t_1, repair [t_2,t_3]
+  ok hand-computed plan bind (moved 1, unused 2, rev3)
+    bind-fail moved: 1
+  ok FORCED-WRONG control: same binder expects moved 2 -> nonzero
+  ok apply: P repaired to [t_2,t_3] rev2 terms frozen (policy0 dur 90)
+  ok amend on SAME repaired P: 20:00, dated policy dur 60 adopted, rev3
+  ok history frozen prefix + appended changed entry
+  ok series bound: rev3, both occurrences at 20:00, no exceptions
+  ok counter bound: 5 writes (create,series,policy,apply,amend)
+== raw-byte replays after evolution
+  ok replay reservations key=[REDACTED] 200
+  ok replay series key=[REDACTED] 200
+  ok replay policies key=[REDACTED] 200
+  ok replay replans key=[REDACTED] 200
+  ok replay apply key=[REDACTED] 200
+  ok replay amend key=[REDACTED] 200
+  ok raw replay create byte-identical
+  ok raw replay series byte-identical
+  ok raw replay policy byte-identical
+  ok raw replay preview byte-identical
+  ok raw replay apply byte-identical
+  ok raw replay amend byte-identical
+  ok export byte-stable across all offline replays
+== assets fully typed from inside the offline network
+  ok / 200 text/html doctype nonempty
+  ok >=2 referenced assets (js+css)
+  ok js /assets/index-CCGk2hmV.js 200 javascript nonempty
+  ok css /assets/index-DoSv5bVs.css 200 text/css nonempty
+  ok font source-code-pro-latin-400-normal.woff2 200 font/woff2
+  ok font source-code-pro-latin-500-normal.woff2 200 font/woff2
+  ok font source-serif-4-latin-400-normal.woff2 200 font/woff2
+  ok font source-serif-4-latin-600-normal.woff2 200 font/woff2
+  ok font source-serif-4-latin-700-normal.woff2 200 font/woff2
+  ok 5 distinct font bodies
+== egress really refused
+  ok egress fails with dial reason
+  dial reason: ConnectError: [Errno -3] Temporary failure in name resolution
+E4 offline: pass=31 fail=0
+probe_exit=0
+service-absent-ok
+== E4 r3 end 2026-10-05T20:58:21Z

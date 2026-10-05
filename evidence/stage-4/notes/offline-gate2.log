@@ -1,0 +1,12 @@
+  ok series amend 201
+  ok page / 200
+  ok page /signup 200
+  ok page /login 200
+  ok page /lookup 200
+  ok font source-serif-4-latin-400-normal bytes=20089 sha256=add66430dddeddf4
+  ok font source-serif-4-latin-600-normal bytes=21533 sha256=efbf14c40ab3020c
+  ok font source-serif-4-latin-700-normal bytes=21717 sha256=22bafcb585ff0bca
+  ok font source-code-pro-latin-400-normal bytes=11657 sha256=9127c9816ea0b40d
+  ok font source-code-pro-latin-500-normal bytes=11605 sha256=c99091d1f7272a06
+  ok egress nonzero (dial)
+OFFLINE GATE RESULT pass=23 fail=0

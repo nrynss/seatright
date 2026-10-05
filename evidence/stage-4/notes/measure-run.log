@@ -1,0 +1,6 @@
+  info selected-pair ratio d-light: 7.611 fg=rgb(255, 248, 240) bg=rgb(140, 52, 24)
+  info selected-pair ratio d-dark: 9.915 fg=rgb(26, 18, 14) bg=rgb(240, 176, 136)
+  info selected-pair ratio p-light: 7.611 fg=rgb(255, 248, 240) bg=rgb(140, 52, 24)
+  info selected-pair ratio p-dark: 9.915 fg=rgb(26, 18, 14) bg=rgb(240, 176, 136)
+
+MEASURE RESULT pass=59 fail=0

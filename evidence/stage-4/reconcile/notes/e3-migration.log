@@ -1,0 +1,280 @@
+== E3 s1 2026-10-05T20:47:59Z argv: /home/agent/harness-venv/bin/python probes/e3_legacy.py s1 (CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile)
+== E3 phase s1 SRC=http://127.0.0.1:9621 DST=http://127.0.0.1:9622
+Traceback (most recent call last):
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e3_legacy.py", line 358, in <module>
+    fn()
+    ~~^^
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e3_legacy.py", line 97, in run_s1
+    bat = cap(SRC, "s1-batch", "POST", "/reservation-moves", tok=ta["token"], key=[REDACTED],
+              body={"moves": [{"reference": A["reference"], "table_id": "t_2"},
+                              {"reference": B["reference"], "table_id": "t_1", "party_size": 2}]})
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e3_legacy.py", line 48, in cap
+    assert r.status_code == expect, f"{name}: {r.status_code} {r.text[:200]}"
+           ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: s1-batch: 404 {"error":{"code":"not_found","message":"unknown reservation"}}
+== E3 s1 exit=0 2026-10-05T20:48:00Z
+== E3 s2 2026-10-05T20:48:00Z argv: /home/agent/harness-venv/bin/python probes/e3_legacy.py s2 (CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile)
+== E3 phase s2 SRC=http://127.0.0.1:9623 DST=http://127.0.0.1:9624
+  ok import source bytes 204
+  ok hash login preserved
+  ok source token survives
+  ok pair record full bind (no table_id, rev1, terms0)
+  ok single record full bind (table_id+table_ids)
+  ok mutation PATCH S party 2->4
+  ok current S differs from original receipt
+  ok replay s2-pair 200 raw-equal
+  ok replay s2-single 200 raw-equal
+  ok replay s2-batch 200 raw-equal
+  ok export byte-stable across all replays
+  ok malformed import 400
+  ok dest byte-identical after 400
+  ok wrong-version import 422
+  ok dest byte-identical after 422
+  ok reimport original bytes 204
+  FAIL reimport destination export byte-stable: 
+  ok old token dead after reset
+  ok namespaces empty after reset
+E3 s2: pass=18 fail=1
+== E3 s2 exit=0 2026-10-05T20:48:01Z
+== E3 s3 2026-10-05T20:48:01Z argv: /home/agent/harness-venv/bin/python probes/e3_legacy.py s3 (CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile)
+== E3 phase s3 SRC=http://127.0.0.1:9625 DST=http://127.0.0.1:9626
+Traceback (most recent call last):
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e3_legacy.py", line 358, in <module>
+    fn()
+    ~~^^
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e3_legacy.py", line 261, in run_s3
+    pol = cap(SRC, "s3-policy", "POST", "/restaurants/r_anker/policies", tok=tb_tok, key=[REDACTED],
+              body={"effective_from": "2027-06-01", "slot_minutes": 30,
+                    "reservation_duration_minutes": 60, "cancellation_cutoff_minutes": 60,
+                    "opening_hours": FX_CORE["opening_hours"],
+                    "capacities": {"t_1": 2, "t_2": 4, "t_3": 4}})
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e3_legacy.py", line 48, in cap
+    assert r.status_code == expect, f"{name}: {r.status_code} {r.text[:200]}"
+           ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: s3-policy: 403 {"error":{"code":"forbidden","message":"restaurant manager permission is required"}}
+== E3 s3 exit=0 2026-10-05T20:48:02Z
+== E3r s1 2026-10-05T20:49:33Z argv: /home/agent/harness-venv/bin/python probes/e3_legacy.py s1 (CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile)
+== E3 phase s1 SRC=http://127.0.0.1:9621 DST=http://127.0.0.1:9622
+  ok import source bytes 204
+  ok hash login preserved (Ada)
+  ok hash login preserved (Bob)
+  ok source token survives
+  ok A record full bind (table_ids+rev1+terms0)
+  ok B record full bind
+  ok decision rev1 terms0
+  FAIL legacy history created entry matches record: {"entries": [{"seq": 1, "at": "2026-10-05T20:49:33+00:00", "event": "created", "changes": [{"field": "table_id", "from": null, "to": "t_2"}, {"field": "starts_at_local", "from": null, "to": "2027-06-03T18:00"}, {"field": "party_size", "from": null, "to": 2}], "revision": 1, "accepted_terms": {"cance
+  ok mutation PATCH A party 2->1
+  ok current A differs from original receipt
+  ok replay s1-create-a 200 raw-equal
+  ok replay s1-create-b 200 raw-equal
+  ok replay s1-batch 200 raw-equal
+  ok export byte-stable across all replays
+  ok malformed import 400
+  ok dest byte-identical after 400
+  ok wrong-track import 422
+  ok dest byte-identical after 422
+  ok reimport original bytes 204
+  ok reimport destination export byte-stable (pristine)
+  ok old token dead after reset
+  ok login dead after reset
+  ok namespaces empty after reset
+E3 s1: pass=22 fail=1
+== E3r s1 exit=1 2026-10-05T20:49:34Z
+== E3r s2 2026-10-05T20:49:34Z argv: /home/agent/harness-venv/bin/python probes/e3_legacy.py s2 (CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile)
+== E3 phase s2 SRC=http://127.0.0.1:9623 DST=http://127.0.0.1:9624
+  ok import source bytes 204
+  ok hash login preserved
+  ok source token survives
+  ok pair record full bind (no table_id, rev1, terms0)
+  ok single record full bind (table_id+table_ids)
+  ok mutation PATCH S party 2->4
+  ok current S differs from original receipt
+  ok replay s2-pair 200 raw-equal
+  ok replay s2-single 200 raw-equal
+  ok replay s2-batch 200 raw-equal
+  ok export byte-stable across all replays
+  ok malformed import 400
+  ok dest byte-identical after 400
+  ok wrong-version import 422
+  ok dest byte-identical after 422
+  ok reimport original bytes 204
+  ok reimport destination export byte-stable (pristine)
+  ok old token dead after reset
+  ok namespaces empty after reset
+E3 s2: pass=19 fail=0
+== E3r s2 exit=0 2026-10-05T20:49:36Z
+== E3r s3 2026-10-05T20:49:36Z argv: /home/agent/harness-venv/bin/python probes/e3_legacy.py s3 (CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile)
+== E3 phase s3 SRC=http://127.0.0.1:9625 DST=http://127.0.0.1:9626
+  ok policy v1 published
+  ok Q under policy1 terms (dur 60)
+  ok series adopted rev1
+  ok occ1 real PATCH exception
+Traceback (most recent call last):
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e3_legacy.py", line 369, in <module>
+    fn()
+    ~~^^
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e3_legacy.py", line 289, in run_s3
+    bat = cap(SRC, "s3-batch", "POST", "/reservation-moves", tok=ta_tok, key=[REDACTED],
+              body={"moves": [{"reference": Q["reference"], "party_size": 1}]})
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e3_legacy.py", line 48, in cap
+    assert r.status_code == expect, f"{name}: {r.status_code} {r.text[:200]}"
+           ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: s3-batch: 404 {"error":{"code":"not_found","message":"unknown reservation"}}
+== E3r s3 exit=1 2026-10-05T20:49:37Z
+== E3r2 s1 2026-10-05T20:50:10Z
+== E3 phase s1 SRC=http://127.0.0.1:9621 DST=http://127.0.0.1:9622
+  ok import source bytes 204
+  ok hash login preserved (Ada)
+  ok hash login preserved (Bob)
+  ok source token survives
+  ok A record full bind (table_ids+rev1+terms0)
+  ok B record full bind
+  ok decision rev1 terms0
+  FAIL legacy history created entry matches record: {"entries": [{"seq": 1, "at": "2026-10-05T20:50:10+00:00", "event": "created", "changes": [{"field": "table_id", "from": null, "to": "t_2"}, {"field": "starts_at_local", "from": null, "to": "2027-06-03T18:00"}, {"field": "party_size", "from": null, "to": 2}], "revision": 1, "accepted_terms": {"cance
+  ok mutation PATCH A party 2->1
+  ok current A differs from original receipt
+  ok replay s1-create-a 200 raw-equal
+  ok replay s1-create-b 200 raw-equal
+  ok replay s1-batch 200 raw-equal
+  ok export byte-stable across all replays
+  ok malformed import 400
+  ok dest byte-identical after 400
+  ok wrong-track import 422
+  ok dest byte-identical after 422
+  ok reimport original bytes 204
+  ok reimport destination export byte-stable (pristine)
+  ok old token dead after reset
+  ok login dead after reset
+  ok namespaces empty after reset
+E3 s1: pass=22 fail=1
+== E3r2 s1 exit=1 2026-10-05T20:50:11Z
+== E3r2 s3 2026-10-05T20:50:11Z
+  ok occ1 real PATCH exception
+  ok ordinary cancel Q
+  ok import source bytes 204
+  ok hash login preserved
+  ok source token survives (list)
+  ok P modern record preserved exactly
+  ok Q modern record preserved exactly
+  ok occ1 modern record preserved exactly
+  ok hP history preserved exactly
+  ok hQ history preserved exactly
+  ok hocc1 history preserved exactly
+  ok decision preserved exactly
+  ok series preserved exactly (rev, exception, states)
+  ok occ1 cancelled? no: exception member still confirmed
+  ok mutation new booking N 201
+  ok replay s3-create-p 200 raw-equal
+  ok replay s3-policy 200 raw-equal
+  ok replay s3-create-q 200 raw-equal
+  ok replay s3-series 200 raw-equal
+  ok replay s3-batch 200 raw-equal
+  ok export byte-stable across all replays
+  ok malformed import 400
+  ok dest byte-identical after 400
+  ok missing-state import 422
+  ok dest byte-identical after 422
+  ok reimport original bytes 204
+  ok reimport destination export byte-stable (pristine)
+  ok old token dead after reset
+  ok namespaces empty after reset
+E3 s3: pass=32 fail=0
+== E3r2 s3 exit=0 2026-10-05T20:50:13Z
+== E3r3 s1 2026-10-05T20:50:30Z
+  ok reimport original bytes 204
+  ok reimport destination export byte-stable (pristine)
+  ok old token dead after reset
+  ok login dead after reset
+  ok namespaces empty after reset
+E3 s1: pass=23 fail=0
+E3r3 s1 exit=0
+== E3 modern 2026-10-05T20:52:46Z argv: /home/agent/harness-venv/bin/python probes/e3_modern.py (CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile)
+== source evolution on A
+  ok policy v1
+  ok zero-move preview on closed day
+Traceback (most recent call last):
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e3_modern.py", line 105, in <module>
+    rp = cap(A, "m-rprev", "POST", "/restaurants/r_anker/replans", tok=TM, key=[REDACTED],
+             body={"table_id": "t_3", "from": "2027-06-03T18:00:00+02:00", "to": "2027-06-03T23:00:00+02:00"})
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S4-R1/reconcile/probes/e3_modern.py", line 47, in cap
+    assert r.status_code == expect, f"{name}: {r.status_code} {r.text[:250]}"
+           ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: m-rprev: 409 {"error":{"code":"no_feasible_plan","message":"no feasible seating plan"}}
+== E3 modern exit=1 2026-10-05T20:52:47Z
+== E3 modern r2 2026-10-05T20:53:18Z
+== source evolution on A
+  ok policy v1
+  ok zero-move preview on closed day
+  FAIL repair preview: P-> unique [t_1,t_2], Q fixed: [{"changed": true, "reference": "NES223MD", "table_ids": ["t_1", "t_2"]}]
+  ok repair apply: P moved, series member
+  ok ordinary cancel R
+  ok amend: P 20:00 adopts dated policy dur 60, rev3
+  ok occ1 real PATCH exception
+  ok occ1 cancel after exception
+  FAIL batch applied: occ2 party 4 exception, Q on t_2 dur 60: {"reservations": [{"accepted_terms": {"cancellation_cutoff_minutes": 60, "capacities": {"t_1": 2, "t_2": 4, "t_3": 4}, "opening_hours": [{"closes": "23:00", "opens": "18:00", "weekday": "thu"}, {"closes": "23:30", "opens": "18:00", "weekday": "fri"}]
+  ok P current differs from original receipt (verified mutation of record)
+  final restaurant_revision observed via fresh preview: 12
+== import + full binding on B
+  ok import evolved source bytes 204
+  ok hash login preserved
+  ok source token survives
+  ok P current record exact
+  ok P history exact
+  ok P decision exact
+  ok Q current record exact
+  ok Q history exact
+  ok Q decision exact
+  ok R current record exact
+  ok R history exact
+  ok R decision exact
+  ok O1 current record exact
+  ok O1 history exact
+  ok O1 decision exact
+  ok O2 current record exact
+  ok O2 history exact
+  ok O2 decision exact
+  ok series exact after evolution
+  ok occ1 cancelled status bound exactly (no vacuous truth)
+  FAIL occ1 reservation revision 3 with cancelled metadata: 4
+  ok occ2 exception party 4 confirmed
+  ok occ0 (P) repaired not exception
+  ok P reassigned history carries plan_id (exact lists)
+  ok restaurant revision counter bound exactly
+  ok imported stale plan still stale: 409
+  ok VERIFIED real mutation on B (S party 1, B1 write over evolved zero-move closure)
+  ok B diverged from pristine after mutation
+== receipts replay on B (all classes, raw-equal)
+  ok replay m-create-p 200 raw-equal
+  ok replay m-create-q 200 raw-equal
+  ok replay m-create-r 200 raw-equal
+  ok replay m-series 200 raw-equal
+  ok replay m-policy 200 raw-equal
+  ok replay m-zprev 200 raw-equal
+  ok replay m-zapply 200 raw-equal
+  ok replay m-rprev 200 raw-equal
+  ok replay m-rapply 200 raw-equal
+  ok replay m-sprev 200 raw-equal
+  ok replay m-amend 200 raw-equal
+  ok replay m-batch 200 raw-equal
+  ok replay m-final 200 raw-equal
+  ok export byte-stable across ALL replays
+  ok malformed import 400
+  ok dest byte-identical after 400
+  ok wrong-version import 422
+  ok dest byte-identical after 422
+  ok reimport original bytes 204
+  ok reimport destination export byte-stable (pristine)
+  ok old token dead after reset
+  ok namespaces empty after reset
+E3 modern: pass=57 fail=3
+== E3 modern r2 exit=1 2026-10-05T20:53:21Z
+== E3 modern r3 2026-10-05T20:54:00Z
+  ok dest byte-identical after 400
+  ok wrong-version import 422
+  ok dest byte-identical after 422
+  ok reimport original bytes 204
+  ok reimport destination export byte-stable (pristine)
+  ok old token dead after reset
+  ok namespaces empty after reset
+E3 modern: pass=60 fail=0
+== E3 modern r3 exit=0 2026-10-05T20:54:03Z
