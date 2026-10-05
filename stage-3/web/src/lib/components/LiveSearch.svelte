@@ -36,7 +36,15 @@
     type RestaurantSummary,
     type SearchQuery,
   } from '../search';
-  import { canonicalTableIds, copyIds, listedPairAvailable, pairKey, sameIds, sameMembers } from '../seating';
+  import {
+    canonicalTableIds,
+    copyIds,
+    explicitPairCapacity,
+    listedPairAvailable,
+    pairKey,
+    sameIds,
+    sameMembers,
+  } from '../seating';
   import { liveTransport, type Transport } from '../transport';
 
   let {
@@ -158,16 +166,18 @@
   );
   const gridPairs = $derived.by(() => {
     const detail = result?.detail;
-    if (!detail) return [];
+    if (!detail || !result) return [];
+    const slots = result.availability.slots;
     return detail.combinable.flatMap((ids) => {
       const members = ids.map((id) => detail.tables.find((table) => table.id === id));
       if (members.some((table) => !table)) return [];
       const tables = members.filter((table): table is (typeof detail.tables)[number] => table != null);
+      const fallback = tables.reduce((sum, table) => sum + table.capacity, 0);
       return [
         {
           ids: copyIds(ids),
           labels: tables.map((table) => table.label),
-          capacity: tables.reduce((sum, table) => sum + table.capacity, 0),
+          capacity: explicitPairCapacity(slots, ids, fallback),
         },
       ];
     });
