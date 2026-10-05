@@ -147,6 +147,9 @@ func (s *Service) restaurantRoute(r *http.Request, path string) Result {
 	if len(parts) == 2 && parts[1] == "replans" && parts[0] != "" && r.Method == http.MethodPost {
 		return s.PreviewReplan(bearerTokenString(r), parts[0], r.Header.Get("Idempotency-Key"), readBody(r))
 	}
+	if len(parts) == 4 && parts[1] == "replans" && parts[0] != "" && parts[2] != "" && parts[3] == "apply" && r.Method == http.MethodPost {
+		return s.ApplyReplan(bearerTokenString(r), parts[0], parts[2], r.Header.Get("Idempotency-Key"), readBody(r))
+	}
 	return notFound("unknown path")
 }
 

@@ -177,7 +177,10 @@ func bookingSlot(obj map[string]any, rules clock.Rules) (clock.Slot, *codedError
 // conflictingReservation reports whether any member of the candidate's table
 // set overlaps a confirmed reservation on the same restaurant, ignoring the
 // references in exclude (the candidate itself for amendments, or a whole
-// batch for moves).
+// batch for moves). Applied table closures also conflict: any option member
+// overlapping a stored closure interval in the half-open absolute sense
+// rejects the candidate. The exclude map skips reservations only; closures
+// are never excluded.
 func conflictingReservation(st *State, candidate Reservation, exclude map[string]bool) bool {
 	cStart, err := parseStoredInstant(candidate.StartsAt)
 	if err != nil {
@@ -188,6 +191,9 @@ func conflictingReservation(st *State, candidate Reservation, exclude map[string
 		return false
 	}
 	candidateTables := reservationTableIDs(candidate)
+	if closureBlocks(st, candidate.RestaurantID, candidateTables, cStart, cEnd) {
+		return true
+	}
 	for ref, r := range st.Reservations {
 		if exclude[ref] {
 			continue

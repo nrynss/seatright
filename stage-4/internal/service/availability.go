@@ -65,6 +65,7 @@ func (s *Service) Availability(q url.Values) Result {
 		return validationFailed("invalid availability request")
 	}
 	confirmed := confirmedOccupancy(&s.state, restaurantID)
+	confirmed = append(confirmed, closureOccupancy(&s.state, restaurantID)...)
 	rendered := make([]any, 0, len(slots))
 	for _, slot := range slots {
 		options := eligibleOptions(restaurant, terms, confirmed, party, slot.Start, slot.End)
@@ -129,6 +130,27 @@ func confirmedOccupancy(st *State, restaurantID string) []occupancy {
 			continue
 		}
 		out = append(out, occupancy{tables: reservationTableIDs(r), start: s, end: e})
+	}
+	return out
+}
+
+// closureOccupancy renders applied closures as occupancy entries so both
+// availability options and explanations treat a closed member as
+// conflicting: the closed single and every declared pair containing it are
+// excluded on overlap, with half-open adjacency free. A single-member entry
+// suffices because member intersection already covers pairs.
+func closureOccupancy(st *State, restaurantID string) []occupancy {
+	var out []occupancy
+	for _, c := range st.Closures[restaurantID] {
+		from, err := time.Parse(time.RFC3339, c.From)
+		if err != nil {
+			continue
+		}
+		to, err := time.Parse(time.RFC3339, c.To)
+		if err != nil {
+			continue
+		}
+		out = append(out, occupancy{tables: []string{c.TableID}, start: from, end: to})
 	}
 	return out
 }
