@@ -324,6 +324,131 @@ export function pairCaptionWidth(caption: string): number {
   return Math.ceil(width + 6);
 }
 
+/** Width of plate or caption ink at a chosen size. Advances are the 13px measurement, without badge padding. */
+export function plateInkWidth(text: string, fontSize: number): number {
+  let width = 0;
+  for (const ch of text) width += advanceOf(ch);
+  return (width * fontSize) / 13;
+}
+
+const PLATE_MIN_FONT = 11;
+const CAPTION_MAX_FONT = 16;
+const CAPTION_MIN_FONT = 11;
+const LINE_EM = 1.15;
+const PLATE_INSET = 4;
+const CAPTION_MAX_HEIGHT = 40;
+const TABLE_LIFT = 1.06;
+
+export interface FittedText {
+  fontSize: number;
+  lineHeight: number;
+  lines: string[];
+}
+
+function wordsOf(text: string): string[] {
+  const trimmed = text.trim();
+  return trimmed ? trimmed.split(/\s+/) : [];
+}
+
+function fontSteps(maxFont: number, minFont: number): number[] {
+  const steps: number[] = [];
+  const top = Math.round(maxFont * 100) / 100;
+  steps.push(top);
+  for (let size = Math.floor(top * 2) / 2; size >= minFont - 0.001; size = Math.round((size - 0.5) * 100) / 100) {
+    const next = Math.round(Math.max(minFont, size) * 100) / 100;
+    if (next < top - 0.001 && next !== steps[steps.length - 1]) steps.push(next);
+  }
+  if (steps[steps.length - 1] > minFont + 0.001) steps.push(minFont);
+  return steps;
+}
+
+function wrapToWidth(text: string, fontSize: number, maxWidth: number): string[] | null {
+  const words = wordsOf(text);
+  if (words.length === 0) return [''];
+  const lines: string[] = [];
+  let current = '';
+  for (const word of words) {
+    if (plateInkWidth(word, fontSize) > maxWidth) return null;
+    const next = current ? `${current} ${word}` : word;
+    if (current && plateInkWidth(next, fontSize) > maxWidth) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = next;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+interface TextLimit {
+  maxHeight: number;
+  maxWidth: (halfHeight: number) => number;
+}
+
+function fitText(text: string, maxFont: number, minFont: number, limit: TextLimit): FittedText {
+  const wordCount = Math.max(1, wordsOf(text).length);
+  for (const size of fontSteps(maxFont, minFont)) {
+    const lineHeight = Math.round(size * LINE_EM * 100) / 100;
+    for (let count = 1; count <= wordCount; count += 1) {
+      const height = count * lineHeight;
+      if (height > limit.maxHeight + 0.01) break;
+      const maxWidth = limit.maxWidth(height / 2);
+      if (maxWidth <= 0) break;
+      const lines = wrapToWidth(text, size, maxWidth);
+      if (lines && lines.length <= count) return { fontSize: size, lineHeight, lines };
+    }
+  }
+  const lineHeight = Math.round(minFont * LINE_EM * 100) / 100;
+  const words = wordsOf(text);
+  return { fontSize: minFont, lineHeight, lines: words.length > 0 ? words : [''] };
+}
+
+function plateLimit(drawing: TableDrawing): TextLimit {
+  if (drawing.kind === 'round') {
+    const radius = Math.max(8, drawing.radius - PLATE_INSET);
+    return {
+      maxHeight: radius * 2,
+      maxWidth: (halfHeight: number) => {
+        const inner = radius * radius - halfHeight * halfHeight;
+        return inner <= 0 ? 0 : 2 * Math.sqrt(inner);
+      },
+    };
+  }
+  const width = drawing.rect?.w ?? drawing.size;
+  const height = drawing.rect?.h ?? drawing.size;
+  return {
+    maxHeight: Math.max(8, height - PLATE_INSET * 2),
+    maxWidth: () => Math.max(8, width - PLATE_INSET * 2),
+  };
+}
+
+/** Lines that keep a table's own name inside its capacity-sized top. */
+export function plateLayout(label: string, drawing: TableDrawing): FittedText {
+  return fitText(label, drawing.labelSize, PLATE_MIN_FONT, plateLimit(drawing));
+}
+
+/** Lines for the caption under a table. The full "Table …" phrase stays inside that table's width. */
+export function captionLayout(label: string, drawing: TableDrawing): FittedText {
+  const maxWidth = Math.max(12, drawing.size - 8);
+  return fitText(`Table ${label}`, CAPTION_MAX_FONT, CAPTION_MIN_FONT, {
+    maxHeight: CAPTION_MAX_HEIGHT,
+    maxWidth: () => maxWidth,
+  });
+}
+
+function plateLineBox(table: PlacedTable, line: string, index: number, plate: FittedText): RoomRect {
+  const width = Math.max(1, plateInkWidth(line, plate.fontSize));
+  const centerY = table.drawing.cy + (index - (plate.lines.length - 1) / 2) * plate.lineHeight;
+  return textBand(table.x + table.drawing.cx, table.y + centerY - plate.lineHeight / 2, width, plate.lineHeight);
+}
+
+function captionLineBox(table: PlacedTable, line: string, index: number, caption: FittedText): RoomRect {
+  const width = Math.max(1, plateInkWidth(line, caption.fontSize));
+  const top = table.y + table.drawing.size + 6 + index * caption.lineHeight;
+  return textBand(table.x + table.drawing.cx, top, width, caption.lineHeight);
+}
+
 export interface PairBadgeBox {
   x: number;
   y: number;
@@ -381,14 +506,123 @@ function tableObstacles(table: PlacedTable): RoomRect[] {
       h: seat.r * 2,
     });
   }
-  const plateW = pairCaptionWidth(table.label) * (drawing.labelSize / 13);
-  const plateH = PAIR_INK_H * (drawing.labelSize / 13);
-  boxes.push(textBand(table.x + drawing.cx, table.y + drawing.cy - plateH / 2, plateW, plateH));
-  const name = `Table ${table.label}`;
-  const nameW = pairCaptionWidth(name) * (16 / 13);
-  const nameH = PAIR_INK_H * (16 / 13);
-  boxes.push(textBand(table.x + drawing.cx, table.y + drawing.size + 6, nameW, nameH));
-  return boxes;
+  const plate = plateLayout(table.label, drawing);
+  plate.lines.forEach((line, index) => {
+    boxes.push(plateLineBox(table, line, index, plate));
+  });
+  const caption = captionLayout(table.label, drawing);
+  caption.lines.forEach((line, index) => {
+    boxes.push(captionLineBox(table, line, index, caption));
+  });
+  const cx = table.x + drawing.size / 2;
+  const cy = table.y + drawing.size / 2;
+  return boxes.map((box) => liftAround(box, cx, cy));
+}
+
+function liftAround(box: RoomRect, cx: number, cy: number): RoomRect {
+  const left = cx + (box.x - cx) * TABLE_LIFT;
+  const top = cy + (box.y - cy) * TABLE_LIFT;
+  const right = cx + (box.x + box.w - cx) * TABLE_LIFT;
+  const bottom = cy + (box.y + box.h - cy) * TABLE_LIFT;
+  return { x: left, y: top, w: right - left, h: bottom - top };
+}
+
+function boxInsideCircle(box: RoomRect, cx: number, cy: number, radius: number): boolean {
+  const corners = [
+    [box.x, box.y],
+    [box.x + box.w, box.y],
+    [box.x, box.y + box.h],
+    [box.x + box.w, box.y + box.h],
+  ];
+  return corners.every(([x, y]) => Math.hypot(x - cx, y - cy) <= radius - 1);
+}
+
+function boxInsideRect(box: RoomRect, rect: RoomRect, inset: number): boolean {
+  return box.x >= rect.x + inset
+    && box.y >= rect.y + inset
+    && box.x + box.w <= rect.x + rect.w - inset
+    && box.y + box.h <= rect.y + rect.h - inset;
+}
+
+/** Null when every plate stays on its own top and no caption crosses another table, seat or name. */
+export function labelCollision(scene: RoomScene): string | null {
+  const marks = scene.tables.flatMap((table) => {
+    const plate = plateLayout(table.label, table.drawing);
+    const caption = captionLayout(table.label, table.drawing);
+    return [
+      ...plate.lines.map((line, index) => ({
+        id: table.id,
+        kind: 'plate' as const,
+        box: plateLineBox(table, line, index, plate),
+      })),
+      ...caption.lines.map((line, index) => ({
+        id: table.id,
+        kind: 'caption' as const,
+        box: captionLineBox(table, line, index, caption),
+      })),
+    ];
+  });
+  for (const mark of marks) {
+    if (mark.box.x < 4 || mark.box.y < 4 || mark.box.x + mark.box.w > scene.width - 4 || mark.box.y + mark.box.h > scene.height - 4) {
+      return `${mark.id} ${mark.kind} leaves the room`;
+    }
+  }
+  for (const table of scene.tables) {
+    const drawing = table.drawing;
+    for (const mark of marks) {
+      if (mark.id !== table.id || mark.kind !== 'plate') continue;
+      if (drawing.kind === 'round') {
+        const cx = table.x + drawing.cx;
+        const cy = table.y + drawing.cy;
+        if (!boxInsideCircle(mark.box, cx, cy, drawing.radius)) return `${table.id} plate leaves its top`;
+      } else if (drawing.rect) {
+        const rect = {
+          x: table.x + drawing.rect.x,
+          y: table.y + drawing.rect.y,
+          w: drawing.rect.w,
+          h: drawing.rect.h,
+        };
+        if (!boxInsideRect(mark.box, rect, 1)) return `${table.id} plate leaves its top`;
+      }
+    }
+    const top = drawing.kind === 'round'
+      ? {
+        x: table.x + drawing.cx - drawing.radius,
+        y: table.y + drawing.cy - drawing.radius,
+        w: drawing.radius * 2,
+        h: drawing.radius * 2,
+      }
+      : drawing.rect
+        ? {
+          x: table.x + drawing.rect.x,
+          y: table.y + drawing.rect.y,
+          w: drawing.rect.w,
+          h: drawing.rect.h,
+        }
+        : null;
+    const seats = drawing.seats.map((seat) => ({
+      x: table.x + seat.x - seat.r,
+      y: table.y + seat.y - seat.r,
+      w: seat.r * 2,
+      h: seat.r * 2,
+    }));
+    for (const mark of marks) {
+      if (mark.id === table.id && mark.kind === 'plate') continue;
+      if (top && overlaps(mark.box, top)) return `${mark.id} ${mark.kind} meets ${table.id}`;
+      for (const seat of seats) {
+        if (overlaps(mark.box, seat)) return `${mark.id} ${mark.kind} meets a seat of ${table.id}`;
+      }
+    }
+  }
+  for (let index = 0; index < marks.length; index += 1) {
+    for (let other = index + 1; other < marks.length; other += 1) {
+      if (marks[index].id === marks[other].id) continue;
+      if (overlaps(marks[index].box, marks[other].box)) {
+        return `${marks[index].id} ${marks[index].kind} meets ${marks[other].id} ${marks[other].kind}`;
+      }
+    }
+  }
+  return null;
 }
 
 function roomObstacles(scene: RoomScene): RoomRect[] {
