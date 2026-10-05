@@ -11,12 +11,11 @@ import (
 
 // This file implements the reservation write core: creation, amendment
 // preparation, overlap detection, cancellation, lookup and list. All helpers
-// operate on a passed *State and never lock the Service, so a future
-// idempotency wrapper can execute them against a cloned working state and
-// commit atomically. HTTP entry points that lock are named
-// ListReservations/GetReservation/CancelReservation/PatchReservation; the
-// creation callback createReservationLocked is bound to POST /reservations by
-// S1-D2 after the receipt wrapper integrates.
+// operate on a passed *State and never lock the Service, so the idempotency
+// wrapper executes them against a cloned working state and commits
+// atomically. Table selection (single legacy table_id or stage-2 table_ids)
+// resolves through the exact M helpers in seating.go; occupancy compares
+// canonical table sets, so every occupied member of a pair conflicts.
 
 // timestampLayout renders RFC 3339 with an always-numeric offset: UTC reads
 // +00:00, never a bare Z.
@@ -48,11 +47,13 @@ func rulesFor(r *Restaurant) clock.Rules {
 }
 
 // validatedBooking is the common validated outcome of create and amendment
-// field checks: the restaurant, the table, the party size and the resolved
-// slot. Occupancy is checked separately by the caller.
+// field checks: the restaurant, the canonical table set, the summed capacity,
+// the party size and the resolved slot. Occupancy is checked separately by
+// the caller.
 type validatedBooking struct {
 	restaurant *Restaurant
-	table      *Table
+	tableIDs   []string
+	capacity   int
 	party      int
 	slot       clock.Slot
 }
@@ -73,34 +74,63 @@ func partySize(obj map[string]any) (int, *codedError) {
 	return n, nil
 }
 
-// bookingTarget resolves restaurant_id and table_id: missing fields are 422,
-// wrong JSON types are 400, and unknown restaurants, unknown tables or tables
-// of another restaurant are 404.
-func bookingTarget(st *State, obj map[string]any) (*Restaurant, *Table, *codedError) {
+// bookingRestaurant resolves restaurant_id: a missing field is 422, a wrong
+// JSON type is 400, and an unknown restaurant is 404.
+func bookingRestaurant(st *State, obj map[string]any) (*Restaurant, *codedError) {
 	restaurantID, present, wrongType := fieldString(obj, "restaurant_id")
 	if wrongType {
-		return nil, nil, malformedErr()
+		return nil, malformedErr()
 	}
 	if !present {
-		return nil, nil, invalidErr("restaurant_id is required")
-	}
-	tableID, present, wrongType := fieldString(obj, "table_id")
-	if wrongType {
-		return nil, nil, malformedErr()
-	}
-	if !present {
-		return nil, nil, invalidErr("table_id is required")
+		return nil, invalidErr("restaurant_id is required")
 	}
 	restaurant := restaurantByID(st, restaurantID)
 	if restaurant == nil {
-		return nil, nil, &codedError{status: 404, code: "not_found", msg: "unknown restaurant"}
+		return nil, &codedError{status: 404, code: "not_found", msg: "unknown restaurant"}
 	}
-	for i := range restaurant.Tables {
-		if restaurant.Tables[i].ID == tableID {
-			return restaurant, &restaurant.Tables[i], nil
-		}
+	return restaurant, nil
+}
+
+// summedCapacity totals the fixture capacities of a validated table set.
+func summedCapacity(restaurant *Restaurant, ids []string) int {
+	caps := map[string]int{}
+	for _, t := range restaurant.Tables {
+		caps[t.ID] = t.Capacity
 	}
-	return nil, nil, &codedError{status: 404, code: "not_found", msg: "unknown table"}
+	total := 0
+	for _, id := range ids {
+		total += caps[id]
+	}
+	return total
+}
+
+// validateBookingFields runs the identical field validation for create and
+// amendment: restaurant, canonical table selection, time, party size and
+// summed capacity. It performs no occupancy check and no mutation.
+func validateBookingFields(st *State, obj map[string]any) (validatedBooking, *codedError) {
+	var out validatedBooking
+	restaurant, cerr := bookingRestaurant(st, obj)
+	if cerr != nil {
+		return out, cerr
+	}
+	ids, cerr := parseTableSelection(restaurant, obj, nil)
+	if cerr != nil {
+		return out, cerr
+	}
+	slot, cerr := bookingSlot(obj, rulesFor(restaurant))
+	if cerr != nil {
+		return out, cerr
+	}
+	party, cerr := partySize(obj)
+	if cerr != nil {
+		return out, cerr
+	}
+	if capacity := summedCapacity(restaurant, ids); party > capacity {
+		return out, &codedError{status: 422, code: "party_exceeds_capacity", msg: "party exceeds capacity"}
+	} else {
+		out = validatedBooking{restaurant: restaurant, tableIDs: ids, capacity: capacity, party: party, slot: slot}
+	}
+	return out, nil
 }
 
 // bookingSlot resolves starts_at_local: a missing field is 422, a wrong JSON
@@ -124,33 +154,10 @@ func bookingSlot(obj map[string]any, rules clock.Rules) (clock.Slot, *codedError
 	return slot, nil
 }
 
-// validateBookingFields runs the identical field validation for create and
-// amendment: target, time, party size and capacity. It performs no occupancy
-// check and no mutation.
-func validateBookingFields(st *State, obj map[string]any) (validatedBooking, *codedError) {
-	var out validatedBooking
-	restaurant, table, cerr := bookingTarget(st, obj)
-	if cerr != nil {
-		return out, cerr
-	}
-	slot, cerr := bookingSlot(obj, rulesFor(restaurant))
-	if cerr != nil {
-		return out, cerr
-	}
-	party, cerr := partySize(obj)
-	if cerr != nil {
-		return out, cerr
-	}
-	if party > table.Capacity {
-		return out, &codedError{status: 422, code: "party_exceeds_capacity", msg: "party exceeds table capacity"}
-	}
-	out = validatedBooking{restaurant: restaurant, table: table, party: party, slot: slot}
-	return out, nil
-}
-
-// conflictingReservation reports whether candidate overlaps a confirmed
-// reservation on the same restaurant and table, ignoring the references in
-// exclude (the candidate itself for amendments, or a whole batch for moves).
+// conflictingReservation reports whether any member of the candidate's table
+// set overlaps a confirmed reservation on the same restaurant, ignoring the
+// references in exclude (the candidate itself for amendments, or a whole
+// batch for moves).
 func conflictingReservation(st *State, candidate Reservation, exclude map[string]bool) bool {
 	cStart, err := parseStoredInstant(candidate.StartsAt)
 	if err != nil {
@@ -160,6 +167,7 @@ func conflictingReservation(st *State, candidate Reservation, exclude map[string
 	if err != nil {
 		return false
 	}
+	candidateTables := reservationTableIDs(candidate)
 	for ref, r := range st.Reservations {
 		if exclude[ref] {
 			continue
@@ -167,7 +175,10 @@ func conflictingReservation(st *State, candidate Reservation, exclude map[string
 		if r.Status != StatusConfirmed {
 			continue
 		}
-		if r.RestaurantID != candidate.RestaurantID || r.TableID != candidate.TableID {
+		if r.RestaurantID != candidate.RestaurantID {
+			continue
+		}
+		if !tableSetsIntersect(candidateTables, reservationTableIDs(r)) {
 			continue
 		}
 		s, err := parseStoredInstant(r.StartsAt)
@@ -207,9 +218,10 @@ func newReference(st *State) (string, *codedError) {
 	return "", &codedError{status: 500, code: "internal", msg: "internal error"}
 }
 
-// createReservationLocked validates obj, checks occupancy and stores a new
-// confirmed reservation in st. It locks nothing itself; callers hold the
-// state lock (or operate on a clone for atomic wrappers).
+// createReservationLocked validates obj, checks occupancy on every selected
+// table member and stores a new confirmed reservation in st. It locks nothing
+// itself; callers hold the state lock (or operate on a clone for atomic
+// wrappers).
 func (s *Service) createReservationLocked(st *State, userID string, obj map[string]any) Result {
 	vb, cerr := validateBookingFields(st, obj)
 	if cerr != nil {
@@ -230,8 +242,6 @@ func (s *Service) createReservationLocked(st *State, userID string, obj map[stri
 		Reference:     reference,
 		UserID:        userID,
 		RestaurantID:  vb.restaurant.ID,
-		TableID:       vb.table.ID,
-		TableIDs:      []string{vb.table.ID},
 		PartySize:     vb.party,
 		Status:        StatusConfirmed,
 		StartsAtLocal: vb.slot.Local,
@@ -239,6 +249,7 @@ func (s *Service) createReservationLocked(st *State, userID string, obj map[stri
 		EndsAt:        formatTimestamp(end),
 		CreatedAt:     formatTimestamp(time.Now().UTC()),
 	}
+	setReservationTables(&candidate, vb.tableIDs)
 	if conflictingReservation(st, candidate, nil) {
 		return conflict("table_unavailable", "the table is taken for that interval")
 	}
@@ -246,11 +257,40 @@ func (s *Service) createReservationLocked(st *State, userID string, obj map[stri
 	return created(candidate.Public())
 }
 
+// amendmentTables builds the effective table-selection fields for validation:
+// changed table_id/table_ids replace the current set (both at once is the
+// caller's 422), otherwise the current set is retained in a single format so
+// no merged body ever introduces both formats by accident. Retained sets use
+// the decoded-JSON shape ([]any of strings), exactly as a request body would
+// carry them, so strict external type validation is unaffected.
+func amendmentTables(current []string, changes map[string]any) map[string]any {
+	fields := map[string]any{}
+	if raw, ok := changes["table_id"]; ok {
+		fields["table_id"] = raw
+	}
+	if raw, ok := changes["table_ids"]; ok {
+		fields["table_ids"] = raw
+	}
+	if len(fields) == 0 {
+		if len(current) == 1 {
+			fields["table_id"] = current[0]
+		} else {
+			retained := make([]any, 0, len(current))
+			for _, id := range current {
+				retained = append(retained, id)
+			}
+			fields["table_ids"] = retained
+		}
+	}
+	return fields
+}
+
 // prepareAmendment validates a PATCH-style change set against the current
 // record: cancelled bookings and passed cutoffs are rejected before changed
 // fields are examined. It returns the fully prepared record with preserved
 // identity, owner and creation time, without any occupancy check or mutation.
-// A no-op change set returns the current values unchanged, but only for an
+// A no-op change set (including a merely reversed pair, which names the same
+// canonical set) returns the current values unchanged, but only for an
 // editable (confirmed, within-cutoff) booking.
 func prepareAmendment(st *State, current Reservation, changes map[string]any) (Reservation, *codedError) {
 	if current.Status == StatusCancelled {
@@ -269,23 +309,26 @@ func prepareAmendment(st *State, current Reservation, changes map[string]any) (R
 	}
 	merged := map[string]any{
 		"restaurant_id":   current.RestaurantID,
-		"table_id":        current.TableID,
 		"starts_at_local": current.StartsAtLocal,
 		// Stored party sizes are Go ints; validation consumes decoded JSON,
 		// so convert to float64 exactly as a request body would carry it.
 		"party_size": float64(current.PartySize),
 	}
-	for _, field := range []string{"table_id", "starts_at_local", "party_size"} {
-		if raw, ok := changes[field]; ok {
-			merged[field] = raw
-		}
+	for field, raw := range amendmentTables(reservationTableIDs(current), changes) {
+		merged[field] = raw
+	}
+	if raw, ok := changes["starts_at_local"]; ok {
+		merged["starts_at_local"] = raw
+	}
+	if raw, ok := changes["party_size"]; ok {
+		merged["party_size"] = raw
 	}
 	vb, cerr := validateBookingFields(st, merged)
 	if cerr != nil {
 		return Reservation{}, cerr
 	}
 	prepared := current
-	setReservationTables(&prepared, []string{vb.table.ID})
+	setReservationTables(&prepared, vb.tableIDs)
 	prepared.PartySize = vb.party
 	prepared.StartsAtLocal = vb.slot.Local
 	prepared.StartsAt = formatTimestamp(vb.slot.Start)
@@ -377,8 +420,9 @@ func (s *Service) GetReservation(token, reference string) Result {
 	return okResult(r.Public())
 }
 
-// CancelReservation cancels a booking, freeing its occupancy immediately.
-// Cancelling an already-cancelled booking returns its current state.
+// CancelReservation cancels a booking, freeing every table in its set
+// immediately. Cancelling an already-cancelled booking returns its current
+// state.
 func (s *Service) CancelReservation(token, reference string) Result {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -409,7 +453,7 @@ func (s *Service) CancelReservation(token, reference string) Result {
 	return okResult(r.Public())
 }
 
-// PatchReservation amends time, table or party size atomically: prepare,
+// PatchReservation amends time, tables or party size atomically: prepare,
 // final occupancy validation and commit happen under one lock. Failures leave
 // the original record and its occupancy unchanged.
 func (s *Service) PatchReservation(token, reference string, raw []byte) Result {
