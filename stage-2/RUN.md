@@ -163,9 +163,27 @@ probe: inherited stage-1 behavior plus combined-table options, occupancy,
 amendments, moves, idempotency, concurrency and same-image export/import
 roundtrips. `probes/stage2-donor.sh <stage-1-base-url> <private-work-dir>`
 builds an upgrade donor, but only against an accepted **stage-1** image — it
-produces a stage-1 export plus manifest for later migration work, not a
-stage-2 claim. `stage1-api.sh`, `stage1-html.sh` and `stage1-export.sh`
-remain for inherited single-table compatibility scope; they are not full
-stage-2 coverage. Final upgrade probing (`stage2-import.sh`) is pending and
-not present: do not treat the same-image API roundtrip inside `stage2-api.sh`
-as a cross-version upgrade proof.
+produces a stage-1 export plus manifest for migration work, not a stage-2
+claim. Genuine stage-1→stage-2 transfer is proven by
+`probes/stage2-import.sh <src-url> <dst-url> <donor-dir> <private-work-dir>`
+run against two independently started processes. Make the donor first with
+`stage2-donor.sh`, then run the import with `DONOR_ORIGIN=fresh` in its
+environment (the flag configures the import command, not the donor command)
+to additionally check live source/destination divergence; without it, a saved
+canonical donor records one explicit `live-source-divergence` skip, since a
+prior-process artifact has no live source:
+
+```sh
+sh probes/stage2-donor.sh http://127.0.0.1:9041 /tmp/priv-donor
+DONOR_ORIGIN=fresh sh probes/stage2-import.sh http://127.0.0.1:9041 http://127.0.0.1:9042 /tmp/priv-donor /tmp/priv-import
+```
+
+It verifies original receipt JSON identical, credentials/sessions,
+references/statuses, failed-key reuse, replacement/repeat/invalid atomicity,
+reset clearing and pair behavior on the destination. `stage1-api.sh`,
+`stage1-html.sh` and `stage1-export.sh` remain for inherited single-table and
+page compatibility scope; they are not full stage-2 coverage. Do not treat
+the same-image API roundtrip inside `stage2-api.sh` as a cross-version
+upgrade proof; only a two-process `stage2-import.sh` run proves migration
+(donor and destination must be distinct processes, and receipts must keep
+their original stage-1 JSON without `table_ids`).
