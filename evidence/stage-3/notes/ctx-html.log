@@ -1,0 +1,18 @@
+PASS page-/-200
+PASS page-/-html
+PASS page-/signup-200
+PASS page-/signup-html
+PASS page-/login-200
+PASS page-/login-html
+PASS page-/lookup-200
+PASS page-/lookup-html
+PASS page-app-div
+PASS asset-js-ref
+PASS asset-css-ref
+PASS asset-js-type
+PASS asset-css-type
+PASS api-miss-404
+PASS api-miss-json
+PASS no-off-origin
+
+RESULT pass=16 fail=0

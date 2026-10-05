@@ -1,0 +1,5 @@
+== lane A: genuine stage-1 donor -> stage-3
+== lane B: genuine stage-2 donor -> stage-3
+== lane C: modern stage-3 producer -> second stage-3
+
+RESULT pass=51 fail=0

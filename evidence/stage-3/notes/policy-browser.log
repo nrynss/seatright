@@ -1,0 +1,8 @@
+  ok policy published
+  ok API: party8 has no available singles
+  ok API: pair option capacity 10 (selected policy, not original 6)
+  ok original detail unchanged
+  ok browser: singles all unavailable at party 8
+  ok browser: hourly grid from selected policy (18:00..22:00, 5 slots)
+  ok browser: party-8 pair booked live under selected policy
+POLICY-BROWSER RESULT pass=7 fail=0
