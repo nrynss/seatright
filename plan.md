@@ -169,7 +169,7 @@ Stage 4 starts from the untouched accepted stage-3 tree, copied in **4f52394728a
 
 S4-P/shared51 and S4-M/shared52 are accepted and integrated after the final live-object proof repairs. Solver author commit: 1e1a381e80ad0d4554184843aa1cb1115f234497. Foundation author commit: 019a27b0fe5280a6a6ee66acd06666044860a685. Host scoped races, formatting, vet, full normal tests and builds passed. The repairs changed tests only; no product defect was found.
 
-Next work: OpenCode/shared54 owns manager seating previews and their exact HTTP route; OMP/shared55 owns recurring clock amendments in two new service files only. Both start from the integrated foundations. Router integration for amendments remains serial, so the owners do not overlap. Grok/shared53 continues fixture compatibility independently. Stage 4 remains unaccepted.
+OpenCode/shared54 owns manager seating previews and their exact HTTP route; OMP/shared55 owns recurring clock amendments in two new service files only. Both are in progress from verified base **727eae17559928196cc7f3f5c7dc8967b0d7088e**. Complete single-message handoffs were accepted: preview 5ba35ade-763f-47c8-9313-329c61c20796; amendments a006af16-14f4-4148-809b-145869cd5ce7. Router integration for amendments remains serial, so the owners do not overlap. Grok/shared53 continues fixture compatibility independently. Stage 4 remains unaccepted.
 
 Historical foundation handoffs at bda7c43023123bd8c96809d2c2f8066f1f81bdae: S4-P 58aa1df7-5be2-42aa-93f4-077f0c133e23; S4-M 72120fff-a6c8-4fd6-b5a6-53a51307b228; S4-G 7e47c02b-4aea-447e-8dd7-555ba8f80ea4. P and M are completed; G is active. Final endpoint handoff bases are recorded after their metadata commits exist.
 
