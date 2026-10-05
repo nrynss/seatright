@@ -17,6 +17,7 @@
     testId,
     label,
     onSelect,
+    layer,
   }: {
     x1: number;
     y1: number;
@@ -29,6 +30,8 @@
     testId: string;
     label: string;
     onSelect: () => void;
+    /** Connector paint sits behind the tables. The badge stays in front. */
+    layer: 'link' | 'badge';
   } = $props();
 
   const lift = new Spring(1, springOptions());
@@ -51,8 +54,11 @@
   }
 </script>
 
-<g class="pair-mark" data-available={available ? 'true' : 'false'} data-selected={selected ? 'true' : 'false'}>
-  <path class="pair-link" d={`M ${x1} ${y1} L ${x2} ${y2}`} />
+{#if layer === 'link'}
+  <g class="pair-mark" data-available={available ? 'true' : 'false'} data-selected={selected ? 'true' : 'false'} aria-hidden="true">
+    <path class="pair-link" d={`M ${x1} ${y1} L ${x2} ${y2}`} />
+  </g>
+{:else}
   <g
     class="pair-badge"
     data-testid={testId}
@@ -71,4 +77,4 @@
       {caption}
     </text>
   </g>
-</g>
+{/if}
