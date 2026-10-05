@@ -1084,7 +1084,7 @@ with open(t + "/" + s + "-mx-resp.json") as f:
 assert json.loads(r["body"]) == json.loads(sent_body), "body canonical"
 assert json.loads(r["response"]) == json.loads(first_resp), "resp canonical"
 assert r["response"] == first_resp, "resp raw bytes"
-print("receipts compared: %d prior plus one %s" % (len(ar), new[0]))
+print("receipts compared: %d prior plus one" % len(ar))
 PYEOF
   export SID1 SID2 G1 G2 H1 H2 MX_KEY
   if python3 "$TMP/$STAGE-batch-check.py" 2>>"$DIAG/stderr.log"; then
