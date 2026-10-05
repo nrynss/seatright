@@ -1136,3 +1136,75 @@ Report ONE foreground DONE/BLOCKED with item/sharedcard/fullbase/onlyowneddiff/r
 Components: restaurant_ui, series_engine, replan_engine, history_engine, receipt_store, policy_engine.
 
 Complete original task, four specifications verbatim and R1–R382 ledger follow:
+
+## S4-D integrated and S4-I1/shared63 native validation
+
+Functional donor author15b74f4a5eef8ecb68d3f64203360a8bbd252d26, merge29d6e55a867e6d8dd0423bb3331b54cc5ffac62a. Complete batch-map/receipt bindings and305livechecks verified; predecessor artifacts5/8/9receipts ready. One literal count-only stdout cleanup is explicitly included in I1, not a destination claim. OMP starts native import validation from that full actual base; complete handoff05df54d3-cba5-47a3-ada5-c017df029239.
+
+ACTIONABLE S4-I1/shared63 — native stage-4 import validation (OMP)
+Role: backend implementer. Mandate /home/nryn/work/seatright/runs/tablekeeper2/result/mandates/seatright-omp.md. Fixed worktree /home/nryn/work/seatright/runs/tablekeeper2/wt/seatright-omp. S4-D functional donor is accepted as author15b74f4a5eef8ecb68d3f64203360a8bbd252d26, merge29d6e55a867e6d8dd0423bb3331b54cc5ffac62a. The coordinator resets your CLEAN fixed worktree to FULL BASE 29d6e55a867e6d8dd0423bb3331b54cc5ffac62a before this assignment. It contains all actual producer endpoints: dated policies/writes/history, series adoption/clock amendment exact HTTP route, collective moves, pure optimizer, manager previews/applications, closures, Reassigned histories and current series propagation. No stand-ins needed. No state-changing Git commands by you.
+
+Owned ONLY:
+1. stage-4/internal/service/version_validation.go — narrow extensions for legal Reassigned history, PlanID shape and replay transition; keep all existing policies/Changed/Created/Cancelled/series/counter constraints intact unless a demonstrated producer contradiction requires a precisely justified extension.
+2. NEW stage-4/internal/service/replan_validation.go — pure read-only validateReplanState(st *State) error, with bounded helpers.
+3. NEW stage-4/internal/service/replan_import_test.go — native producer/export/import/corruption/legacy-artifact tests.
+4. stage-4/internal/service/control.go — ONLY minimal offside validateReplanState call after normalizeVersionState + validateState + validateVersionState, before acquiring replacement lock; map errors to existing422validation_failed.
+5. stage-4/probes/stage4-donor.sh — ONLY ONE cosmetic print-line change inside the new batch checker: replace its output of a NUL-delimited scoped receipt key with a count-only message, preserving all assertions. This closes an observed public-log hygiene deviation; no token/body was emitted. No other donor edits or new scenarios. Syntax/all12heredocs compile suffice for this literal output-only change; fresh305 workflow was already proven on unchanged assertions. Do not claim a new live donor run if you don't execute one.
+
+FORBIDDEN: engines/producers/model/state/normalization/clock/planner/policy/history-package/router/web/Docker/RUN/PLAN/RUNLOG/other probes/any existing test file/accepted stage1–3, lock/config/dependency changes. If actual producer behavior contradicts stored validation, give exact reproduction rather than bypass receipts or weaken unrelated checks. New tests may use existing actual helpers/endpoints, but never edit inherited tests or compare an object with itself.
+
+Why: existing copied stage3 validateVersionHistories accepts only Created/Changed/Cancelled, so legitimate current Reassigned history imports fail. Plans/Closures lack consistency validation. Implement a strict read-only extension that accepts legitimate native4 exports and all older accepted exporters. This is storage consistency validation, not a fresh booking/optimizer decision.
+
+Frozen seams/types:
+func validateVersionState(st *State) error unchanged.
+func validateReplanState(st *State) error new; pure no state mutation/no clock/lock/id/receipt/counter changes.
+Import existing sequence ParseBody → offside State decode → old table normalization → normalizeVersionState (already calls normalizeReplanState) → validateState → validateVersionState → new validateReplanState → atomic state replacement. No changes to normalization or receipt byte strings.
+Stored Replan fields: plan_id, restaurant_id, restaurant_revision (captured at preview), closure{table_id,from,to}, assignments[{reference,table_ids,changed}], moved_count, unused_seats, applied. Plans map key==ID. Closures map restaurant→[]Closure, append one per successful apply including empty/zero-move. Preview/current public response six keys; RestaurantID/Applied stay internal.
+History Entry PlanID json plan_id,omitempty; Reassigned emits exactly ONE field table_ids with full canonical From/To arrays (even singleton→singleton), real set change; seq/revision+1, unchanged party/local clock/frozen accepted terms. Other events omit plan_id.
+Strict closure parsing reuse actual parseStrictInstant; Z/dotfractions/explicit signed HH:MM valid, malformed +24:00/+02:60/single-digit/comma/nozone invalid, from<to by absolute instant; preserve original text.
+Receipts are actual scoped immutable first201 bytes. Legacy booking/series receipts can omit modern fields and differ from evolved current records; never rewrite or require equality with current state. Existing validateReceipts remains authoritative for generic key/body/response checks.
+
+Acceptance behavior and tests:
+A. Native roundtrip from REAL producer operations, not a hand-invented forged plan:
+- actual manager preview(s), unapplied/stale previews preserved, nonempty changed apply and empty/zero-move applies, scalar→scalar (arrays in reassigned), pair→singleton and pair→pair, multiple sequential applications where legitimate.
+- real series adoption, repair of middle member, actual dated clock amend on original scheduled date/CURRENT repaired table; ordinary PATCH exception then cancel same member; mixed collective changes; preserve permanent flags/membership/series revs.
+- later real table/time/party edits/cancel/publication AFTER apply so original saved plans/history/receipts differ from current; import must still204. Stale/unapplied plan need not match current occupancy/tables/party/policy/status. Full complete native state plus GET/history/decision/series agree; post-normalization raw export byte-stable on reimport, snapshot/clone isolation actual source-vs-destination mutation binding.
+- use stored above-publication-maxima fixture0 terms (1441/1441/10081/cap101 and long durations where applicable), past/off-grid/over-capacity/already-cancelled seeds; no business cutoff/grid/hours/capacity/occupancy revalidation of historical records. Existing stage3 strict chains/terms/version/cancel checks remain.
+
+B. History:
+- FirstCreated, contiguous seq/rev, nondecreasing real at, exact coherent historical From values, known canonical selectors/real local clocks/positive parties, final replay==record and finalstatus agreement all retain existing enforcement.
+- New Reassigned requires nonempty plan_id, previously-created/confirmed history, exactly ONE table_ids change, canonical lists1..2 known/declared pair order, different sets, From equal actual replayed previous selection, To advances only selection; carry local clock/party and EXACT prior accepted_terms; revision+1. Arrays1→1 valid here, stay forbidden for ordinary Changed (its singleton→singleton field is table_id).
+- PlanID forbidden on other event kinds. Referenced plan must exist, beApplied, same restaurant, contain this ref exactlyonce with changed=true and saved target TableIDs equal Reassigned To at THAT history event. Exactly one Reassigned per changed assignment per applied plan, none for unchanged assignments/unapplied plans. Later edits allowed; don't compare a historical To or plan assignment to final current table.
+- No receipt-bound From divergence bypass. Original faulty stage3 bypass was removed for a reason; reproduce valid chain, never trust receipt as permission for an incoherent chain.
+
+C. Plans/closures:
+- known restaurant; nonempty/map-key matching plan ID; captured revision nonnegative and <=current rest counter (applied requires current >=captured+1); assignments allocated/order reference ascending/unique/same-restaurant known refs, <=6, canonical legal singles/declared pairs; moved_count == count(changed=true), totals nonnegative. Empty[]/zero totals valid; unused cannot be recomputed from newest policies/current party after evolution.
+- closure table known in plan's restaurant, strict real interval absolutefrom<to. All stored closures valid with known namespace/rest/table.
+- applied-plan closure multiset must match saved closure collection per restaurant, EXACT multiplicity (two legitimate identical closures allowed), no orphan/missing/extra closure; unapplied plans have no applied contribution. Zero-move apply still contributes one closure.
+- plans/receipt and apply/history cross-bind wherever retained data proves the original producer state: preview receipt may be matched by full original six-key response, proper path/201 and known caller; applied receipt plan/ref/target/captured+1 consistent with historical records, not later current values. Do not require the original caller still be manager (demotion replay remains valid), and don't reinterpret old booking/series receipt shape. Never rerun Solve against today's changed world or invent unavailable historical snapshots to justify rejecting a legitimate old preview.
+- counters cannot be negative/unknown; preserve existing constraints. Any extra producer-derived invariant needs explicit explanation and valid evolution tests so it cannot reject real exports.
+- reject corrupted PlanID/rest/closure interval/table/assignment ref/order/duplicate/illegal-reversed pair/changedcount/negative totals/applied-vs-closure mismatch/orphan or forged reassigned From-To/term drift/extra history changes or term keys/seq/status in a matrix. Each mutation MUST report applied=true, each422 with FULL destination export byte-identical; malformed JSON400 and wrongtrack422 atomic. Seed destination distinctly before every rejection. Include valid control alongside each narrow shape family, avoid invalid input for multiple unrelated reasons masking the target check.
+
+D. Genuine predecessor artifacts are already available/private on this SAME machine:
+ /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-omp/S4-D/r4/donors-r3/stage1/{export,manifest}.json
+ /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-omp/S4-D/r4/donors-r3/stage2/{export,manifest}.json
+ /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-omp/S4-D/r4/donors-r3/stage3/{export,manifest}.json
+These are fresh verified genuine OLD SOURCE process exports, not fresh source builds in I1; label PRIOR-PROCESS ARTIFACT. Respect original raw file bytes, manifests5/8/9 receipts/source provenance/full owner metadata. Implement TestReplanImportGenuineDonors under NEW env S4_DONORS_DIR pointing to parent donors-r3; unset→explicit SKIP, configured absent/malformed→FAIL, never synthetic fallback. For ALL3 import unchanged raw file204; compare complete normalized record/terms/history/series/policies/counters/identity/tokens/receipt values; native maps empty foroldsource. Replay every manifest receipt through actual HTTP with original path/token/body/key to200 EXACT original response_raw strings, not remarshal fallback; after real current mutation required where eligible. Stage3 series anchor/exception/cancelled metadata retained; exercise imported series clock amend if eligible without inventing past-seed eligibility. Genuine destination-process/full fresh-source transfer belongs later I2; this lane doesn't claim R382 browser upgrades.
+
+E. Real first201 raw receipts from native operations across /replans, /apply, /series/id/amend and inherited paths persist through import, later changes/cancel, replay200 bytes with pre/post export unchanged; current differs proven. Scope user/method/actual path/key/canonical body/status intact. Tests use deterministic reference selection (not random map iteration) and safe capacity/clock slots. Concurrency producer behavior covered already; import/isolation race gates here appropriate.
+
+Exact gates CWD worktree/stage-4:
+gofmt -l internal/service
+go vet ./...
+S4_DONORS_DIR=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-omp/S4-D/r4/donors-r3 go test -count=1 ./...
+S4_DONORS_DIR=... go test -race -count=1 -timeout 240s -v ./internal/service -run '^TestReplanImport'
+go build -o /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-omp/S4-I1/tablekeeper ./cmd/tablekeeper
+sh -n probes/stage4-donor.sh; compile all12 static Python heredocs (print-only cleanup).
+Prove unset-envSKIP and configured empty-dirFAIL for narrow genuine-donor test separately, don't make full suite depend on secrets whenenvunset.
+
+Evidence /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-omp/S4-I1/: executable gate/lifecycle drivers, literal argv/absoluteCWD/UTC-start-end/effectiveEXIT/raw percommand, originalfailedattempts separate, private0700/0600 payload/exports/tokens/diag, stdout safe test names/status/counts only (do NOT print ReceiptKey/body/response/token inassertfail). One real service smoke against fresh current binary PORT9192: health200exact15B+charset; producer repair+clock workflow/export→import204+stable; one corrupted reassigned/closure422+atomic; native receipts200byteexact. Own pid/portcleanup. If your Docker has room, fresh own image/container optional with exact full inspect/caps/provenance; ifENOSPC recordno shareddeletion and useactual freshbinary. No UI/harness/packagingacceptance claim. No need repeat old-source builds or donor workflows for literal countprint.
+Bounded one foreground item ~20–30min; if contract cannot finish, report concrete scope/evidence/remaining work without claiming full acceptance. Keep shared task current; no acknowledgment-only message.
+Report DONE/BLOCKED: sharedcard/fullbase/exactownedfiles/status/invariant→named effective tests/all counts/exits/absolute raw evidence/current binary-or-image provenance/failed attempts/cleanup/gaps/elapsed/visible usage. No stage4 acceptance.
+Components: snapshot_store, replan_engine, closure_store, history_engine, series_engine, receipt_store.
+
+Complete original task, four specifications verbatim and R1–R382 ledger follow:
