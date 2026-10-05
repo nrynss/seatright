@@ -32,6 +32,7 @@ type Entry struct {
 	Changes       []Change        `json:"changes"`
 	Revision      int             `json:"revision"`
 	AcceptedTerms json.RawMessage `json:"accepted_terms"`
+	PlanID        string          `json:"plan_id,omitempty"`
 }
 
 // Snapshot is the reservation state an entry is built from. TableIDs are the
@@ -51,9 +52,10 @@ const timestampLayout = "2006-01-02T15:04:05-07:00"
 
 // Events named in entries.
 const (
-	EventCreated   = "created"
-	EventChanged   = "changed"
-	EventCancelled = "cancelled"
+	EventCreated    = "created"
+	EventChanged    = "changed"
+	EventCancelled  = "cancelled"
+	EventReassigned = "reassigned"
 )
 
 // Next derives the next sequence number and instant for a well-formed
@@ -198,6 +200,28 @@ func Cancelled(after Snapshot, seq int, at string) Entry {
 	}
 }
 
+// Reassigned builds the operator-repair entry: exactly one table_ids change
+// with full canonical arrays From/To (even singleton-to-singleton), the plan
+// id, and the resulting revision plus frozen complete terms. The same
+// unordered table set returns no entry (false): a repair that changes nothing
+// records nothing. Inputs are never modified.
+func Reassigned(before, after Snapshot, seq int, at, planID string) (Entry, bool) {
+	if tableSetsEqual(before.TableIDs, after.TableIDs) {
+		return Entry{}, false
+	}
+	return Entry{
+		Seq:   seq,
+		At:    at,
+		Event: EventReassigned,
+		Changes: []Change{
+			{Field: "table_ids", From: copyStrings(before.TableIDs), To: copyStrings(after.TableIDs)},
+		},
+		Revision:      after.Revision,
+		AcceptedTerms: copyTerms(after.AcceptedTerms),
+		PlanID:        planID,
+	}, true
+}
+
 // deepCopyValue deep-copies JSON-shaped change values: raw terms blobs,
 // string slices, generic arrays and objects (recursively), leaving immutable
 // scalars shared. Exact nil versus non-nil empty shape is preserved for every
@@ -263,6 +287,7 @@ func CloneEntries(entries []Entry) []Entry {
 			Changes:       changes,
 			Revision:      e.Revision,
 			AcceptedTerms: copyTerms(e.AcceptedTerms),
+			PlanID:        e.PlanID,
 		}
 	}
 	return out
