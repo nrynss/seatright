@@ -1,6 +1,6 @@
 # Tablekeeper Stage 4 implementation plan
 
-Status: planned; initial three independent work items ready. Stage 3 accepted at e13272d90213be0914211ae6f6f0bfd5888900ff in formal round 1. The accepted folder tree c783f9e08522a04a62bb11f9a0e3c485d077684f was copied byte-identically to stage-4 in commit 4f52394728aaf2f15dc9afcd7081e3c2a489eba1 before this extension. No product or test work has started on stage 4.
+Status: initial three independent work items in progress at clean committed base bda7c43023123bd8c96809d2c2f8066f1f81bdae. Stage 3 accepted at e13272d90213be0914211ae6f6f0bfd5888900ff in formal round 1. The accepted folder tree c783f9e08522a04a62bb11f9a0e3c485d077684f was copied byte-identically to stage-4 in commit 4f52394728aaf2f15dc9afcd7081e3c2a489eba1 before this extension. No stage-4 product item has been accepted.
 
 ## Requirements ledger
 
@@ -462,4 +462,4 @@ All work is foreground, one DONE or concrete BLOCKED report in roughly20–30min
 
 Quiet lossy private-task fallback: native private creation was rejected under approval_policy=never; PLAN/RUNLOG preserve current steps and outcomes without private ids/dependencies/history. Acceptance audit, evidence archive and accepted folder copy are complete. Initial contracts/ledger/publication and dispatch are the current step. Shared cards are only actual team assignments.
 
-Next: verify clean fixed worktrees, reset to the committed plan base, send full self-contained handoffs, mark shared51/52/53 in progress, log accepted delivery ids. No peer waiting/polling; progress resumes when reports arrive. Accepted stage folder hashes must remain unchanged at every integration.
+Initial dispatch complete: clean fixed worktrees reset and verified at bda7c43023123bd8c96809d2c2f8066f1f81bdae; shared51/52/53 in progress. Full self-contained original-task/four-spec/382-ledger/scoped-contract handoffs accepted: S4-P 58aa1df7-5be2-42aa-93f4-077f0c133e23; S4-M 72120fff-a6c8-4fd6-b5a6-53a51307b228; S4-G 7e47c02b-4aea-447e-8dd7-555ba8f80ea4. Quiet fallback's audit/archive/copy/planning/dispatch steps complete; next verification starts on actual reports. No peer waiting/polling; progress resumes when reports arrive. Accepted stage folder hashes must remain unchanged at every integration.
