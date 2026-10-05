@@ -290,7 +290,7 @@ func validateVersionHistories(st *State) error {
 				return errors.New("entry after cancellation")
 			}
 			switch e.Event {
-			case history.EventCreated, history.EventChanged, history.EventCancelled:
+			case history.EventCreated, history.EventChanged, history.EventCancelled, history.EventReassigned:
 			default:
 				return errors.New("history event unknown")
 			}
@@ -309,7 +309,11 @@ func validateVersionHistories(st *State) error {
 				return err
 			}
 			var next versionSnapshot
-			if err := checkHistoryTransition(e, running, &next, st, res); err != nil {
+			var prevTerms []byte
+			if i > 0 {
+				prevTerms = entries[i-1].AcceptedTerms
+			}
+			if err := checkHistoryTransition(e, running, &next, st, res, prevTerms); err != nil {
 				return err
 			}
 			running = &next
@@ -628,11 +632,14 @@ func historyTermsMatchPolicy(m map[string]any, q policy.Policy) bool {
 // stays valid after amendment. Later entries must transition from actual
 // previous values with real changes only, ordered selection/time/party
 // fields, coherent From/To types and values, and matching revision.
-func checkHistoryTransition(e history.Entry, prev *versionSnapshot, next *versionSnapshot, st *State, res Reservation) error {
+func checkHistoryTransition(e history.Entry, prev *versionSnapshot, next *versionSnapshot, st *State, res Reservation, prevTerms []byte) error {
 	switch e.Event {
 	case history.EventCreated:
 		if prev != nil {
 			return errors.New("created entry must be first")
+		}
+		if e.PlanID != "" {
+			return errors.New("plan id on non-repair entry")
 		}
 		if len(e.Changes) != 3 {
 			return errors.New("created entry must name three fields")
@@ -685,6 +692,9 @@ func checkHistoryTransition(e history.Entry, prev *versionSnapshot, next *versio
 	case history.EventChanged:
 		if prev == nil {
 			return errors.New("changed entry without creation")
+		}
+		if e.PlanID != "" {
+			return errors.New("plan id on non-repair entry")
 		}
 		if len(e.Changes) == 0 || len(e.Changes) > 3 {
 			return errors.New("changed entry fields invalid")
@@ -781,9 +791,17 @@ func checkHistoryTransition(e history.Entry, prev *versionSnapshot, next *versio
 		if len(e.Changes) != 0 {
 			return errors.New("cancelled entry must be empty")
 		}
+		if e.PlanID != "" {
+			return errors.New("plan id on non-repair entry")
+		}
 		*next = *prev
 		next.revision = e.Revision
 		return nil
+	case history.EventReassigned:
+		if prev == nil {
+			return errors.New("reassigned entry without creation")
+		}
+		return checkReassignedTransition(e, prev, next, st, res, prevTerms)
 	}
 	return errors.New("history event unknown")
 }
