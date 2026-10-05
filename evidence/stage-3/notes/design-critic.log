@@ -1,0 +1,12 @@
+All 12 requested screenshots (`F2-results-d.png`, `F2-results-p.png`, `F2-confirmation-p.png`, `F2-409-p.png`, `F2-uncertain-p.png`, `F2-empty-p.png`, `F3F4-d-light.png`, `F3F4-p-dark.png`, `s3-policy-grid-d.png`, `measure-dense-15.png`, `measure-dense-5.png`, and `measure-selected-pair-d-dark.png`) were reviewed against the design system and expectations:
+
+- Signed-in headers correctly omit "Sign in" and "Create account" links.
+- Settled viewport frames reveal the relevant availability grid, booking form, confirmation banner, error notice, or empty state within the viewport without clipping or inaccessible controls.
+- Floor-plan tables render human names once per plate with distinct seat captions and no duplicate text.
+- Dashed combinable connector lines layer underneath table plates and badges without intersecting or slicing label ink.
+- Theme palettes (light and dark), typography, cell states, badges, and dated booking policy hourly layouts render cleanly with WCAG AA compliant contrast.
+
+No concrete visual defects were identified.
+
+### VERDICT-CRITICAL
+NONE

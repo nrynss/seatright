@@ -1,0 +1,169 @@
+{
+  "accepted_revision": "e13272d90213be0914211ae6f6f0bfd5888900ff",
+  "stage3_tree": "c783f9e08522a04a62bb11f9a0e3c485d077684f",
+  "source": "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1",
+  "files": [
+    {
+      "file": "REVIEW.md",
+      "source_sha256": "b9b01b3c51f21f5457091d8fafec69710bd47322d358f91f178f04487639fe26",
+      "archived_sha256": "b9b01b3c51f21f5457091d8fafec69710bd47322d358f91f178f04487639fe26",
+      "redacted": false
+    },
+    {
+      "file": "review.log",
+      "source_sha256": "bdacbdf7ee98ca7f558c82263e69b1654faa5c5ab750444f6fda40f5b157c377",
+      "archived_sha256": "bdacbdf7ee98ca7f558c82263e69b1654faa5c5ab750444f6fda40f5b157c377",
+      "redacted": false
+    },
+    {
+      "file": "checks/report.json",
+      "source_sha256": "c9cc6e03651a14903e54d64b992911a0b2420584f46adaa09050b5e9b868aaab",
+      "archived_sha256": "c9cc6e03651a14903e54d64b992911a0b2420584f46adaa09050b5e9b868aaab",
+      "redacted": false
+    },
+    {
+      "file": "checks/stage-1.counts.json",
+      "source_sha256": "b18fabdbadab8f1094c6b47d09dd89a3e3215cb6c471340343c5f8787e30b77b",
+      "archived_sha256": "b18fabdbadab8f1094c6b47d09dd89a3e3215cb6c471340343c5f8787e30b77b",
+      "redacted": false
+    },
+    {
+      "file": "checks/stage-1.log",
+      "source_sha256": "fb5528809c2c2d70e639b359ff5e994a8e74ff17a7a14355e74d4aa528fc5caa",
+      "archived_sha256": "fb5528809c2c2d70e639b359ff5e994a8e74ff17a7a14355e74d4aa528fc5caa",
+      "redacted": false
+    },
+    {
+      "file": "checks/stage-2.counts.json",
+      "source_sha256": "5e7ced47a9492a568aec12049d401867a868110520ced788cfc9976f400e4b0a",
+      "archived_sha256": "5e7ced47a9492a568aec12049d401867a868110520ced788cfc9976f400e4b0a",
+      "redacted": false
+    },
+    {
+      "file": "checks/stage-2.log",
+      "source_sha256": "acf184cac985e48e04feaf50601f3b70306dc7b2b883a35c2426afa0a6fc7fd3",
+      "archived_sha256": "acf184cac985e48e04feaf50601f3b70306dc7b2b883a35c2426afa0a6fc7fd3",
+      "redacted": false
+    },
+    {
+      "file": "checks/stage-3.counts.json",
+      "source_sha256": "0690b4b540761c4ee3ae249853e6a8a3bdc4210f686645f4612e3c336d716713",
+      "archived_sha256": "0690b4b540761c4ee3ae249853e6a8a3bdc4210f686645f4612e3c336d716713",
+      "redacted": false
+    },
+    {
+      "file": "checks/stage-3.log",
+      "source_sha256": "8ba5b51c8614993777a9fc64f57f9b65713706768c381a7b5cc61de75656ee51",
+      "archived_sha256": "8ba5b51c8614993777a9fc64f57f9b65713706768c381a7b5cc61de75656ee51",
+      "redacted": false
+    },
+    {
+      "file": "checks/stage-4.counts.json",
+      "source_sha256": "83c208cdfc9473aef80d8f0f43c9a17b72cdf2e44f9fffd4984e299d64c0f1b5",
+      "archived_sha256": "83c208cdfc9473aef80d8f0f43c9a17b72cdf2e44f9fffd4984e299d64c0f1b5",
+      "redacted": false
+    },
+    {
+      "file": "checks/stage-4.log",
+      "source_sha256": "d94bd633c87b05ba5f234403165f2cc7ec7e67d61961ec45bc05b43444856e54",
+      "archived_sha256": "1ac765966a77ae1aa8d831de85397c22a3f8fbc96a96ba0ae7787806e07c2a76",
+      "redacted": true
+    },
+    {
+      "file": "notes/closure-run.log",
+      "source_sha256": "0e61be9a989296934f2924d0298f7e881598bf073c170c05dfa6cca32f043f33",
+      "archived_sha256": "0e61be9a989296934f2924d0298f7e881598bf073c170c05dfa6cca32f043f33",
+      "redacted": false
+    },
+    {
+      "file": "notes/ctx-html.log",
+      "source_sha256": "4bb4ce426b13400744f2bb4d02059553ce41ff5fa2b228815bc5f1b63e1195a8",
+      "archived_sha256": "4bb4ce426b13400744f2bb4d02059553ce41ff5fa2b228815bc5f1b63e1195a8",
+      "redacted": false
+    },
+    {
+      "file": "notes/ctx-stage3-api.log",
+      "source_sha256": "b246e365feeb9006fbe6c23ebeb1866fef8071ee257cc426e23b26eaa72ef58b",
+      "archived_sha256": "b246e365feeb9006fbe6c23ebeb1866fef8071ee257cc426e23b26eaa72ef58b",
+      "redacted": false
+    },
+    {
+      "file": "notes/design-critic.log",
+      "source_sha256": "37baf7d4ca6e89a0567e240775ac04284bb0cea1e149990783ed5908598cfcc2",
+      "archived_sha256": "37baf7d4ca6e89a0567e240775ac04284bb0cea1e149990783ed5908598cfcc2",
+      "redacted": false
+    },
+    {
+      "file": "notes/go-gates.log",
+      "source_sha256": "198e8ffeba7451b85ce0332ee8b09bf09ba85982dcd85eba1eace5f028807517",
+      "archived_sha256": "198e8ffeba7451b85ce0332ee8b09bf09ba85982dcd85eba1eace5f028807517",
+      "redacted": false
+    },
+    {
+      "file": "notes/go-race.log",
+      "source_sha256": "e3e68587acbfea6b40e9c788d97549dc5d3c8c925dfbc56ee1abd49db7d67159",
+      "archived_sha256": "e3e68587acbfea6b40e9c788d97549dc5d3c8c925dfbc56ee1abd49db7d67159",
+      "redacted": false
+    },
+    {
+      "file": "notes/harness-stdout.log",
+      "source_sha256": "8533048f5068c4e7ab1e7589166ec04955ee7bc1546b77a5db1f4332cff647d4",
+      "archived_sha256": "8533048f5068c4e7ab1e7589166ec04955ee7bc1546b77a5db1f4332cff647d4",
+      "redacted": false
+    },
+    {
+      "file": "notes/measure-run.log",
+      "source_sha256": "b0b6fca93a19f0c0fbab181c8571909b63f96ecd47fa48bfe525b1e796801111",
+      "archived_sha256": "b0b6fca93a19f0c0fbab181c8571909b63f96ecd47fa48bfe525b1e796801111",
+      "redacted": false
+    },
+    {
+      "file": "notes/policy-browser.log",
+      "source_sha256": "66d6c9798750a125afa403f63d8c9ca530fe73bed8f43e0a7ed0d92781364522",
+      "archived_sha256": "66d6c9798750a125afa403f63d8c9ca530fe73bed8f43e0a7ed0d92781364522",
+      "redacted": false
+    },
+    {
+      "file": "notes/s2-regression-probe.log",
+      "source_sha256": "1d82ad8a3b9c097dc01ea6276c5bfeaf6cc7220913c3a907975772ed1eb0ff1c",
+      "archived_sha256": "1d82ad8a3b9c097dc01ea6276c5bfeaf6cc7220913c3a907975772ed1eb0ff1c",
+      "redacted": false
+    },
+    {
+      "file": "notes/s3-api-probe.log",
+      "source_sha256": "9f29eb078da8e19823b4b511f1dbaf07fdc64b19de8e2d7800f981ad43d20ced",
+      "archived_sha256": "9f29eb078da8e19823b4b511f1dbaf07fdc64b19de8e2d7800f981ad43d20ced",
+      "redacted": false
+    },
+    {
+      "file": "notes/s3-migration-probe.log",
+      "source_sha256": "b78df76ed455b517beff444425bbd5410deeed7000b05a3d97d9c8e6236d4238",
+      "archived_sha256": "b78df76ed455b517beff444425bbd5410deeed7000b05a3d97d9c8e6236d4238",
+      "redacted": false
+    },
+    {
+      "file": "notes/states-run.log",
+      "source_sha256": "1f53d594f66ed3541518e77217aeaba18cb0b938b78fe73d85dde6a3d5764ef3",
+      "archived_sha256": "1f53d594f66ed3541518e77217aeaba18cb0b938b78fe73d85dde6a3d5764ef3",
+      "redacted": false
+    },
+    {
+      "file": "notes/ui-gates.log",
+      "source_sha256": "d28c6a55e4cce9348022fae9d49142419242b0465766da296369e44eedbd0ed7",
+      "archived_sha256": "d28c6a55e4cce9348022fae9d49142419242b0465766da296369e44eedbd0ed7",
+      "redacted": false
+    },
+    {
+      "file": "notes/upgrade-s1-run.log",
+      "source_sha256": "9144e8a52808359e6e7c0774f5f945ed3165f04ed10d6438b87c789f3bf39afd",
+      "archived_sha256": "9144e8a52808359e6e7c0774f5f945ed3165f04ed10d6438b87c789f3bf39afd",
+      "redacted": false
+    },
+    {
+      "file": "notes/upgrade-s2-run.log",
+      "source_sha256": "924097c977ad5b242d83af4f5b5ba22da8dcc109164c149b9c4ddfbe5e2fc6c0",
+      "archived_sha256": "924097c977ad5b242d83af4f5b5ba22da8dcc109164c149b9c4ddfbe5e2fc6c0",
+      "redacted": false
+    }
+  ]
+}

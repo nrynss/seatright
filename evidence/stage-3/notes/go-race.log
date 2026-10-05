@@ -1,0 +1,10 @@
+RACE-R2 2026-10-05T11:01:35Z extended timeout
+go: downloading github.com/nrynss/keel v0.5.0
+go: downloading golang.org/x/crypto v0.57.0
+?   	tablekeeper/cmd/tablekeeper	[no test files]
+ok  	tablekeeper/internal/clock	1.058s
+ok  	tablekeeper/internal/history	1.016s
+ok  	tablekeeper/internal/policy	1.056s
+ok  	tablekeeper/internal/service	575.394s
+?   	tablekeeper/probes/pclient	[no test files]
+race_exit=0

@@ -1,0 +1,13 @@
+== health/reset/conventions
+== auth
+== booking matrix
+== idempotency scope
+== concurrent idempotency
+== DST
+== pairs
+== atomic moves
+== export/import (same process)
+== limits/50 in flight
+
+RESULT mode=stage2 pass=346 fail=0 elapsed=4.6s slow=[]
+statuses seen: [200, 201, 204, 400, 401, 404, 409, 422]

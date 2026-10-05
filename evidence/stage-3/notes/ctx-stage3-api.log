@@ -1,0 +1,276 @@
+== input validation ==
+PASS: base-url-shape (http host present)
+PASS: workdir-owned-writable
+== health ==
+PASS: health-200
+PASS: health-body
+PASS: health-charset
+== reset fixture ==
+PASS: reset-204
+== dates ==
+PASS: future-thursday
+PASS: fixed-sundays
+== auth ==
+PASS: signup-201
+PASS: dup-email-409
+PASS: shortpw-422
+PASS: bademail-422
+PASS: login-200
+PASS: login-bea-200
+PASS: tokens-distinct
+PASS: badpw-401
+== public catalogue ==
+PASS: restaurants-200
+PASS: restaurants-shape
+PASS: detail-unknown-404
+PASS: detail-200
+PASS: detail-original
+PASS: policies-empty-200
+PASS: policies-empty
+== policy publication matrix ==
+PASS: policy-no-token-401
+PASS: policy-bad-token-401
+PASS: policy-nonmanager-403
+PASS: policy-forbidden-code
+PASS: policy-unknown-404
+PASS: policy-missing-key-400
+PASS: policy-publish-201
+PASS: policy-version-1
+PASS: policy-replay-200
+PASS: policy-replay-bytes
+PASS: policy-diffbody-409
+PASS: policy-partial-422
+PASS: policy-baddate-422
+PASS: policy-bool-422
+PASS: policy-caps-422
+PASS: policy-failed-reusable
+PASS: policy-failed-key-reused-201
+PASS: policies-list-200
+PASS: policies-versions
+== dated availability ==
+PASS: avail-grid
+PASS: avail-hourly
+PASS: avail-pair10
+PASS: avail-no-transitive
+PASS: avail-singles-empty
+PASS: avail-party4
+PASS: avail-party4-caps
+PASS: avail-explain
+PASS: explain-matrix
+PASS: explain-reject-false
+PASS: explain-reject-1
+PASS: explain-reject-
+PASS: avail-noexplain
+PASS: noexplain-absent
+PASS: avail-closed
+PASS: closed-empty
+== DST ==
+PASS: berlin-gap
+PASS: gap-skipped
+PASS: ny-fold
+PASS: fold-first
+== dated writes ==
+PASS: create-single-201
+PASS: create-terms
+PASS: create-end-60
+PASS: create-pair-201
+PASS: pair-canonical
+PASS: history-200
+PASS: history-created
+PASS: history-pair-created
+== PATCH matrix ==
+PASS: patch-200
+PASS: patch-rev2
+PASS: expected-bad-"expected_revision":true
+PASS: expected-bad-"expected_revision":"2"
+PASS: expected-bad-"expected_revision":null
+PASS: expected-bad-"expected_revision":2.5
+PASS: expected-bad-"expected_revision":0
+PASS: expected-huge-409
+PASS: expected-1e21-409
+PASS: expected-match-200
+PASS: history-changed
+== no-op retention ==
+PASS: noop-200
+PASS: noop-200
+PASS: noop-200
+PASS: noop-200
+PASS: noop-bytes
+PASS: noop-state-frozen
+== off-grid seed no-op retention ==
+PASS: offgrid-reset-204
+PASS: offgrid-publish-201
+PASS: offgrid-single-noop-200
+PASS: offgrid-single-bytes
+PASS: offgrid-single-export
+PASS: offgrid-single-noop-200
+PASS: offgrid-single-bytes
+PASS: offgrid-single-export
+PASS: offgrid-single-noop-200
+PASS: offgrid-single-bytes
+PASS: offgrid-single-export
+PASS: offgrid-reversed-200
+PASS: offgrid-pair-bytes
+PASS: offgrid-pair-export
+== cutoff both directions ==
+PASS: cutoff-reset-204
+PASS: cutoff-publish-201
+PASS: old-cutoff-blocks-409
+PASS: old-cutoff-code
+PASS: old-cutoff-cancel-409
+PASS: old-cutoff-cancel-code
+PASS: old-cutoff-export-same
+== cutoff old-zero allows ==
+PASS: cutoff0-reset-204
+PASS: cutoff0-publish-201
+PASS: old-zero-patch-200
+PASS: old-zero-cancel-200
+== repeat cancel preserves state ==
+PASS: refix-204
+PASS: rc-create-201
+PASS: rc-cancel-200
+PASS: rc-recancel-200
+PASS: recancel-bytes
+PASS: recancel-export-bytes
+== history and decision privacy ==
+PASS: history-cancelled-200
+PASS: history-cancelled-entry
+PASS: decision-cancelled-200
+PASS: decision-shape
+PASS: history-foreign-404
+PASS: decision-anon-404
+PASS: history-unknown-404
+PASS: decision-unknown-404
+PASS: lookup-badtoken-401
+== series ==
+PASS: anchor-201
+PASS: adopt-count-422
+PASS: adopt-201
+PASS: adopt-calendar
+PASS: anchor-retained
+PASS: series-get-200
+PASS: series-anon-404
+PASS: series-badtoken-404
+PASS: occurrence-patch-200
+PASS: patch-flag-once
+PASS: occurrence-cancel-200
+PASS: cancel-keeps-flag
+PASS: occurrence-recancel-200
+PASS: recancel-stable
+PASS: adopt-replay-200
+PASS: adopt-replay-bytes
+== series failure precedence and rollback ==
+PASS: blocker-201
+PASS: anchor2-201
+PASS: adopt-index1-409
+PASS: adopt-index1-code
+PASS: adopt-fail-rollback
+PASS: blocker-cancel-200
+PASS: adopt-reuse-201
+PASS: adopt-reuse-replay-200
+PASS: adopt-reuse-bytes
+== long anchor occupancy ==
+PASS: long120-publish-201
+PASS: long-anchor-201
+PASS: long60-publish-201
+PASS: short-accepted-end-409
+PASS: short-accepted-code
+== santiago calendar ==
+PASS: san-anchor-201
+PASS: san-adopt-201
+PASS: san-sep5
+== series index precedence ==
+PASS: precedence-thursdays
+PASS: prec-pol30-201
+PASS: prec-anchor-201
+PASS: prec-block-201
+PASS: prec-pol60-201
+PASS: prec-occupancy-wins-409
+PASS: prec-occupancy-code
+PASS: prec-rollback-bytes
+== policy versions explicit ==
+PASS: version-dates-thursday
+PASS: ny-per-restaurant-201
+PASS: ny-version-1
+PASS: v42-publish-201
+PASS: v35-publish-201
+PASS: vb-create-201
+PASS: vb-selects-earlier-date
+PASS: vb-amend1-200
+PASS: v35b-publish-201
+PASS: vb-amend2-200
+PASS: vb-history-frozen
+PASS: before-first-grid
+PASS: before-first-fixture
+== closed day independence ==
+PASS: wed-publish-201
+PASS: wed-now-open
+PASS: wed-nonempty
+PASS: tue-still-closed
+PASS: tue-empty
+== collective moves ==
+PASS: cb-create-a-201
+PASS: cb-create-p-201
+PASS: batch-201
+PASS: batch-order-rev
+PASS: batch-counter-once
+PASS: batch-histories-once
+PASS: batch-replay-200
+PASS: batch-replay-bytes
+PASS: batch-stale-first-409
+PASS: batch-huge-stale-409
+== mixed-series collective batch ==
+PASS: mx-anchorF-201
+PASS: mx-adoptF-201
+PASS: mx-anchorH-201
+PASS: mx-adoptH-201
+PASS: mx-batch-201
+PASS: mx-counter-once
+PASS: mx-series-once
+PASS: mx-flags
+PASS: mx-member-state
+PASS: mx-third-untouched
+PASS: mx-flag-patch-200
+PASS: mx-flag-true
+PASS: mx-flag-cancel-200
+PASS: mx-flag-retained
+PASS: mx-fail-409
+PASS: mx-fail-code
+PASS: mx-fail-rollback
+PASS: mx-reuse-201
+PASS: mx-noop-201
+PASS: mx-noop-zero
+PASS: mx-replay-200
+PASS: mx-replay-bytes
+PASS: mx-replay-export-same
+== races and scopes ==
+PASS: comp-create-201
+PASS: competing-expected-one-each
+PASS: competing-stale-code
+PASS: comp-history-once
+PASS: comp-race-counter-once
+PASS: comp-race-target-once
+PASS: comp-race-others-unchanged
+PASS: race-50-1x201-49x200
+PASS: race-50-bytes
+PASS: race50-counter-once
+PASS: race50-one-record
+PASS: race50-others-unchanged
+PASS: scope-create-201
+PASS: scope-user-201
+PASS: scope-path-201
+PASS: scope-replay-200
+== same-image export/import smoke ==
+PASS: export-envelope
+PASS: same-image-import-204
+PASS: session-survives-200
+PASS: receipt-survives-200
+PASS: bad-import-422
+== week-long accepted duration blocks adoption ==
+PASS: longseed-reset-204
+PASS: long-short-201
+PASS: long-adopt-409
+PASS: long-adopt-code
+PASS: long-adopt-rollback
+
+probe checks passed: 245 failed: 0 skipped: 0

@@ -1,0 +1,619 @@
+S3-R1 FORMAL REVIEW START 2026-10-05T10:34:57Z
+EXPECT SHA: e13272d90213be0914211ae6f6f0bfd5888900ff
+
+### [10:34:57Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c git -C /home/nryn/work/seatright/runs/tablekeeper2/wt/review rev-parse HEAD; git -C /home/nryn/work/seatright/runs/tablekeeper2/wt/review status --short | wc -l; git -C /home/nryn/work/seatright/runs/tablekeeper2/wt/review log -1 --format='%H %ci %s'
+e13272d90213be0914211ae6f6f0bfd5888900ff
+0
+e13272d90213be0914211ae6f6f0bfd5888900ff 2026-10-05 16:03:06 +0530 Freeze complete stage3 review candidate with current room plan
+exit=0
+
+### [10:34:57Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c git -C /home/nryn/work/seatright/runs/tablekeeper2/wt/review rev-parse 'HEAD:stage-1' 'HEAD:stage-2'
+8b8b28da1d7772bbc443ed4fccb57d8e5ed8530c
+9fee3dc7d0766091b3fb7cdbb521c6dfaf652b7f
+exit=0
+
+### [10:34:57Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c ls /home/nryn/work/seatright/runs/tablekeeper2/wt/review; ls /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/internal/service | head -40
+RUNLOG.md
+TASK.md
+architecture.json
+evidence
+mandates
+plan.md
+stage-1
+stage-2
+stage-3
+auth.go
+auth_test.go
+availability.go
+availability_test.go
+collective_writes_test.go
+combinations_test.go
+control.go
+control_reset.go
+control_seed.go
+control_test.go
+control_validation_test.go
+http.go
+http_test.go
+idempotency.go
+idempotency_test.go
+migration_test.go
+model.go
+model_test.go
+moves.go
+moves_test.go
+policies.go
+policies_test.go
+reservation_views.go
+reservation_views_test.go
+reservations.go
+reservations_test.go
+seating.go
+seating_test.go
+series.go
+series_mutations_test.go
+series_test.go
+state.go
+state_test.go
+version_import_test.go
+version_state.go
+version_state_test.go
+version_transfer_test.go
+version_validation.go
+version_writes.go
+version_writes_test.go
+exit=0
+
+### [10:34:57Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ df -h /var/lib/docker
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vdd        9.8G  7.4G  2.0G  80% /var/lib/docker
+exit=0
+
+### [10:35:24Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c mkdir -p /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/staging && cp -a /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-1 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/staging/stage-1 && cp -a /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/staging/stage-2 && cp -a /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/staging/stage-3 && du -sh /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/staging/*
+984K	/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/staging/stage-1
+1.6M	/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/staging/stage-2
+2.4M	/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/staging/stage-3
+exit=0
+
+### [10:35:25Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c cp /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes/*.py /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/ && ls /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+r1_api_probe.py
+r1_debug_click.py
+r1_measure.py
+r1_migration_probe.py
+r1_offgrid_noop.py
+r1_offline_probe.py
+r1_states.py
+r1_upgrade.py
+r1_verify_critic.py
+r2_closure.py
+r2_refute.py
+exit=0
+
+### [10:35:25Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c cd /home/nryn/work/seatright/runs/tablekeeper2/wt/review && git diff --stat 8812cdeaaa993cd944493c654e51d355cdd6b676..e13272d90213be0914211ae6f6f0bfd5888900ff -- stage-3 | tail -6
+ stage-3/web/src/test/setup.ts                      |   74 +
+ stage-3/web/src/theme.css                          |  112 +
+ stage-3/web/svelte.config.js                       |    6 +
+ stage-3/web/tsconfig.json                          |   16 +
+ stage-3/web/vite.config.ts                         |   25 +
+ 145 files changed, 46067 insertions(+)
+exit=0
+
+### [10:39:48Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c tail -12 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/harness-stdout.log
+building /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3 ...
+  stage 1: pass  (log: /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/checks/stage-1.log)
+building upgrade source /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-1 ...
+  stage 2: pass  (log: /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/checks/stage-2.log)
+building upgrade source /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-2 ...
+  stage 3: pass  (log: /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/checks/stage-3.log)
+  stage 4: fail  (log: /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/checks/stage-4.log)
+highest contiguous stage: 3
+claimed stage: 3 on the shipped checks
+report: /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/checks/report.json
+NOTE: this run only includes a portion of the full tests that are applied before judging; this is meant to provide directional feedback, and ultimately you may not pass the stage with the full set of tests.
+exit=0
+
+### [10:39:48Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c python3 -c "
+import json
+r=json.load(open('/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/checks/report.json'))
+print('revision', r['revision'], '| mode', r['mode'], '| state', r['state'])
+print('stages', r['stages'], '| highest', r['highest_contiguous'], '| claimed', r['claimed_stage'], '| share', r['share'])
+for s in ('1','2','3'):
+    if s in r['checks']: print('stage', s, r['checks'][s]['passed'], '/', r['checks']['1']['collected'] if s=='1' else r['checks']['2']['collected'] if s=='2' else r['checks']['3']['collected'])
+"
+revision e13272d90213be0914211ae6f6f0bfd5888900ff | mode isolated | state completed
+stages {'1': 'pass', '2': 'pass', '3': 'pass'} | highest 3 | claimed 3 | share 1.0
+stage 1 120 / 120
+stage 2 25 / 25
+stage 3 7 / 7
+exit=0
+
+### [10:39:48Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c cat /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/go-gates.log | tail -12
+$ go vet ./...
+vet_exit=0
+$ go test -count=1 ./...
+?   	tablekeeper/cmd/tablekeeper	[no test files]
+ok  	tablekeeper/internal/clock	0.044s
+ok  	tablekeeper/internal/history	0.020s
+ok  	tablekeeper/internal/policy	0.129s
+ok  	tablekeeper/internal/service	116.162s
+?   	tablekeeper/probes/pclient	[no test files]
+test_exit=0
+$ go build ./cmd/tablekeeper
+build_exit=0
+exit=0
+
+### [10:39:48Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c grep -E 'ci_exit|check_exit|test_exit|build_exit|Tests ' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/ui-gates.log | head -6
+ci_exit=0
+check_exit=0
+[2m      Tests [22m [1m[32m90 passed[39m[22m[90m (90)[39m
+test_exit=0
+build_exit=0
+exit=0
+
+### [10:40:12Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ docker build -t s3r1/stage3:cand /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/staging/stage-3
+#26 naming to docker.io/s3r1/stage3:cand done
+#26 unpacking to docker.io/s3r1/stage3:cand
+#26 unpacking to docker.io/s3r1/stage3:cand 0.2s done
+#26 DONE 0.3s
+exit=0
+
+### [10:40:14Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ docker build -t s3r1/stage1:donor /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/staging/stage-1
+#26 exporting manifest list sha256:e2d8b54aed4b087be808814d52a568bbbcd8cd701694be8d67023376fdb4d768 0.0s done
+#26 naming to docker.io/s3r1/stage1:donor done
+#26 unpacking to docker.io/s3r1/stage1:donor done
+#26 DONE 0.1s
+exit=0
+
+### [10:40:15Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ docker build -t s3r1/stage2:donor /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/staging/stage-2
+#26 exporting manifest list sha256:25baa81f42b869f13069b2cfc546199f81d723b5cebb8bbd6ab943a36e817a5a done
+#26 naming to docker.io/s3r1/stage2:donor done
+#26 unpacking to docker.io/s3r1/stage2:donor done
+#26 DONE 0.0s
+exit=0
+
+### [10:40:16Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker images --format '{{.Repository}}:{{.Tag}} id={{.ID}} size={{.Size}}' | grep s3r1; df -h /var/lib/docker | tail -1
+s3r1/stage3:cand id=6d07453dbf2f size=144MB
+s3r1/stage2:donor id=25baa81f42b8 size=144MB
+s3r1/stage1:donor id=e2d8b54aed4b size=143MB
+/dev/vdd        9.8G  7.9G  1.5G  85% /var/lib/docker
+exit=0
+
+### [10:40:16Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker rm -f s3r1-def s3r1-alt s3r1-off s3r1-d1 s3r1-d2 s3r1-dest s3r1-peer >/dev/null 2>&1; docker network rm s3r1off >/dev/null 2>&1; T0=$(date +%s.%N); docker run -d --name s3r1-def --cpus 2 --memory 2g -p 127.0.0.1:9401:8080 s3r1/stage3:cand >/dev/null; for i in $(seq 1 120); do code=$(curl -s -o /tmp/h.json -w "%{http_code}" http://127.0.0.1:9401/health || true); [ "$code" = 200 ] && break; sleep 0.25; done; T1=$(date +%s.%N); echo "default8080 healthy_after=$(echo "$T1-$T0"|bc)s code=$code body=$(cat /tmp/h.json)"
+default8080 healthy_after=.274362691s code=200 body={"status":"ok"}
+exit=0
+
+### [10:40:17Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker run -d --name s3r1-alt --cpus 2 --memory 2g -e PORT=9555 -p 127.0.0.1:9402:9555 s3r1/stage3:cand >/dev/null; sleep 1; for i in $(seq 1 40); do code=$(curl -s -o /tmp/h2.json -w "%{http_code}" http://127.0.0.1:9402/health || true); [ "$code" = 200 ] && break; sleep 0.25; done; echo "PORT=9555 code=$code body=$(cat /tmp/h2.json)"
+PORT=9555 code=200 body={"status":"ok"}
+exit=0
+
+### [10:40:18Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ docker run --rm df-harness-runner python -c import httpx; r=httpx.get('http://172.18.0.3:8080/health',timeout=3); print('via container IP', '172.18.0.3', r.status_code, r.text, '|', r.headers.get('content-type'))
+via container IP 172.18.0.3 200 {"status":"ok"} | application/json; charset=utf-8
+exit=0
+
+### [10:40:19Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker run -d --name s3r1-d1 --cpus 2 --memory 2g -p 127.0.0.1:9403:8080 s3r1/stage1:donor >/dev/null && docker run -d --name s3r1-d2 --cpus 2 --memory 2g -p 127.0.0.1:9405:8080 s3r1/stage2:donor >/dev/null && docker run -d --name s3r1-dest --cpus 2 --memory 2g -p 127.0.0.1:9404:8080 s3r1/stage3:cand >/dev/null && docker run -d --name s3r1-peer --cpus 2 --memory 2g -p 127.0.0.1:9406:8080 s3r1/stage3:cand >/dev/null && sleep 1.5 && for p in 9403 9405 9404 9406; do curl -s http://127.0.0.1:$p/health; echo " <- $p"; done
+{"status":"ok"} <- 9403
+{"status":"ok"} <- 9405
+{"status":"ok"} <- 9404
+{"status":"ok"} <- 9406
+exit=0
+
+### [10:40:21Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker inspect -f "{{.Name}} cpus={{.HostConfig.NanoCpus}} mem={{.HostConfig.Memory}}" s3r1-def
+/s3r1-def cpus=2000000000 mem=2147483648
+exit=0
+
+### [10:40:57Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker rm -f s3r1-off >/dev/null 2>&1; docker network create --internal s3r1off >/dev/null && docker run -d --name s3r1-off --network s3r1off --cpus 2 --memory 2g s3r1/stage3:cand >/dev/null && sleep 1.5 && docker run --rm --network s3r1off -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes:/probes:ro df-harness-runner sh -c "python /probes/r1_offline_probe.py && python /probes/s3_offline_extra.py"; echo offline_exit=$?
+health 200 {"status":"ok"}
+reset 204
+signup(fresh) 201
+login(seeded) 200
+availability 200 46 slots
+booking 201
+index 200 text/html; charset=utf-8 842 bytes
+asset links: ['/assets/index-CCGk2hmV.js', '/assets/index-DoSv5bVs.css']
+asset /assets/index-CCGk2hmV.js 200 text/javascript; charset=utf-8 107470 bytes
+asset /assets/index-DoSv5bVs.css 200 text/css; charset=utf-8 14568 bytes
+font /fonts/source-code-pro-latin-400-normal.woff2 200 11656 bytes (binary not dumped)
+font /fonts/source-code-pro-latin-500-normal.woff2 200 11604 bytes (binary not dumped)
+font /fonts/source-serif-4-latin-400-normal.woff2 200 20088 bytes (binary not dumped)
+font /fonts/source-serif-4-latin-600-normal.woff2 200 21532 bytes (binary not dumped)
+font /fonts/source-serif-4-latin-700-normal.woff2 200 21716 bytes (binary not dumped)
+routes [200, 200, 200]
+outbound blocked: ConnectError
+reset 204
+policy publish 201 1
+Traceback (most recent call last):
+  File "/probes/s3_offline_extra.py", line 29, in <module>
+    sl = a.json()["slots"][0]
+         ~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+offline_exit=1
+exit=0
+
+### [10:41:00Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker stats --no-stream --format '{{.Name}} cpu={{.CPUPerc}} mem={{.MemUsage}}' s3r1-def s3r1-off | head -2
+s3r1-def cpu=0.00% mem=1.449MiB / 1.941GiB
+s3r1-off cpu=0.00% mem=2.121MiB / 1.941GiB
+exit=0
+
+### [10:41:21Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c docker run --rm --network s3r1off -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes:/probes:ro df-harness-runner python /probes/s3_offline_extra.py; echo extra_exit=$?
+reset 204
+policy publish 201 1
+explain 200 23 slots; ['t1', 't2'] 1
+pair booking under policy 201 1 35M6KKA0
+history 200 created ['table_ids', 'starts_at_local', 'party_size']
+decision 200 1 ['cancellation_cutoff_minutes', 'capacities', 'opening_hours', 'policy_version', 'reservation_duration_minutes', 'slot_minutes']
+series adopt 201 ['2027-03-01T18:00', '2027-03-08T18:00', '2027-03-15T18:00']
+series get 200 3
+outbound blocked: ConnectError
+extra_exit=0
+exit=0
+
+### [10:41:40Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py http://127.0.0.1:9401 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log 2>&1; echo S3_PROBE_EXIT=$?; tail -6 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log
+S3_PROBE_EXIT=1
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py", line 242, in g_policies
+    now = req("GET", f"/reservations/{before['reference']}", token=tada).json()
+          ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py", line 39, in req
+    r = client.request(method, path, **kw)
+TypeError: Client.request() got an unexpected keyword argument 'token'
+exit=0
+
+### [10:41:41Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S2-R2/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/r1_api_probe.py http://127.0.0.1:9401 stage2 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s2-regression-probe.log 2>&1; echo S2_REGRESSION_EXIT=$?; tail -4 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s2-regression-probe.log
+S2_REGRESSION_EXIT=0
+== limits/50 in flight
+
+RESULT mode=stage2 pass=346 fail=0 elapsed=4.6s slow=[]
+statuses seen: [200, 201, 204, 400, 401, 404, 409, 422]
+exit=0
+
+### [10:42:02Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py http://127.0.0.1:9401 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log 2>&1; echo S3_PROBE_EXIT=$?; tail -8 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log
+S3_PROBE_EXIT=1
+    ~~~~^^
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py", line 745, in main
+    g_history()
+    ~~~~~~~~~^^
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py", line 420, in g_history
+    pref = r.json()["reference"]
+           ~~~~~~~~^^^^^^^^^^^^^
+KeyError: 'reference'
+exit=0
+
+### [10:44:35Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py http://127.0.0.1:9401 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log 2>&1; echo S3_PROBE_EXIT=$?; tail -6 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log
+S3_PROBE_EXIT=1
+    g_history()
+    ~~~~~~~~~^^
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py", line 432, in g_history
+    and [c["field"] for c in h["entries"][2]["changes"]] == ["table_id", "starts_at_local"]
+                             ~~~~~~~~~~~~^^^
+IndexError: list index out of range
+exit=0
+
+### [10:44:54Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py http://127.0.0.1:9401 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log 2>&1; echo S3_PROBE_EXIT=$?; grep -cE '^  FAIL' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log; grep -E '^  FAIL' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log | head -6; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log
+S3_PROBE_EXIT=1
+5
+  FAIL concurrent same expected_revision: at most one real change: expected [200, 200, 409, 409, 409, 409, 409, 422], got ''
+  FAIL cancel rev+1 cancelled: expected '{"accepted_terms":{"cancellation_cutoff_minutes":0,"capacities":{"t_1":4,"t_2":6,"t_3":4},"opening_hours":[{"closes":"23:00","opens":"17:00","weekday":"thu"}],"policy_version":2,"reservation_duration_', got ''
+  FAIL repeat cancel no revision/counter: expected '{"accepted_terms":{"cancellation_cutoff_minutes":0,"capacities":{"t_1":4,"t_2":6,"t_3":4},"opening_hours":[{"closes":"23:00","opens":"17:00","weekday"', got ''
+  FAIL decision current after cancel: expected '{"accepted_terms":{"cancellation_cutoff_minutes":0,"capacities":{"t_1":4,"t_2":6,"t_3":4},"opening_hours":[{"closes":"23:00","opens":"17:00","weekday":"thu"}],"policy_version":2,"reservation_duration_minutes":30,"slot_minutes":15},"reference":"X4UASY', got ''
+  FAIL changed entries seq/order: expected [{'seq': 1, 'at': '2026-10-05T10:44:56+00:00', 'event': 'created', 'changes': [{'field': 'table_id', 'from': None, 'to': 't_2'}, {'field': 'starts_at_local', 'from': None, 'to': '2027-06-17T19:00'}, {'field': 'party_size', 'from': None, 'to': 4}], 'revision': 1, 'accepted_terms': {'cancellation_cutoff_minutes': 120, 'capacities': {'t_1': 2, 't_2': 4, 't_3': 4}, 'opening_hours': [{'closes': '23:00', 'opens': '18:00', 'weekday': 'thu'}], 'policy_version': 0, 'reservation_duration_minutes': 90, 'slot_minutes': 30}}, {'seq': 2, 'at': '2026-10-05T10:44:56+00:00', 'event': 'changed', 'changes': [{'field': 'party_size', 'from': 4, 'to': 3}], 'revision': 2, 'accepted_terms': {'cancellation_cutoff_minutes': 120, 'capacities': {'t_1': 2, 't_2': 4, 't_3': 4}, 'opening_hours': [{'closes': '23:00', 'opens': '18:00', 'weekday': 'thu'}], 'policy_version': 0, 'reservation_duration_minutes': 90, 'slot_minutes': 30}}], got ''
+    and [c["field"] for c in h["entries"][2]["changes"]] == ["table_id", "starts_at_local"]
+                             ~~~~~~~~~~~~^^^
+IndexError: list index out of range
+exit=0
+
+### [10:45:53Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py http://127.0.0.1:9401 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log 2>&1; echo S3_PROBE_EXIT=$?; grep -cE '^  FAIL' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log; grep -E '^  FAIL' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log | head -5; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log
+S3_PROBE_EXIT=1
+15
+  FAIL changed names only changed fields in order: expected '[{"seq": 2, "at": "2026-10-05T10:45:55+00:00", "event": "changed", "changes": [{"field": "party_size", "from": 4, "to": 3}], "revision": 2, "accepted_terms": {"cancellation_cutoff_minutes": 120, "capacities": {"t_1": 2, "t_2": 4, "t_3": 4}, "opening_hours": [{"closes": "23:00", "opens": "18:00", "weekday": "thu"}], "policy_version": 0, "reservation_duration_minutes": 90, "slot_minutes": 30}}, {"se', got ''
+  FAIL counter before adoption: expected 2, got ''
+  FAIL series revision +1 and exception permanent: expected '{"interval_weeks": 1, "occurrences": [{"exception": false, "index": 0, "reference": "NN8XKB5O", "reservation": {"accepted_terms": {"cancellation_cutoff_minutes": 120, "capacities": {"t_1": 2, "t_2": 4', got ''
+  FAIL skip rejects adoption status: expected 422, got 201
+  FAIL skip rejects adoption code: expected 'invalid_local_time', got {'interval_weeks': 1, 'occurrences': [{'exception': False, 'index': 0, 'reference': 'X18KMEWD', 'reservation': {'accepted_terms': {'cancellation_cutoff_minutes': 0, 'capacities': {'t_x': 4}, 'opening_hours': [{'closes': '23:59', 'opens': '00:00', 'weekday': 'mon'}, {'closes': '23:59', 'opens': '00:00', 'weekday': 'tue'}, {'closes': '23:59', 'opens': '00:00', 'weekday': 'wed'}, {'closes': '23:59', 'opens': '00:00', 'weekday': 'thu'}, {'closes': '23:59', 'opens': '00:00', 'weekday': 'fri'}, {'closes': '23:59', 'opens': '00:00', 'weekday': 'sat'}, {'closes': '23:59', 'opens': '00:00', 'weekday': 'sun'}], 'policy_version': 0, 'reservation_duration_minutes': 60, 'slot_minutes': 30}, 'created_at': '2026-10-05T10:45:55+00:00', 'ends_at': '2027-03-22T03:00:00+01:00', 'party_size': 2, 'reference': 'X18KMEWD', 'reservation_id': '7e51290a6ec8ac2b8532618628f3f2c5', 'restaurant_id': 'r_dst', 'revision': 1, 'starts_at': '2027-03-22T02:00:00+01:00', 'starts_at_local': '2027-03-22T02:00', 'status': 'confirmed', 'table_id': 't_x', 'table_ids': ['t_x']}}, {'exception': False, 'index': 1, 'reference': 'BMRM102W', 'reservation': {'accepted_terms': {'cancellation_cutoff_minutes': 0, 'capacities': {'t_x': 4}, 'opening_hours': [{'closes': '23:59', 'opens': '00:00', 'weekday': 'mon'}, {'closes': '23:59', 'opens': '00:00', 'weekday': 'tue'}, {'closes': '23:59', 'opens': '00:00', 'weekday': 'wed'}, {'closes': '23:59', 'opens': '00:00', 'weekday': 'thu'}, {'closes': '23:59', 'opens': '00:00', 'weekday': 'fri'}, {'closes': '23:59', 'opens': '00:00', 'weekday': 'sat'}, {'closes': '23:59', 'opens': '00:00', 'weekday': 'sun'}], 'policy_version': 0, 'reservation_duration_minutes': 60, 'slot_minutes': 30}, 'created_at': '2026-10-05T10:45:55+00:00', 'ends_at': '2027-03-29T03:00:00+02:00', 'party_size': 2, 'reference': 'BMRM102W', 'reservation_id': 'c6e1599b319e967a3d66eacd89b764a4', 'restaurant_id': 'r_dst', 'revision': 1, 'starts_at': '2027-03-29T02:00:00+02:00', 'starts_at_local': '2027-03-29T02:00', 'status': 'confirmed', 'table_id': 't_x', 'table_ids': ['t_x']}}], 'revision': 1, 'series_id': 'ad2f0b632a2e9c4b5f432f0253ee4dbe'}
+ - failed batch state byte-identical: expected '', got ''
+ - failed batch key reusable: expected 409, got ''
+ - all-no-op zero metadata: expected '', got ''
+exit=0
+
+### [10:48:36Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py http://127.0.0.1:9401 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log 2>&1; echo S3_PROBE_EXIT=$?; grep -cE '^  FAIL' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log; grep -E '^  FAIL' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log | head -6; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log
+S3_PROBE_EXIT=1
+4
+  FAIL changed names only changed fields in order: expected '[{"seq": 2, "at": "2026-10-05T10:48:38+00:00", "event": "changed", "changes": [{"field": "party_size", "from": 4, "to": 3}], "revision": 2, "accepted_terms": {"cancellation_cutoff_minutes": 120, "capacities": {"t_1": 2, "t_2": 4, "t_3": 4}, "opening_hours": [{"closes": "23:00", "opens": "18:00", "weekday": "thu"}], "policy_version": 0, "reservation_duration_minutes": 90, "slot_minutes": 30}}, {"se', got ''
+  FAIL conflicting batch under 60-minute policy status: expected 409, got 422
+  FAIL conflicting batch under 60-minute policy code: expected 'table_unavailable', got {'error': {'code': 'not_on_slot_grid', 'message': 'not_on_slot_grid'}}
+  FAIL all-no-op zero metadata: expected '', got ''
+ - conflicting batch under 60-minute policy status: expected 409, got 422
+ - conflicting batch under 60-minute policy code: expected 'table_unavailable', got {'error': {'code': 'not_on_slot_grid', 'message': 'not_on_slot_grid'}}
+ - all-no-op zero metadata: expected '', got ''
+exit=0
+
+### [10:51:08Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py http://127.0.0.1:9401 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log 2>&1; echo S3_PROBE_EXIT=$?; grep -cE '^  FAIL' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log; grep -E '^  FAIL' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log | head -4; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log
+S3_PROBE_EXIT=1
+1
+  FAIL all-no-op zero metadata: expected '', got ''
+
+RESULT pass=216 fail=1 elapsed=3.8s statuses=[200, 201, 204, 401, 403, 404, 409, 422]
+ - all-no-op zero metadata: expected '', got ''
+exit=0
+
+### [10:51:39Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py http://127.0.0.1:9401 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log 2>&1; echo S3_PROBE_EXIT=$?; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log
+S3_PROBE_EXIT=1
+
+RESULT pass=216 fail=1 elapsed=3.8s statuses=[200, 201, 204, 401, 403, 404, 409, 422]
+ - all-no-op zero metadata: expected 'counter 4->4', got ''
+exit=0
+
+### [10:51:43Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c W=/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3; sh /probes/stage3-api.sh http://127.0.0.1:9401 /tmp/s3r1-priv > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/ctx-stage3-api.log 2>&1; echo CTX_EXIT=$?; tail -2 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/ctx-stage3-api.log
+CTX_EXIT=2
+sh: 0: cannot open /probes/stage3-api.sh: No such file
+exit=0
+
+### [10:52:02Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_api_probe.py http://127.0.0.1:9401 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log 2>&1; echo S3_PROBE_EXIT=$?; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-api-probe.log
+S3_PROBE_EXIT=0
+== races
+
+RESULT pass=217 fail=0 elapsed=3.9s statuses=[200, 201, 204, 401, 403, 404, 409, 422]
+exit=0
+
+### [10:52:06Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c W=/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3; sh /probes/stage3-api.sh http://127.0.0.1:9401 /tmp/s3r1-priv > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/ctx-stage3-api.log 2>&1; echo CTX_EXIT=$?; tail -2 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/ctx-stage3-api.log
+CTX_EXIT=2
+sh: 0: cannot open /probes/stage3-api.sh: No such file
+exit=0
+
+### [10:52:06Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c W=/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3; sh /probes/stage1-html.sh http://127.0.0.1:9401 /tmp/s3r1-priv/html > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/ctx-html.log 2>&1; echo HTML_EXIT=$?; tail -2 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/ctx-html.log
+HTML_EXIT=2
+sh: 0: cannot open /probes/stage1-html.sh: No such file
+exit=0
+
+### [10:52:30Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c sh /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/probes/stage3-api.sh http://127.0.0.1:9401 /tmp/s3r1-priv > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/ctx-stage3-api.log 2>&1; echo CTX_EXIT=$?; tail -2 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/ctx-stage3-api.log
+CTX_EXIT=0
+
+probe checks passed: 245 failed: 0 skipped: 0
+exit=0
+
+### [10:52:37Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c sh /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/probes/stage1-html.sh http://127.0.0.1:9401 /tmp/s3r1-priv/html > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/ctx-html.log 2>&1; echo HTML_EXIT=$?; tail -2 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/ctx-html.log
+HTML_EXIT=0
+
+RESULT pass=16 fail=0
+exit=0
+
+### [10:54:01Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_migration_probe.py http://127.0.0.1:9403 http://127.0.0.1:9405 http://127.0.0.1:9401 http://127.0.0.1:9404 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-migration-probe.log 2>&1; echo MIG_EXIT=$?; tail -8 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-migration-probe.log
+MIG_EXIT=1
+    main()
+    ~~~~^^
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_migration_probe.py", line 285, in main
+    prod = build_modern_producer(D2)
+  File "/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_migration_probe.py", line 206, in build_modern_producer
+    assert r.status_code == 201
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError
+exit=0
+
+### [10:55:27Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_migration_probe.py http://127.0.0.1:9403 http://127.0.0.1:9405 http://127.0.0.1:9401 http://127.0.0.1:9404 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-migration-probe.log 2>&1; echo MIG_EXIT=$?; tail -6 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-migration-probe.log
+MIG_EXIT=1
+ - [s1->s3] current record mutated (party 5): expected '{"accepted_terms": {"cancellation_cutoff_minutes": 120, "capacities": {"t_1": 2, "t_2": 4}, "opening_hours": [{"closes": "23:00", "opens": "18:00", "w' got ''
+ - [s1->s3] unused failed key valid-first-201 then replayable: expected 409 got ''
+ - [s1->s3] reused key replays 200: expected '{"error":{"code":"table_unavailable","message":"the table is taken for that interval"}}' got ''
+ - [s2->s3] unused failed key valid-first-201 then replayable: expected 409 got ''
+ - [s2->s3] reused key replays 200: expected '{"error":{"code":"table_unavailable","message":"the table is taken for that interval"}}' got ''
+ - [mod] receipt pol1 replay byte-exact: expected '403 {"error":{"code":"forbidden","message":"restaurant manager permission is required"}}' got ''
+exit=0
+
+### [10:56:04Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_migration_probe.py http://127.0.0.1:9403 http://127.0.0.1:9405 http://127.0.0.1:9401 http://127.0.0.1:9404 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-migration-probe.log 2>&1; echo MIG_EXIT=$?; tail -6 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-migration-probe.log
+MIG_EXIT=1
+== lane B: genuine stage-2 donor -> stage-3
+  FAIL [s2->s3] current record mutated (party 4): expected '{"accepted_terms": {"cancellation_cutoff_minutes": 120, "capacities": {"t_1": 2, "t_2": 4, "t_3": 4}, "opening_hours": [{"closes": "23:00", "opens": "' got ''
+== lane C: modern stage-3 producer -> second stage-3
+
+RESULT pass=50 fail=1
+ - [s2->s3] current record mutated (party 4): expected '{"accepted_terms": {"cancellation_cutoff_minutes": 120, "capacities": {"t_1": 2, "t_2": 4, "t_3": 4}, "opening_hours": [{"closes": "23:00", "opens": "' got ''
+exit=0
+
+### [10:56:26Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c PYTHONPATH=/home/nryn/work/dark-factory-wearedevs /home/agent/harness-venv/bin/python /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes/s3_migration_probe.py http://127.0.0.1:9403 http://127.0.0.1:9405 http://127.0.0.1:9401 http://127.0.0.1:9404 > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-migration-probe.log 2>&1; echo MIG_EXIT=$?; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/s3-migration-probe.log
+MIG_EXIT=0
+== lane C: modern stage-3 producer -> second stage-3
+
+RESULT pass=51 fail=0
+exit=0
+
+### [10:56:45Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes:/probes:ro df-harness-runner python /probes/r2_closure.py http://127.0.0.1:9401 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/closure-run.log 2>&1; echo CLOSURE_EXIT=$?; grep -c '  ok ' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/closure-run.log; grep 'FAIL' /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/closure-run.log | head -4; tail -2 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/closure-run.log
+CLOSURE_EXIT=0
+121
+
+CLOSURE RESULT pass=121 fail=0
+exit=0
+
+### [10:57:39Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes:/probes:ro df-harness-runner python /probes/r1_states.py http://127.0.0.1:9401 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/states-run.log 2>&1; echo STATES_EXIT=$?; tail -2 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/states-run.log
+STATES_EXIT=0
+
+STATES RESULT pass=132 fail=0
+exit=0
+
+### [10:58:52Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes:/probes:ro df-harness-runner python /probes/r1_measure.py http://127.0.0.1:9401 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/measure-run.log 2>&1; echo MEASURE_EXIT=$?; tail -7 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/measure-run.log
+MEASURE_EXIT=0
+  info selected-pair ratio d-light: 7.611 fg=rgb(255, 248, 240) bg=rgb(140, 52, 24)
+  info selected-pair ratio d-dark: 9.915 fg=rgb(26, 18, 14) bg=rgb(240, 176, 136)
+  info selected-pair ratio p-light: 7.611 fg=rgb(255, 248, 240) bg=rgb(140, 52, 24)
+  info selected-pair ratio p-dark: 9.915 fg=rgb(26, 18, 14) bg=rgb(240, 176, 136)
+
+MEASURE RESULT pass=59 fail=0
+exit=0
+
+### [10:59:16Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes:/probes:ro df-harness-runner python /probes/r1_upgrade.py http://127.0.0.1:9403 http://127.0.0.1:9404 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/upgrade-s1-run.log 2>&1; echo UPG1_EXIT=$?; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/upgrade-s1-run.log
+UPG1_EXIT=0
+  ok destination holds exactly one booking
+
+UPGRADE RESULT pass=19 fail=0
+exit=0
+
+### [10:59:20Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes:/probes:ro df-harness-runner python /probes/r1_upgrade.py http://127.0.0.1:9405 http://127.0.0.1:9404 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/upgrade-s2-run.log 2>&1; echo UPG2_EXIT=$?; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/upgrade-s2-run.log
+UPG2_EXIT=1
+
+UPGRADE RESULT pass=18 fail=1
+ - stage-1 receipt has no table_ids ['created_at', 'ends_at', 'party_size', 'reference', 'reservation_id', 'restaurant_id', 'starts_at', 'starts_at_local', 'status', 'table_id', 'table_ids']
+exit=0
+
+### [10:59:42Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes:/probes:ro df-harness-runner python /probes/r1_upgrade.py http://127.0.0.1:9405 http://127.0.0.1:9404 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/upgrade-s2-run.log 2>&1; echo UPG2_EXIT=$?; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/upgrade-s2-run.log
+UPG2_EXIT=1
+
+UPGRADE RESULT pass=18 fail=1
+ - stage-2 receipt shape (table_ids, no scalar table_id) ['created_at', 'ends_at', 'party_size', 'reference', 'reservation_id', 'restaurant_id', 'starts_at', 'starts_at_local', 'status', 'table_id', 'table_ids']
+exit=0
+
+### [11:00:10Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes:/probes:ro df-harness-runner python /probes/r1_upgrade.py http://127.0.0.1:9405 http://127.0.0.1:9404 /shots > /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/upgrade-s2-run.log 2>&1; echo UPG2_EXIT=$?; tail -3 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/upgrade-s2-run.log
+UPG2_EXIT=0
+  ok destination holds exactly one booking
+
+UPGRADE RESULT pass=19 fail=0
+exit=0
+
+### [11:00:44Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes:/probes:ro df-harness-runner python /probes/s3_policy_browser.py 2>&1 | tee /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/policy-browser.log; echo PB_EXIT=${PIPESTATUS[0]}
+  ok policy published
+  ok API: party8 has no available singles
+  ok API: pair option capacity 10 (selected policy, not original 6)
+  ok original detail unchanged
+  FAIL browser: singles all unavailable at party 8 :: singles=10 pairs=10 taken=15
+  ok browser: hourly grid from selected policy (18:00..22:00, 5 slots)
+  ok browser: party-8 pair booked live under selected policy
+POLICY-BROWSER RESULT pass=6 fail=1
+PB_EXIT=1
+exit=0
+
+### [11:00:48Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c tail -7 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/go-race.log
+	/usr/local/go/src/testing/testing.go:2193 +0x21d
+created by testing.(*T).Run in goroutine 709
+	/usr/local/go/src/testing/testing.go:2258 +0xb13
+FAIL	tablekeeper/internal/service	600.041s
+?   	tablekeeper/probes/pclient	[no test files]
+FAIL
+race_exit=1
+exit=0
+
+### [11:01:13Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c docker run --rm --network host -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/shots:/shots -v /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes:/probes:ro df-harness-runner python /probes/s3_policy_browser.py 2>&1 | tail -10 | tee /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/policy-browser.log; echo PB_EXIT=${PIPESTATUS[0]}
+  ok policy published
+  ok API: party8 has no available singles
+  ok API: pair option capacity 10 (selected policy, not original 6)
+  ok original detail unchanged
+  ok browser: singles all unavailable at party 8
+  ok browser: hourly grid from selected policy (18:00..22:00, 5 slots)
+  ok browser: party-8 pair booked live under selected policy
+POLICY-BROWSER RESULT pass=7 fail=0
+PB_EXIT=0
+exit=0
+
+### [11:01:55Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c grep -rnE 'keel/gate|throttle|ratelimit|rate_limit|rate-limit' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/internal /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/cmd /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/web/src 2>/dev/null | head -3; echo rate-limit-scan-done
+rate-limit-scan-done
+exit=0
+
+### [11:01:55Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c grep -rnE 'r_anker|Zum Anker|2027-06-17|PAIR01|Window alcove' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/internal --include='*.go' | grep -v _test.go | head -5; echo fixture-branch-go-done
+fixture-branch-go-done
+exit=0
+
+### [11:01:55Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c grep -rnE 'Window alcove|Garden corner|2027-06-17' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/web/src --include='*.svelte' --include='*.ts' | grep -vE 'test|spec|fixture|preview|demo' | head -5; echo fixture-branch-web-done
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/web/src/lib/search.ts:6:export const DEFAULT_SEARCH_DATE = '2027-06-17';
+fixture-branch-web-done
+exit=0
+
+### [11:01:55Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c grep -rnE 'bcrypt|argon' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/internal/service/auth.go | head -3; grep -rn 'keel/id' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/internal --include='*.go' | grep -v _test | head -3; grep -rn 'chaaya/keel' /home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/web/src/lib/client.ts | head -2
+9:	"golang.org/x/crypto/bcrypt"
+53:// Password hashing scheme: SHA-256 prehash, hex-encoded, fed to bcrypt.
+54:// bcrypt rejects inputs longer than 72 bytes, but the specification sets a
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/internal/service/auth.go:8:	"github.com/nrynss/keel/id"
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/internal/service/version_writes.go:7:	"github.com/nrynss/keel/id"
+/home/nryn/work/seatright/runs/tablekeeper2/wt/review/stage-3/internal/service/series.go:6:	"github.com/nrynss/keel/id"
+6:export { api, ApiError, keelErrorParser } from '@nrynss/chaaya/keel';
+exit=0
+
+### [11:08:42Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c cat /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/design-critic.log | tail -30
+All 12 requested screenshots (`F2-results-d.png`, `F2-results-p.png`, `F2-confirmation-p.png`, `F2-409-p.png`, `F2-uncertain-p.png`, `F2-empty-p.png`, `F3F4-d-light.png`, `F3F4-p-dark.png`, `s3-policy-grid-d.png`, `measure-dense-15.png`, `measure-dense-5.png`, and `measure-selected-pair-d-dark.png`) were reviewed against the design system and expectations:
+
+- Signed-in headers correctly omit "Sign in" and "Create account" links.
+- Settled viewport frames reveal the relevant availability grid, booking form, confirmation banner, error notice, or empty state within the viewport without clipping or inaccessible controls.
+- Floor-plan tables render human names once per plate with distinct seat captions and no duplicate text.
+- Dashed combinable connector lines layer underneath table plates and badges without intersecting or slicing label ink.
+- Theme palettes (light and dark), typography, cell states, badges, and dated booking policy hourly layouts render cleanly with WCAG AA compliant contrast.
+
+No concrete visual defects were identified.
+
+### VERDICT-CRITICAL
+NONE
+exit=0
+
+### [11:12:12Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c tail -8 /home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/notes/go-race.log
+go: downloading golang.org/x/crypto v0.57.0
+?   	tablekeeper/cmd/tablekeeper	[no test files]
+ok  	tablekeeper/internal/clock	1.058s
+ok  	tablekeeper/internal/history	1.016s
+ok  	tablekeeper/internal/policy	1.056s
+ok  	tablekeeper/internal/service	575.394s
+?   	tablekeeper/probes/pclient	[no test files]
+race_exit=0
+exit=0
+
+### [11:12:12Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c git -C /home/nryn/work/seatright/runs/tablekeeper2/wt/review rev-parse HEAD; git -C /home/nryn/work/seatright/runs/tablekeeper2/wt/review status --short | wc -l
+e13272d90213be0914211ae6f6f0bfd5888900ff
+0
+exit=0
+
+### [11:12:12Z] CWD=/home/nryn/work/seatright/runs/tablekeeper2/evidence/seatright-zcode/S3-R1/probes
+$ bash -c docker rm -f s3r1-def s3r1-alt s3r1-off s3r1-d1 s3r1-d2 s3r1-dest s3r1-peer >/dev/null 2>&1; docker network rm s3r1off >/dev/null 2>&1; docker rmi s3r1/stage3:cand s3r1/stage1:donor s3r1/stage2:donor >/dev/null 2>&1; echo reviewer-assets-cleaned; df -h /var/lib/docker | tail -1
+reviewer-assets-cleaned
+/dev/vdd        9.8G  7.5G  1.8G  82% /var/lib/docker
+exit=0
