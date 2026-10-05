@@ -1,11 +1,14 @@
 package service
 
-// This file implements the stage-1 atomic move batch. moveReservationsLocked
-// is the idempotent-write callback for POST /reservation-moves: it validates
-// the whole body shape first, then checks each booking in input order with
-// the ordinary ownedReservation/prepareAmendment helpers, then validates the
-// final occupancy of the whole resulting set (so legal swaps pass), and
-// applies every change to the passed working state together. It locks nothing
+// This file implements the atomic move batch for single tables and declared
+// pairs. moveReservationsLocked is the idempotent-write callback for POST
+// /reservation-moves: it validates the whole body shape first, then checks
+// each booking in input order with the ordinary ownedReservation/
+// prepareAmendment helpers (which accept table_ids per item), then validates
+// the final occupancy of the whole resulting set (so legal swaps pass), and
+// applies every change to the passed working state together. No table may
+// belong to overlapping resulting bookings; any failure rolls back records
+// and receipt together via the discarded working state. It locks nothing
 // itself. Identity, ownership and creation time never change; no-op listed
 // bookings keep their values and occupancy.
 
@@ -96,7 +99,7 @@ func parseMovesBody(obj map[string]any) ([]moveItem, *codedError) {
 		}
 		seen[ref] = true
 		changes := map[string]any{}
-		for _, field := range []string{"table_id", "starts_at_local", "party_size"} {
+		for _, field := range []string{"table_id", "table_ids", "starts_at_local", "party_size"} {
 			if v, ok := item[field]; ok {
 				changes[field] = v
 			}
