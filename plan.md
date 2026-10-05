@@ -169,6 +169,8 @@ Stage 4 starts from the untouched accepted stage-3 tree, copied in **4f52394728a
 
 OpenCode/shared51 implements the pure global seating solver. OMP/shared52 implements the small closure/plan state and reassigned-history foundation. Grok/shared53 validates existing screens with an actual working Transport fixture for current repaired assignments and amended clocks while preserving original retry receipts. Each starts independently from the committed stage-4 plan base.
 
+All three are in progress from verified clean base **bda7c43023123bd8c96809d2c2f8066f1f81bdae**. Full self-contained handoffs were accepted: S4-P 58aa1df7-5be2-42aa-93f4-077f0c133e23; S4-M 72120fff-a6c8-4fd6-b5a6-53a51307b228; S4-G 7e47c02b-4aea-447e-8dd7-555ba8f80ea4. Initial audit/archive/copy/plan/dispatch are complete; integration waits for actual reports between turns. No stage-4 acceptance is claimed.
+
 
 ## Work items and dependency queue
 
