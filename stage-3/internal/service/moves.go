@@ -1,5 +1,7 @@
 package service
 
+import "time"
+
 // This file implements the atomic move batch for single tables and declared
 // pairs. moveReservationsLocked is the idempotent-write callback for POST
 // /reservation-moves: it validates the whole body shape first, then checks
@@ -10,7 +12,9 @@ package service
 // belong to overlapping resulting bookings; any failure rolls back records
 // and receipt together via the discarded working state. It locks nothing
 // itself. Identity, ownership and creation time never change; no-op listed
-// bookings keep their values and occupancy.
+// bookings keep their values and occupancy. A batch with real changes
+// commits revision+1/history+1 per changed booking, one restaurant counter
+// increment and one series touch; an all-no-op batch changes nothing.
 
 // moveReservationsLocked executes an atomic batch on the working state st.
 func (s *Service) moveReservationsLocked(st *State, userID string, obj map[string]any) Result {
@@ -19,6 +23,7 @@ func (s *Service) moveReservationsLocked(st *State, userID string, obj map[strin
 		return cerr.Result()
 	}
 	prepared := make([]Reservation, 0, len(items))
+	before := make([]Reservation, 0, len(items))
 	restaurantID := ""
 	for _, item := range items {
 		current, cerr := ownedReservation(st, userID, item.reference)
@@ -34,11 +39,13 @@ func (s *Service) moveReservationsLocked(st *State, userID string, obj map[strin
 		if cerr != nil {
 			return cerr.Result()
 		}
+		before = append(before, current)
 		prepared = append(prepared, candidate)
 	}
-	// Publish candidates into the working copy, then check each result
+	// Publish detached candidates into the working copy, then check each result
 	// against everything else: unlisted bookings and the other results.
-	// Old assignments are gone, so legal swaps validate cleanly.
+	// Old assignments are gone, so legal swaps validate cleanly. Histories
+	// and counters stay untouched until every check passes.
 	for _, cand := range prepared {
 		st.Reservations[cand.Reference] = cand
 	}
@@ -50,9 +57,29 @@ func (s *Service) moveReservationsLocked(st *State, userID string, obj map[strin
 			return conflict("table_unavailable", "resulting bookings overlap")
 		}
 	}
-	itemsOut := make([]any, 0, len(prepared))
-	for _, cand := range prepared {
-		itemsOut = append(itemsOut, cand.Public())
+	// Every validation succeeded: commit each candidate against its ORIGINAL
+	// before values, in input order, and render the committed records. Only
+	// actual changed refs count toward the single counter/series touch.
+	now := time.Now()
+	committed := make([]Reservation, 0, len(prepared))
+	var changedRefs []string
+	for i, cand := range prepared {
+		final, changed := commitReservationAmendment(st, before[i], cand, now)
+		if changed {
+			changedRefs = append(changedRefs, before[i].Reference)
+		}
+		committed = append(committed, final)
+	}
+	if len(changedRefs) > 0 {
+		if st.RestaurantRevisions == nil {
+			st.RestaurantRevisions = map[string]int{}
+		}
+		st.RestaurantRevisions[restaurantID]++
+		touchSeriesForChanges(st, changedRefs, true)
+	}
+	itemsOut := make([]any, 0, len(committed))
+	for _, final := range committed {
+		itemsOut = append(itemsOut, final.Public())
 	}
 	return created(map[string]any{"reservations": itemsOut})
 }
@@ -99,7 +126,7 @@ func parseMovesBody(obj map[string]any) ([]moveItem, *codedError) {
 		}
 		seen[ref] = true
 		changes := map[string]any{}
-		for _, field := range []string{"table_id", "table_ids", "starts_at_local", "party_size"} {
+		for _, field := range []string{"table_id", "table_ids", "starts_at_local", "party_size", "expected_revision"} {
 			if v, ok := item[field]; ok {
 				changes[field] = v
 			}
