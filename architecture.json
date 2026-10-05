@@ -1,0 +1,108 @@
+{
+  "kind": "layered",
+  "title": "Tablekeeper: dated policy decisions and atomic recurring reservations",
+  "layers": [
+    {
+      "id": "browser",
+      "title": "Diner experience",
+      "items": [
+        {
+          "id": "restaurant_ui",
+          "label": "Search, SVG floor, booking, lookup",
+          "detail": "Svelte and Chaaya; authoritative availability; immutable pending retry; existing screens"
+        }
+      ]
+    },
+    {
+      "id": "api",
+      "title": "HTTP service",
+      "items": [
+        {
+          "id": "policy_engine",
+          "label": "Dated policies and accepted terms"
+        },
+        {
+          "id": "reservation_engine",
+          "label": "Atomic bookings, revisions and moves"
+        },
+        {
+          "id": "history_engine",
+          "label": "Immutable per-booking history and decision"
+        },
+        {
+          "id": "series_engine",
+          "label": "Recurring agreements and exceptions"
+        },
+        {
+          "id": "clock_engine",
+          "label": "IANA wall times and half-open intervals"
+        }
+      ]
+    },
+    {
+      "id": "state",
+      "title": "Atomic state and portability",
+      "items": [
+        {
+          "id": "snapshot_store",
+          "label": "Mutex transaction, deep snapshots, opaque exports"
+        },
+        {
+          "id": "receipt_store",
+          "label": "Immutable idempotency receipts and sessions"
+        }
+      ]
+    },
+    {
+      "id": "delivery",
+      "title": "Delivery and verification",
+      "items": [
+        {
+          "id": "service_image",
+          "label": "Single offline Go + Svelte image"
+        },
+        {
+          "id": "review_gate",
+          "label": "Exact-SHA isolated checks and independent review"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "from": "restaurant_ui",
+      "to": "api",
+      "label": "Same-origin Keel adapter"
+    },
+    {
+      "from": "reservation_engine",
+      "to": "policy_engine",
+      "label": "Resulting local date selects terms"
+    },
+    {
+      "from": "reservation_engine",
+      "to": "history_engine",
+      "label": "One entry per real change"
+    },
+    {
+      "from": "series_engine",
+      "to": "reservation_engine",
+      "label": "One atomic agreement operation"
+    },
+    {
+      "from": "api",
+      "to": "clock_engine",
+      "label": "Generic DST resolution"
+    },
+    {
+      "from": "api",
+      "to": "state",
+      "label": "One transaction and immutable replay"
+    },
+    {
+      "from": "service_image",
+      "to": "review_gate",
+      "label": "Frozen revision acceptance"
+    }
+  ]
+}
