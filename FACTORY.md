@@ -69,7 +69,7 @@ rejected points never reached the room.
 | Stages 3 and 4 | No critical findings | Own design pass agreed | Accepted in round 1 |
 
 Antigravity's critiques for the accepted reviews are committed with them, in
-`evidence/stage-1/design/`, `evidence/stage-3/notes/` and `evidence/stage-4/notes/`.
+`evidence/stage-1/design/` and `evidence/stage-N/notes/` for stages 2 to 4.
 
 ## Design choices, and why
 
@@ -145,7 +145,7 @@ independent API checks, 346 and 217 inherited, 134 migration checks across genui
 stages 1–3 accepted and stage 4 blocked. Its mandate allows at most three review rounds per
 work item; it had counted its own integration audits against that limit, so one stage 4 item
 was declared blocked before the reviewer had seen stage 4 at all. Its stage 4 candidate
-passed every supplied check. The owner sent this to the coordinator:
+passed every supplied check. At 19:07 UTC the owner sent this to the coordinator:
 
 > Operator clarification of your mandate: the limit of 3 review rounds per work item counts
 > the reviewer's formal review rounds (ZCode CHANGES verdicts), not your own integration

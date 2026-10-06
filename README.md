@@ -53,7 +53,7 @@ and every operator event.
 
 | Path | What it is |
 |---|---|
-| [evidence/stage-1/](evidence/stage-1/) … [evidence/stage-4/](evidence/stage-4/) | The accepted review of each stage: the reviewer's `REVIEW.md`, the isolated harness report (`checks/`), its probes and notes, and the design critique. Stage 1 also keeps the reviewer's 59 design screenshots. Stage 4 also keeps the coordinator's audit of the review and the superseded first report |
+| [evidence/](evidence/) | The accepted review of each stage (`evidence/stage-1/` … `stage-4/`): the reviewer's `REVIEW.md`, the isolated harness report, its own probes and the design critique. Stage 1 also keeps the reviewer's 55 design screenshots. [evidence/README.md](evidence/README.md) describes every folder |
 | [evidence/stage-4-blocked/](evidence/stage-4-blocked/) | A superseded record: the audits and the "stage 4 blocked" outcome the coordinator wrote before the operator's clarification reopened stage 4 (see FACTORY.md, Operator events). Kept as part of the run's history |
 
 ## The factory's scripts
