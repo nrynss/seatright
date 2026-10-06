@@ -40,6 +40,11 @@ flowchart LR
 All four stages came from **one dispatch**. [FACTORY.md](FACTORY.md) explains the factory,
 how we ran it, and every operator event.
 
+## Repositories
+
+- **This repository** ([nrynss/seatright](https://github.com/nrynss/seatright)) holds run 2: the four stages, the room record, the evidence and a snapshot of the factory.
+- **The factory** ([nrynss/seatright-factory](https://github.com/nrynss/seatright-factory)) holds the factory's own history: mandates, setup documents, scripts and learnings. The tag `run-tablekeeper2` marks the version this run used.
+
 ## How to read this repository
 
 **Start here**
