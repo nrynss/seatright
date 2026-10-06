@@ -159,9 +159,11 @@ It clarifies the factory's own rule and gives no product or implementation hint.
 coordinator reopened stage 4, OMP fixed both open findings in one attempt, and the reviewer
 accepted stage 4 in its first formal round.
 
-**Six restarts, no room messages.** A seat's runtime stopped six times. Each time the
-operator restarted that seat's room session and Band re-delivered the message it had been
-handling:
+**Six restarts, no room messages.** A seat's runtime stopped six times. The operator ran a
+health watch on Band's log, the seats' states and the room's activity, which raised each
+drop-out; every restart followed within about two minutes. The operator restarted that
+seat's room session and Band re-delivered the message it had been handling. The watch scripts
+are in [operator/](operator/).
 
 | UTC (2026-10-05) | Seat | Cause |
 |---|---|---|

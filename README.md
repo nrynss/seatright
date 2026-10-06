@@ -24,6 +24,7 @@ and every operator event.
 | [evidence/](evidence/) | The accepted review trail of each stage, including the design critiques |
 | [RUNLOG.md](RUNLOG.md), [plan.md](plan.md) | The coordinator's run log and its requirements ledger and work-item plan |
 | [factory/](factory/) | The factory itself, exactly as tagged for this run |
+| [operator/](operator/) | The operator's own tooling for this run: the health watch that raised every seat drop-out, the room progress log, and the transcript generator. Not part of the factory |
 
 ## The factory's scripts
 
