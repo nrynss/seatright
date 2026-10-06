@@ -12,6 +12,29 @@ five-seat Band Desktop factory, set up like a rock band:
 - Antigravity, running Gemini 3.8 Flash, is the reviewer's private monitor engineer and
   design critic.
 
+```mermaid
+flowchart LR
+  owner(["Owner<br/>one dispatch"])
+  subgraph room["Band room: Seatright Redux"]
+    codex["Seatright-Codex<br/>lead vocals<br/>coordinator"]
+    opencode["Seatright-OpenCode<br/>bass<br/>backend"]
+    omp["Seatright-OMP<br/>drums<br/>backend"]
+    grok["Seatright-Grok<br/>lead guitar<br/>frontend and design"]
+    zcode["Seatright-ZCode<br/>rhythm guitar<br/>reviewer"]
+  end
+  subgraph zvm["Inside ZCode's VM, not in the room"]
+    agy["Antigravity<br/>Gemini 3.8 Flash<br/>design critic"]
+  end
+  owner -->|"task, specs, stack"| codex
+  codex <-->|"handoffs and reports"| opencode
+  codex <-->|"handoffs and reports"| omp
+  codex <-->|"handoffs and reports"| grok
+  codex <-->|"frozen candidate and verdict"| zcode
+  zcode -.->|"screenshots"| agy
+  agy -.->|"critique"| zcode
+  codex -->|"final report"| owner
+```
+
 All four stages came from **one dispatch**. [FACTORY.md](FACTORY.md) explains the factory,
 how we ran it, and every operator event.
 
@@ -110,6 +133,21 @@ docker build -t tablekeeper-stage4 . && docker run --rm -p 8080:8080 -e PORT=808
 ```
 
 Then open <http://localhost:8080/>.
+
+```mermaid
+flowchart LR
+  user(["Diner or manager<br/>browser or API client"])
+  subgraph image["One Docker image per stage"]
+    ui["Svelte 5 web UI<br/>Chaaya tokens and themes<br/>SVG floor plan"]
+    api["Go HTTP API<br/>Keel ids<br/>bookings, policies, history, seating repair"]
+    state[("In-memory state<br/>export and import")]
+  end
+  user --> ui
+  user --> api
+  ui -->|"Chaaya Keel adapter"| api
+  api --> state
+```
+
 
 ## Checks
 

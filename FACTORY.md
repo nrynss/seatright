@@ -55,6 +55,108 @@ the first message in [evidence/room-transcript.md](evidence/room-transcript.md).
   screenshots and recordings at both widths, a critique from Antigravity, and its own
   browser measurements of every point it adopts. Returns ACCEPT or CHANGES.
 
+## Architecture
+
+**The band.** The coordinator is the hub. Every message travels through the Band room, and
+implementers never message each other. Antigravity works inside the reviewer's VM and never
+reaches the room.
+
+```mermaid
+flowchart LR
+  owner(["Owner<br/>one dispatch"])
+  subgraph room["Band room: Seatright Redux"]
+    codex["Seatright-Codex<br/>lead vocals<br/>coordinator"]
+    opencode["Seatright-OpenCode<br/>bass<br/>backend"]
+    omp["Seatright-OMP<br/>drums<br/>backend"]
+    grok["Seatright-Grok<br/>lead guitar<br/>frontend and design"]
+    zcode["Seatright-ZCode<br/>rhythm guitar<br/>reviewer"]
+  end
+  subgraph zvm["Inside ZCode's VM, not in the room"]
+    agy["Antigravity<br/>Gemini 3.8 Flash<br/>design critic"]
+  end
+  owner -->|"task, specs, stack"| codex
+  codex <-->|"handoffs and reports"| opencode
+  codex <-->|"handoffs and reports"| omp
+  codex <-->|"handoffs and reports"| grok
+  codex <-->|"frozen candidate and verdict"| zcode
+  zcode -.->|"screenshots"| agy
+  agy -.->|"critique"| zcode
+  codex -->|"final report"| owner
+```
+
+**Where each seat runs.** Band Desktop starts every seat with one of our launchers. The
+coordinator runs on the host with no Docker access. The other four seats run in their own
+VMs. The reviewer can read the candidate but write only to its own evidence.
+
+```mermaid
+flowchart LR
+  subgraph host["Host machine"]
+    band["Band Desktop<br/>starts each seat<br/>with our launcher"]
+    codex["Seatright-Codex<br/>Codex sandbox<br/>no Docker access"]
+    run[("runs/&lt;run&gt;/<br/>result repo<br/>worktrees<br/>evidence")]
+  end
+  subgraph impl["Implementer VMs (Docker Sandboxes)"]
+    vo["seatright-opencode<br/>OpenCode"]
+    vm["seatright-omp<br/>OMP"]
+    vg["seatright-grok<br/>Grok CLI"]
+  end
+  subgraph rev["Reviewer VM (Docker Sandboxes)"]
+    vz["seatright-zcode<br/>ZCode bridge<br/>Antigravity"]
+  end
+  band -->|"codex-host.sh"| codex
+  band ==>|"sbx exec, ACP"| impl
+  band ==>|"sbx exec, ACP"| rev
+  codex -->|"commits, merges"| run
+  run -->|"read-write"| impl
+  run -->|"read-only<br/>own evidence writable"| rev
+```
+
+**One work item's path.** Every item follows the same loop, from handoff to accepted stage.
+
+```mermaid
+sequenceDiagram
+  participant O as Owner
+  participant C as Codex (coordinator)
+  participant I as Implementer (OpenCode, OMP or Grok)
+  participant Z as ZCode (reviewer)
+  participant A as Antigravity (critic)
+  O->>C: One dispatch for all four stages
+  C->>C: Requirements ledger and small work items
+  C->>I: Complete handoff in one message
+  I->>I: Tests first, build, write raw evidence
+  I->>C: One report with evidence paths
+  C->>C: Check evidence, rerun tests, commit as the implementer, merge
+  C->>Z: Frozen candidate at an exact SHA
+  Z->>Z: Isolated harness, own probes, browser checks
+  Z->>A: Screenshots at 375 and 1280 px
+  A-->>Z: Critique
+  Z->>Z: Measure each point before adopting it
+  alt CHANGES
+    Z->>C: Findings with reproductions
+    C->>I: Route each finding to its owner
+  else ACCEPT
+    Z->>C: Verdict at that SHA
+    C->>C: Merge to main, archive the review, copy forward
+  end
+  C->>O: Final report after stage 4
+```
+
+**The service.** Each stage folder builds one image that serves both the API and the UI.
+
+```mermaid
+flowchart LR
+  user(["Diner or manager<br/>browser or API client"])
+  subgraph image["One Docker image per stage"]
+    ui["Svelte 5 web UI<br/>Chaaya tokens and themes<br/>SVG floor plan"]
+    api["Go HTTP API<br/>Keel ids<br/>bookings, policies, history, seating repair"]
+    state[("In-memory state<br/>export and import")]
+  end
+  user --> ui
+  user --> api
+  ui -->|"Chaaya Keel adapter"| api
+  api --> state
+```
+
 ## Any seat can be its own team
 
 Antigravity is not in the room. The reviewer runs it as a command-line tool inside its own
