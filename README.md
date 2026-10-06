@@ -25,6 +25,44 @@ and every operator event.
 | [RUNLOG.md](RUNLOG.md), [plan.md](plan.md) | The coordinator's run log and its requirements ledger and work-item plan |
 | [factory/](factory/) | The factory itself, exactly as tagged for this run |
 
+## The factory's scripts
+
+[factory/scripts/](factory/scripts/) is the machinery that stands the factory up and runs it.
+Nothing in it is specific to Tablekeeper: a run on another problem uses the same scripts, and
+only the dispatch changes.
+
+**Running a factory run** ([factory/scripts/factory/](factory/scripts/factory/))
+
+| Script | What it does |
+|---|---|
+| `prepare-run.sh <run>` | Starts a run. Refuses a factory repository with uncommitted changes and tags the commit it uses, so every run is pinned to an exact factory version. Creates the result repository, the worktree root and one evidence folder per seat. Mounts them into the sandboxes (read-only for the reviewer) and installs each mandate where its harness reads it. |
+| `new-room.sh <ids-file> --room <id>` | Brings the seats into the Band room the owner created. Starts every seat, drops sessions and queued messages from earlier rooms, adds any seat still missing, checks the coordinator's runtime settings, and writes the room and participant ids to a file |
+| `end-run.sh <run>` | Ends a run. Stops every seat, detaches it from the room and revokes the sandbox mounts. The result repository and worktrees are kept. |
+| `snapshot-factory.sh <run>` | Copies the tagged factory version, not the working copy, into the result repository as `factory/` (how this folder got here) |
+| `gen-implementer-mandates.py` | Writes the three implementer mandates from one shared text, so the backend and frontend seats follow identical rules and differ only in their role section |
+
+**Launching each seat** ([factory/scripts/sandboxes/](factory/scripts/sandboxes/))
+
+Band starts each seat by running one of these commands, and talks to the seat over the Agent
+Client Protocol (ACP) on its standard input and output.
+
+| Script | What it does |
+|---|---|
+| `codex-host.sh` | Starts the coordinator on the host as a Codex app-server inside Codex's own `workspace-write` sandbox, with no container runtime. It allows network for this seat only (to fetch modules and run tests) without changing the owner's global Codex settings. |
+| `codex.sh` | An earlier launcher that ran Codex inside a VM; not used in this run, kept for reference |
+| `opencode.sh`, `omp.sh`, `grok.sh`, `zcode.sh` | Start each seat inside its own Docker Sandbox VM with `sbx exec`, in the seat's fixed working directory. `grok.sh` also removes the placeholder API key Docker Sandboxes injects, which would otherwise override Grok's own login. |
+| `acp-strip-mcp.py` | Sits between Band and a sandboxed seat and removes the host tool server Band offers, which a seat inside a VM cannot start |
+| `assign-worktree.sh` | Mounts one worktree into a seat's sandbox and sets the seat's next working directory, used when a seat's fixed worktree is first set up |
+
+**A fix to a harness** ([factory/scripts/patches/](factory/scripts/patches/))
+
+| File | What it does |
+|---|---|
+| `zcode-acp-server-0.60.0-no-success-footer.patch` | Stops the ZCode bridge posting a "✓ completed" line after each turn. In a Band room every posted line wakes the seat it is addressed to, so those lines started reply loops between seats. |
+
+The scripts use this machine's absolute paths and Band session ids; adapt them on another
+machine. They contain no credentials: each seat's login lives only inside its own sandbox.
+
 ## The service
 
 Each stage folder builds one Docker image: an HTTP API in Go, and a Svelte 5 web UI built on
