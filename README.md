@@ -11,20 +11,50 @@ and every operator event.
 
 ## How to read this repository
 
+**Start here**
+
 | Path | What it is |
 |---|---|
-| [FACTORY.md](FACTORY.md) | The factory: seats, design choices, results, operator events, learnings, how to stand it up |
-| [FINAL-OUTCOME.md](FINAL-OUTCOME.md) | The coordinator's final report: accepted revisions, what review changed, verification |
-| [mandates/](mandates/) | One mandate per seat, named after the seat, each naming its harness and model |
+| [FACTORY.md](FACTORY.md) | The factory: seats, design choices, results, operator events, what review changed, learnings, how to stand it up. Written by the owner after the run |
+| [FINAL-OUTCOME.md](FINAL-OUTCOME.md) | The coordinator's final report: each stage's accepted revision, its checks and review rounds, what review changed, and the final stage 4 verification |
+
+**The factory**
+
+| Path | What it is |
+|---|---|
+| [mandates/](mandates/) | One mandate per seat, named after the seat, each naming its harness and model. Generic: they describe how each seat works, not this problem |
+| [factory/](factory/) | The factory itself, as tagged for this run (`run-tablekeeper2`): setup documents, mandates, scripts and learnings |
 | [factory/AGENT-ROLES.md](factory/AGENT-ROLES.md) | Every seat's role, access and boundaries, with the reason for each |
 | [factory/CODEX-SETUP.md](factory/CODEX-SETUP.md), [OPENCODE](factory/OPENCODE-SETUP.md), [OMP](factory/OMP-SETUP.md), [GROK](factory/GROK-SETUP.md), [ZCODE](factory/ZCODE-SETUP.md) `-SETUP.md` | How each agent is set up: harness, model, sandbox, network, credentials, and what was verified. Antigravity is set up inside ZCODE-SETUP.md |
-| `room.json` | The room ("Seatright Redux"), downloaded unchanged from Band Desktop: all 6,263 messages |
-| [evidence/room-transcript.md](evidence/room-transcript.md) | All 371 text messages in the room, generated from Band's CLI: the dispatch, every handoff, report and review, the operator message and the final report |
-| [stage-1/](stage-1/) … [stage-4/](stage-4/) | One complete service per stage, each extending the last. Build and run with its `RUN.md` |
-| [evidence/](evidence/) | The accepted review trail of each stage, including the design critiques |
-| [RUNLOG.md](RUNLOG.md), [plan.md](plan.md) | The coordinator's run log and its requirements ledger and work-item plan |
-| [factory/](factory/) | The factory itself, exactly as tagged for this run |
+| [factory/DOCKER-SETUP.md](factory/DOCKER-SETUP.md) | The Docker Sandboxes: VMs, mounts and network rules |
+| [factory/LEARNINGS.md](factory/LEARNINGS.md) | What the rehearsals and run 1 taught, and the change each lesson led to |
 | [operator/](operator/) | The operator's own tooling for this run: the health watch that raised every seat drop-out, the room progress log, and the transcript generator. Not part of the factory |
+
+**The run's record**
+
+| Path | What it is |
+|---|---|
+| [TASK.md](TASK.md) | A copy of the top of the owner's dispatch (task, paths, stack, design brief and check command, without the four specifications), written by the coordinator when it planned stage 1. Never updated; the seats worked from the dispatch in the room, which is the first message in the transcript |
+| `room.json` | The room ("Seatright Redux"), downloaded unchanged from Band Desktop: all 6,263 messages |
+| [evidence/room-transcript.md](evidence/room-transcript.md) | The room's 371 text messages, oldest first, generated from Band's CLI: the dispatch, every handoff, report and review, the operator message and the final report |
+| [RUNLOG.md](RUNLOG.md) | The coordinator's run log: one timestamped entry per handoff, report, verdict, retry and blocker |
+| [plan.md](plan.md) | The coordinator's living room plan from stage 3 onward: current status, architecture, the full text of active handoffs, the work-item queue with owners and dependencies, interface contracts and the requirements ledger (R1–R382). The coordinator rewrote it 70 times; earlier versions are in Git history. It began because Band's task tool was unavailable to the coordinator (RUNLOG, first entry) |
+| [architecture.json](architecture.json) | The layered architecture diagram the coordinator published with the room plan |
+
+**The product**
+
+| Path | What it is |
+|---|---|
+| [stage-1/](stage-1/) … [stage-4/](stage-4/) | One complete service per stage, each extending the last. Each has its source (`cmd/`, `internal/`, `web/`), a Dockerfile and `RUN.md` (how to build, run and use it) |
+| `stage-N/PLAN.md` | That stage's plan: its requirements ledger and work items, as the coordinator mandate requires |
+| `stage-N/probes/` | The API, HTML, upgrade and export probes the band wrote for that stage, beyond the supplied checks |
+
+**Evidence**
+
+| Path | What it is |
+|---|---|
+| [evidence/stage-1/](evidence/stage-1/) … [evidence/stage-4/](evidence/stage-4/) | The accepted review of each stage: the reviewer's `REVIEW.md`, the isolated harness report (`checks/`), its probes and notes, and the design critique. Stage 1 also keeps the reviewer's 59 design screenshots. Stage 4 also keeps the coordinator's audit of the review and the superseded first report |
+| [evidence/stage-4-blocked/](evidence/stage-4-blocked/) | A superseded record: the audits and the "stage 4 blocked" outcome the coordinator wrote before the operator's clarification reopened stage 4 (see FACTORY.md, Operator events). Kept as part of the run's history |
 
 ## The factory's scripts
 
