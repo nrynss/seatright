@@ -63,7 +63,6 @@ worktrees under `runs/<run>/wt/` and keeps them for the whole run, because seats
 directory mid-run. `scripts/factory/end-run.sh <run>` revokes the mounts. `prepare-run.sh`
 tags the factory commit `run-<run>`; after the run, `scripts/factory/snapshot-factory.sh <run>`
 stages that tagged tree as `factory/` in the result repository.
-`scripts/sandboxes/assign-worktree.sh` remains for ad-hoc single-worktree mounts.
 
 ## Verified capabilities
 
