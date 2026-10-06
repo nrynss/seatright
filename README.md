@@ -34,11 +34,11 @@ and every operator event.
 
 | Path | What it is |
 |---|---|
-| [TASK.md](TASK.md) | A copy of the top of the owner's dispatch (task, paths, stack, design brief and check command, without the four specifications), written by the coordinator when it planned stage 1. Never updated; the seats worked from the dispatch in the room, which is the first message in the transcript |
+| [TASK.md](TASK.md) | A copy of the top of the owner's dispatch (task, paths, stack, design brief and check command, without the four specifications), written by the coordinator when it planned stage 1. Never updated. The seats worked from the dispatch in the room, which is the first message in the transcript |
 | `room.json` | The room ("Seatright Redux"), downloaded unchanged from Band Desktop: all 6,263 messages |
 | [evidence/room-transcript.md](evidence/room-transcript.md) | The room's 371 text messages, oldest first, generated from Band's CLI: the dispatch, every handoff, report and review, the operator message and the final report |
 | [RUNLOG.md](RUNLOG.md) | The coordinator's run log: one timestamped entry per handoff, report, verdict, retry and blocker |
-| [plan.md](plan.md) | The coordinator's living room plan from stage 3 onward: current status, architecture, the full text of active handoffs, the work-item queue with owners and dependencies, interface contracts and the requirements ledger (R1–R382). The coordinator rewrote it 70 times; earlier versions are in Git history. It began because Band's task tool was unavailable to the coordinator (RUNLOG, first entry) |
+| [plan.md](plan.md) | The coordinator's living room plan from stage 3 onward: current status, architecture, the full text of active handoffs, the work-item queue with owners and dependencies, interface contracts and the requirements ledger (R1–R382). The coordinator rewrote it 70 times. Earlier versions are in Git history. It began because Band's task tool was unavailable to the coordinator (RUNLOG, first entry) |
 | [architecture.json](architecture.json) | The layered architecture diagram the coordinator published with the room plan |
 
 **The product**
@@ -89,7 +89,7 @@ Client Protocol (ACP) on its standard input and output.
 |---|---|
 | `zcode-acp-server-0.60.0-no-success-footer.patch` | Stops the ZCode bridge posting a "✓ completed" line after each turn. In a Band room every posted line wakes the seat it is addressed to, so those lines started reply loops between seats. |
 
-The scripts use this machine's absolute paths and Band session ids; adapt them on another
+The scripts use this machine's absolute paths and Band session ids. Adapt them on another
 machine. They contain no credentials: each seat's login lives only inside its own sandbox.
 
 ## The service

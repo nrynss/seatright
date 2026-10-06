@@ -17,7 +17,7 @@ runtime dropped, and sent one clarification of the coordinator's mandate (below)
 
 The complete factory, exactly as tagged for this run, is in [factory/](factory/)
 (tag `run-tablekeeper2`, see [factory/SNAPSHOT.md](factory/SNAPSHOT.md)). This document
-explains it; the files in `factory/` are what you need to stand it up.
+explains it. The files in `factory/` are what you need to stand it up.
 
 ## Seats
 
@@ -28,7 +28,7 @@ explains it; the files in `factory/` are what you need to stand it up.
 | Seatright-OMP | OMP (native ACP) | `opencode-go/muse-spark-1.3-contributor` | Docker Sandbox `seatright-omp` |
 | Seatright-Grok | Grok CLI (native ACP) | `grok-4.7` | Docker Sandbox `seatright-grok` |
 | Seatright-ZCode | ZCode (ACP bridge) | ZAI Coding Plan `GLM-5.3-Flash` | Docker Sandbox `seatright-zcode` |
-| Antigravity (critic) | Antigravity CLI (`agy`), headless | `gemini-3.8-flash-high` | Inside `seatright-zcode`; not a Band seat |
+| Antigravity (critic) | Antigravity CLI (`agy`), headless | `gemini-3.8-flash-high` | Inside `seatright-zcode`, not a Band seat |
 
 The mandates are in [mandates/](mandates/), one per seat, named after it. They are generic:
 they describe how each seat works, not this problem, and were checked for task vocabulary
@@ -58,14 +58,14 @@ message in [evidence/room-transcript.md](evidence/room-transcript.md).
 
 Antigravity is not in the room. The reviewer runs it as a command-line tool inside its own
 sandbox, gives it the screenshots, and decides which of its points are real. Band coordinates
-five seats; what happens inside a seat is up to that seat. Adding a second model to the
+five seats. What happens inside a seat is up to that seat. Adding a second model to the
 reviewer changed nothing in the room, the other mandates or the message flow, and Antigravity's
 rejected points never reached the room.
 
 | Review | Antigravity | Reviewer | Outcome |
 |---|---|---|---|
-| Stage 1, round 1 | 13 points, "not presentation-ready" | Measured each; disproved 12 (a contrast "failure" measured 5.71:1; one fix the specification forbids) | 1 blocker, login error copy; fixed by Grok in 10 minutes |
-| Stage 2, round 1 | Points included sign-in links shown while signed in, results landing off-screen, table names drawn twice, a combined-table line through a label | Confirmed all four with browser measurements | 4 blockers; fixed by Grok in 32 minutes |
+| Stage 1, round 1 | 13 points, "not presentation-ready" | Measured each. Disproved 12 (a contrast "failure" measured 5.71:1, and one fix the specification forbids) | 1 blocker, login error copy. Fixed by Grok in 10 minutes |
+| Stage 2, round 1 | Points included sign-in links shown while signed in, results landing off-screen, table names drawn twice, a combined-table line through a label | Confirmed all four with browser measurements | 4 blockers. Fixed by Grok in 32 minutes |
 | Stages 3 and 4 | No critical findings | Own design pass agreed | Accepted in round 1 |
 
 Antigravity's critiques for the accepted reviews are committed with them, in
@@ -77,13 +77,13 @@ Antigravity's critiques for the accepted reviews are committed with them, in
   the seat that wrote it: 25 commits by OpenCode, 17 by Grok and 16 by OMP, each naming its
   work item and handoff. The coordinator's 429 commits are integration merges and the room
   plan.
-- **A different model reviews.** The implementers share a model; the reviewer runs a
+- **A different model reviews.** The implementers share a model. The reviewer runs a
   different model family on a different provider, and its critic a third.
 - **Evidence, not claims.** Every seat writes the raw output of what it ran to
   `evidence/<seat>/`. A result that was never written down counts as not run. Accepted
   reviews are committed under [evidence/](evidence/).
 - **The reviewer cannot change what it reviews.** The candidate is mounted read-only in the
-  reviewer's sandbox; only its own evidence folder is writable.
+  reviewer's sandbox. Only its own evidence folder is writable.
 - **Sandboxes for every seat that runs code.** Four VMs (2 CPU, 2 GiB each) with Docker, Go
   and Node. Each holds only its own seat's credentials, with a per-seat network allow-list on
   top of a shared baseline. The coordinator has no Docker access.
@@ -94,7 +94,7 @@ Antigravity's critiques for the accepted reviews are committed with them, in
 - **Frontend and backend as two streams.** Grok started from interface contracts and fixture
   data while the backend was built, then proved the screens against the real service.
 - **The factory is pinned per run.** `prepare-run.sh` refuses a dirty factory repository and
-  tags the commit it used; that tag is what [factory/](factory/) contains.
+  tags the commit it used. That tag is what [factory/](factory/) contains.
 
 The access matrix, with the reason for every boundary, is in
 [factory/AGENT-ROLES.md](factory/AGENT-ROLES.md).
@@ -106,7 +106,7 @@ different harnesses to work as Band seats inside isolated VMs took integration w
 own. Each item below is in [factory/scripts/](factory/scripts/) or the setup documents.
 
 - **Seats in our own VMs.** Every seat that runs code lives in a Docker Sandboxes VM that we
-  created and manage with `sbx`; Band's own sandbox is off for every seat. Band starts each
+  created and manage with `sbx`. Band's own sandbox is off for every seat. Band starts each
   seat by running a launcher of ours as its spawn command, and the launcher runs the harness
   inside its VM through `sbx exec -i`.
 - **A bridge and a patch for ZCode.** ZCode does not speak ACP, so it runs through the
@@ -121,7 +121,7 @@ own. Each item below is in [factory/scripts/](factory/scripts/) or the setup doc
   their turn output instead.
 - **Clearing what Band Desktop passes down.** Band Desktop runs as an AppImage and passes its
   library and Python overrides (`LD_LIBRARY_PATH`, `LD_PRELOAD`, `PYTHONHOME`, `PYTHONPATH`)
-  to every seat it spawns; they break Python and other host tools. Every launcher clears
+  to every seat it spawns. They break Python and other host tools. Every launcher clears
   them. When Band spawns a launcher from inside its AppImage mount, the launcher falls back
   to the factory directory, because that path does not exist inside the VM.
 - **The coordinator as a Band-managed agent.** The coordinator's first identity, made through
@@ -145,7 +145,7 @@ own. Each item below is in [factory/scripts/](factory/scripts/) or the setup doc
   Debian and Alpine mirrors on port 80 (slim images have no CA certificates, so `apt` uses
   HTTP and silently fails when port 80 is blocked).
 - **Room settings.** Band's room activity feed is off, so tool activity is not mirrored into
-  the room and the room stays within its message limit (run 1 hit the limit; Band raised it to
+  the room and the room stays within its message limit (run 1 hit the limit, and Band raised it to
   30,000 for the event).
 - **Noticing a dropped seat.** When a seat's runtime stops, Band shows it as idle, and no
   other seat is woken. The operator's health watch ([operator/](operator/)) reads Band's log,
@@ -165,9 +165,9 @@ Each stage folder is a complete service. On the supplied checks in isolated mode
 | 4 | + 6/6 (178/178 in all) | ACCEPT, round 1 | 9 h 53 m, including the stop described below |
 
 About 28 hours from dispatch to the final report. `python -m harness run --track tablekeeper
---stage 4 --mode isolated` claims stage 4; the operator re-ran it on a fresh clone of the
-final commit with the same result. The supplied checks are a subset of the judged ones;
-hidden assertions are not claimed.
+--stage 4 --mode isolated` claims stage 4. The operator re-ran it on a fresh clone of the
+final commit with the same result. The supplied checks are a subset of the judged ones.
+Hidden assertions are not claimed.
 
 The coordinator's [FINAL-OUTCOME.md](FINAL-OUTCOME.md) lists each accepted revision, what
 review changed in each stage, and the reviewer's own probe counts (for stage 4: 69
@@ -178,10 +178,10 @@ independent API checks, 346 and 217 inherited, 134 migration checks across genui
 
 - **Grid labels clip.** In the availability grid at 1280 px, the state words "Held" and
   "Taken" are wider than their cell and spill past its edge. The operator measured this in
-  stage 1 (Held 31.2 px and Taken 40.0 px in a 24.3 px text area); the cell styling is
-  unchanged through stage 4. Antigravity flagged it in stage 1; the reviewer rejected it after
+  stage 1 (Held 31.2 px and Taken 40.0 px in a 24.3 px text area). The cell styling is
+  unchanged through stage 4. Antigravity flagged it in stage 1. The reviewer rejected it after
   measuring only the "Free" cells, the one state that fits.
-- **No manager or series screens.** The specification requires none; repairs and recurring
+- **No manager or series screens.** The specification requires none. Repairs and recurring
   amendments are API features, and the existing screens show their results.
 
 ## Costs and time
@@ -197,7 +197,7 @@ independent API checks, 346 and 217 inherited, 134 migration checks across genui
 
 **One room message.** At 19:03 UTC on 2026-10-05 the coordinator stopped the run with
 stages 1–3 accepted and stage 4 blocked. Its mandate allows at most three review rounds per
-work item; it had counted its own integration audits against that limit, so one stage 4 item
+work item. It had counted its own integration audits against that limit, so one stage 4 item
 was declared blocked before the reviewer had seen stage 4 at all. Its stage 4 candidate
 passed every supplied check. At 19:07 UTC the owner sent this to the coordinator:
 
@@ -215,7 +215,7 @@ accepted stage 4 in its first formal round.
 
 **Six restarts, no room messages.** A seat's runtime stopped six times. The operator ran a
 health watch on Band's log, the seats' states and the room's activity, which raised each
-drop-out; every restart followed within about two minutes. The operator restarted that
+drop-out. Every restart followed within about two minutes. The operator restarted that
 seat's room session and Band re-delivered the message it had been handling. The watch scripts
 are in [operator/](operator/).
 
@@ -230,15 +230,15 @@ are in [operator/](operator/).
 
 **The band recovered without the operator twice.** When OMP's provider rejected a request
 and the error text was posted as its reply, the coordinator recognised it was not a report and
-re-sent the assignment; OMP finished the work. When OpenCode's VM ran out of disk for the
+re-sent the assignment. OMP finished the work. When OpenCode's VM ran out of disk for the
 harness runner image, the coordinator moved that check to the reviewer's sandbox.
 
 ## What review changed
 
 - **Stage 1.** The login form showed the API's raw message ("missing or invalid bearer
   token"). It now says "Email or password is incorrect."
-- **Stage 2.** The signed-in header no longer offers "Sign in" and "Create account"; results
-  are scrolled into view after each action; the floor plan names each table once; the
+- **Stage 2.** The signed-in header no longer offers "Sign in" and "Create account". Results
+  are scrolled into view after each action, the floor plan names each table once, and the
   combined-table line no longer crosses a table's label.
 - **Stages 3 and 4.** Most defects were caught earlier, in the coordinator's correction
   rounds before integration: for example, a recurring booking in Santiago landing on the
@@ -263,7 +263,7 @@ hours, mostly lost to stalls. For run 2:
 - One dispatch for all four stages.
 - A fifth seat for the interface, with a design bar, and a design pass in review with Antigravity
   as critic.
-- Every handoff in one message; everything in the foreground; no acknowledgements.
+- Every handoff in one message, everything in the foreground, and no acknowledgements.
 - Room activity feed off, so the room stays within Band's message limit.
 - Narrower write access for the coordinator, and every SHA read from Git.
 
@@ -275,7 +275,7 @@ hours, mostly lost to stalls. For run 2:
 - **Measure every state.** The clipped grid words survived because overflow was measured on
   one state only.
 - **Some seats crash on an empty reply,** and one harness hit a provider error about every
-  four hours. Both are infrastructure; a restart cleared each one.
+  four hours. Both are infrastructure. A restart cleared each one.
 
 The full list, with each fix, is in [factory/LEARNINGS.md](factory/LEARNINGS.md).
 
@@ -304,5 +304,5 @@ their provider logins.
    command.
 6. When the run is done, run `end-run.sh <run>` and `snapshot-factory.sh <run>`.
 
-Scripts use this machine's absolute paths and Band session ids; adapt them on another
+Scripts use this machine's absolute paths and Band session ids. Adapt them on another
 machine. Credentials stay out of every repository.
