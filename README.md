@@ -60,6 +60,7 @@ how we ran it, and every operator event.
 | [factory/DOCKER-SETUP.md](factory/DOCKER-SETUP.md) | The Docker Sandboxes: VMs, mounts and network rules |
 | [factory/LEARNINGS.md](factory/LEARNINGS.md) | What the rehearsals and run 1 taught us, and the change each lesson led to |
 | [operator/](operator/) | The operator's own tooling for this run: the health watch that raised every seat drop-out, the room progress log and the transcript generator. Not part of the factory |
+| [docs/images/](docs/images/) | The Seatright banner at the top of this page |
 
 **The run's record**
 
