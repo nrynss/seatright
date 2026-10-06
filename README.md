@@ -5,7 +5,7 @@
 This repository is the output of one run of the Seatright factory, a five-seat Band Desktop
 factory set up like a rock band: Codex on lead vocals (coordinator), OpenCode on bass and OMP
 on drums (backend), Grok on lead guitar (frontend and design), and ZCode on rhythm guitar
-(reviewer), with Gemini as its private monitor engineer (design critic). All four stages
+(reviewer), with Antigravity, running Gemini 3.8 Flash, as its private monitor engineer (design critic). All four stages
 came from **one dispatch**. See [FACTORY.md](FACTORY.md) for the factory, how it was run,
 and every operator event.
 

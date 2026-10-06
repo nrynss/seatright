@@ -9,7 +9,7 @@ Seatright is a five-seat dark factory for Band Desktop, set up like a rock band:
 | Seatright-OMP | Drums | Backend implementer |
 | Seatright-Grok | Lead guitar | Frontend and design implementer |
 | Seatright-ZCode | Rhythm guitar | Independent reviewer |
-| Gemini 3.8 Flash | Monitor engineer | Design critic inside the reviewer's sandbox, heard only by the reviewer |
+| Antigravity (Gemini 3.8 Flash) | Monitor engineer | Design critic inside the reviewer's sandbox, heard only by the reviewer |
 
 The whole run, all four stages, was started by **one dispatch message**. The seats planned,
 built, reviewed and delivered it among themselves. The operator restarted seats whose
@@ -28,7 +28,7 @@ explains it; the files in `factory/` are what you need to stand it up.
 | Seatright-OMP | OMP (native ACP) | `opencode-go/muse-spark-1.3-contributor` | Docker Sandbox `seatright-omp` |
 | Seatright-Grok | Grok CLI (native ACP) | `grok-4.7` | Docker Sandbox `seatright-grok` |
 | Seatright-ZCode | ZCode (ACP bridge) | ZAI Coding Plan `GLM-5.3-Flash` | Docker Sandbox `seatright-zcode` |
-| (critic) | Antigravity CLI (`agy`), headless | `gemini-3.8-flash-high` | Inside `seatright-zcode`; not a Band seat |
+| Antigravity (critic) | Antigravity CLI (`agy`), headless | `gemini-3.8-flash-high` | Inside `seatright-zcode`; not a Band seat |
 
 The mandates are in [mandates/](mandates/), one per seat, named after it. They are generic:
 they describe how each seat works, not this problem, and were checked for task vocabulary
@@ -51,24 +51,24 @@ message in [evidence/room-transcript.md](evidence/room-transcript.md).
   recording evidence of every state.
 - **Reviewer.** Checks a frozen candidate at an exact SHA, read-only. Runs the isolated
   harness and its own probes against the written requirements, then a design pass:
-  screenshots and recordings at both widths, a critique from Gemini, and its own browser
+  screenshots and recordings at both widths, a critique from Antigravity, and its own browser
   measurements of every point it adopts. Returns ACCEPT or CHANGES.
 
 ## Any seat can be its own team
 
-Gemini is not in the room. The reviewer runs it as a command-line tool inside its own
+Antigravity is not in the room. The reviewer runs it as a command-line tool inside its own
 sandbox, gives it the screenshots, and decides which of its points are real. Band coordinates
 five seats; what happens inside a seat is up to that seat. Adding a second model to the
-reviewer changed nothing in the room, the other mandates or the message flow, and Gemini's
+reviewer changed nothing in the room, the other mandates or the message flow, and Antigravity's
 rejected points never reached the room.
 
-| Review | Gemini | Reviewer | Outcome |
+| Review | Antigravity | Reviewer | Outcome |
 |---|---|---|---|
 | Stage 1, round 1 | 13 points, "not presentation-ready" | Measured each; disproved 12 (a contrast "failure" measured 5.71:1; one fix the specification forbids) | 1 blocker, login error copy; fixed by Grok in 10 minutes |
 | Stage 2, round 1 | Points included sign-in links shown while signed in, results landing off-screen, table names drawn twice, a combined-table line through a label | Confirmed all four with browser measurements | 4 blockers; fixed by Grok in 32 minutes |
 | Stages 3 and 4 | No critical findings | Own design pass agreed | Accepted in round 1 |
 
-Gemini's critiques for the accepted reviews are committed with them, in
+Antigravity's critiques for the accepted reviews are committed with them, in
 `evidence/stage-1/design/`, `evidence/stage-3/notes/` and `evidence/stage-4/notes/`.
 
 ## Design choices, and why
@@ -125,7 +125,7 @@ independent API checks, 346 and 217 inherited, 134 migration checks across genui
 - **Grid labels clip.** In the availability grid at 1280 px, the state words "Held" and
   "Taken" are wider than their cell and spill past its edge. The operator measured this in
   stage 1 (Held 31.2 px and Taken 40.0 px in a 24.3 px text area); the cell styling is
-  unchanged through stage 4. Gemini flagged it in stage 1; the reviewer rejected it after
+  unchanged through stage 4. Antigravity flagged it in stage 1; the reviewer rejected it after
   measuring only the "Free" cells, the one state that fits.
 - **No manager or series screens.** The specification requires none; repairs and recurring
   amendments are API features, and the existing screens show their results.
@@ -136,7 +136,7 @@ independent API checks, 346 and 217 inherited, 134 migration checks across genui
   21:11 UTC).
 - **Money.** No seat used a metered API key. Codex runs on a ChatGPT subscription,
   OpenCode and OMP on OpenCode Go, Grok on a grok.com account, ZCode on the ZAI Coding Plan
-  and Gemini on an Antigravity login. None of the harnesses exposed per-seat token or cost counters through Band, so no per-seat
+  and Antigravity on its own login. None of the harnesses exposed per-seat token or cost counters through Band, so no per-seat
   token figures are claimed.
 
 ## Operator events in this run
@@ -205,7 +205,7 @@ Run 1 built the same four stages with four seats, one dispatch per stage, and to
 hours, mostly lost to stalls. For run 2:
 
 - One dispatch for all four stages.
-- A fifth seat for the interface, with a design bar, and a design pass in review with Gemini
+- A fifth seat for the interface, with a design bar, and a design pass in review with Antigravity
   as critic.
 - Every handoff in one message; everything in the foreground; no acknowledgements.
 - Room activity feed off, so the room stays within Band's message limit.
