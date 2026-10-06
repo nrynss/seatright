@@ -50,7 +50,7 @@ Client Protocol (ACP) on its standard input and output.
 |---|---|
 | `codex-host.sh` | Starts the coordinator on the host as a Codex app-server inside Codex's own `workspace-write` sandbox, with no container runtime. It allows network for this seat only (to fetch modules and run tests) without changing the owner's global Codex settings. |
 | `opencode.sh`, `omp.sh`, `grok.sh`, `zcode.sh` | Start each seat inside its own Docker Sandbox VM with `sbx exec`, in the seat's fixed working directory. `grok.sh` also removes the placeholder API key Docker Sandboxes injects, which would otherwise override Grok's own login. |
-| `acp-strip-mcp.py` | Sits between Band and a sandboxed seat and removes the host tool server Band offers, which a seat inside a VM cannot start |
+| `acp-strip-mcp.py` | Sits between Band and the OMP and Grok seats and removes the host tool server Band offers, which a seat inside a VM cannot start |
 
 **A fix to a harness** ([factory/scripts/patches/](factory/scripts/patches/))
 
