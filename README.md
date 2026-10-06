@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/images/seatright-banner.png" alt="Seatright: All Agents, Now in Sync" width="800"></p>
+
 # Seatright: Tablekeeper
 
 **Team:** Seatright (Narayan S S) · **Track:** Tablekeeper · **Reached:** stage 4
