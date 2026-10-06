@@ -1,0 +1,15 @@
+--- a/dist/handlers/dispatch.js
++++ b/dist/handlers/dispatch.js
+@@ -341,6 +341,12 @@
+ async function dispatchTurnInfo(cx, acpSid, ev, chunkMsgId) {
+     const m = messages();
+     let line;
++    // Seatright: a successful turn posts no status line. In a Band room every posted
++    // chunk becomes a message that wakes its addressee, so a footer-only "reply" to a
++    // message that needed none restarts a reply loop between seats.
++    if (ev.resultType === "success") {
++        return;
++    }
+     if (ev.resultType === "success") {
+         line = ev.cacheStats
+             ? m.turnCompletedCache(ev.cacheStats.cachedMessages, ev.cacheStats.totalMessages, ev.cacheStats.cacheReadTokens !== undefined

@@ -1,0 +1,52 @@
+/scratch/
+# Compatibility links to ignored local runtime files
+/.tools
+/.zcode
+# Secrets and machine-local configuration
+/BRIEF.md
+/Brief.md
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+/secrets/
+
+# Dependencies and build outputs
+.tools/
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+target/
+dist/
+build/
+.next/
+
+# Local test output and caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage/
+.coverage
+playwright-report/
+test-results/
+*.log
+/checks/
+
+# Editor and OS files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Keep room.json, mandates, stage source/assets and lockfiles tracked.
+# Keep all agent *-SETUP.md documentation tracked.
+# Store rehearsal repos outside the submitted result checkout.
+
+# Factory run repositories and worktrees (each result repo is its own Git repo)
+/runs/
