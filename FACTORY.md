@@ -99,6 +99,60 @@ Antigravity's critiques for the accepted reviews are committed with them, in
 The access matrix, with the reason for every boundary, is in
 [factory/AGENT-ROLES.md](factory/AGENT-ROLES.md).
 
+## What we built to run these seats on Band
+
+Band runs each seat as an agent that speaks the Agent Client Protocol (ACP). Getting five
+different harnesses to work as Band seats inside isolated VMs took integration work of our
+own. Each item below is in [factory/scripts/](factory/scripts/) or the setup documents.
+
+- **Seats in our own VMs.** Every seat that runs code lives in a Docker Sandboxes VM that we
+  created and manage with `sbx`; Band's own sandbox is off for every seat. Band starts each
+  seat by running a launcher of ours as its spawn command, and the launcher runs the harness
+  inside its VM through `sbx exec -i`.
+- **A bridge and a patch for ZCode.** ZCode does not speak ACP, so it runs through the
+  `zcode-acp-server` bridge. We patched the bridge
+  ([factory/scripts/patches/](factory/scripts/patches/)) so that a successful turn posts no
+  "✓ completed" line: in a Band room every posted line wakes the seat it addresses, and those
+  lines started reply loops between seats.
+- **Filtering Band's tool server out of sandboxed sessions.** In each new session Band offers
+  its own host tool server (MCP). A seat inside a VM cannot start that host command, and OMP
+  fails the whole wake when an offered server fails. `acp-strip-mcp.py` sits between Band and
+  the OMP and Grok seats and removes the offer. Sandboxed seats reply to the room through
+  their turn output instead.
+- **Clearing what Band Desktop passes down.** Band Desktop runs as an AppImage and passes its
+  library and Python overrides (`LD_LIBRARY_PATH`, `LD_PRELOAD`, `PYTHONHOME`, `PYTHONPATH`)
+  to every seat it spawns; they break Python and other host tools. Every launcher clears
+  them. When Band spawns a launcher from inside its AppImage mount, the launcher falls back
+  to the factory directory, because that path does not exist inside the VM.
+- **The coordinator as a Band-managed agent.** The coordinator's first identity, made through
+  CLI onboarding, became a "local terminal agent" that Band would not add to a room the owner
+  created. We recreated it with `band agent create` and a parked runtime template, so it joins
+  rooms like any other seat. Its mandate is live-linked as Band owner instructions. Its
+  launcher enables network for this seat alone, inside Codex's own sandbox, without changing
+  the owner's global Codex settings.
+- **Work tracking without Band's task tools.** Band's task tools need an approval the
+  coordinator's sandbox policy never grants, so the coordinator tracks work in `PLAN.md`,
+  `plan.md` and `RUNLOG.md` instead (RUNLOG, first entry).
+- **Each mandate where its harness reads it.** `prepare-run.sh` installs the mandates as
+  `~/.config/opencode/AGENTS.md`, `~/.omp/agent/AGENTS.md`, `~/.grok/AGENTS.md` and
+  `~/.zcode/AGENTS.md` inside the VMs.
+- **Run folders mounted per run.** `prepare-run.sh` mounts the run folder read-write for the
+  implementers and read-only for the reviewer, and gives each seat a fixed worktree for the
+  whole run, because a seat cannot change directory mid-run.
+- **Grok's login inside a VM.** Docker Sandboxes injects a placeholder `XAI_API_KEY` into every
+  VM, and Grok prefers it over its own login. `grok.sh` removes it.
+- **One rule per network need.** Each VM has an allow-list for its own provider, plus the
+  Debian and Alpine mirrors on port 80 (slim images have no CA certificates, so `apt` uses
+  HTTP and silently fails when port 80 is blocked).
+- **Room settings.** Band's room activity feed is off, so tool activity is not mirrored into
+  the room and the room stays within its message limit (run 1 hit the limit; Band raised it to
+  30,000 for the event).
+- **Noticing a dropped seat.** When a seat's runtime stops, Band shows it as idle, and no
+  other seat is woken. The operator's health watch ([operator/](operator/)) reads Band's log,
+  the seats' states and the room's activity, and raises the drop. The recovery is
+  `band --session <seat> restart --host-session <room session>`, after which Band re-delivers
+  the message the seat had not acknowledged.
+
 ## Results
 
 Each stage folder is a complete service. On the supplied checks in isolated mode:
