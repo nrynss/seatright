@@ -27,7 +27,7 @@ it. The files in `factory/` are what you need to stand it up.
 | Seatright-Codex | Codex (app-server) | `gpt-6.1-sol`, high reasoning | Host, Codex `workspace-write` sandbox, no container runtime |
 | Seatright-OpenCode | OpenCode (ACP) | `opencode-go/muse-spark-1.3-contributor` | Docker Sandbox `seatright-opencode` |
 | Seatright-OMP | OMP (native ACP) | `opencode-go/muse-spark-1.3-contributor` | Docker Sandbox `seatright-omp` |
-| Seatright-Grok | Grok CLI (native ACP) | `grok-4.7` | Docker Sandbox `seatright-grok` |
+| Seatright-Grok | Grok Build (native ACP) | `grok-4.7` | Docker Sandbox `seatright-grok` |
 | Seatright-ZCode | ZCode (ACP bridge) | ZAI Coding Plan `GLM-5.3-Flash` | Docker Sandbox `seatright-zcode` |
 | Antigravity (critic) | Antigravity CLI (`agy`), headless | `gemini-3.8-flash-high` | Inside `seatright-zcode`, not a Band seat |
 
@@ -98,7 +98,7 @@ flowchart LR
   subgraph impl["Implementer VMs (Docker Sandboxes)"]
     vo["seatright-opencode<br/>OpenCode"]
     vm["seatright-omp<br/>OMP"]
-    vg["seatright-grok<br/>Grok CLI"]
+    vg["seatright-grok<br/>Grok Build"]
   end
   subgraph rev["Reviewer VM (Docker Sandboxes)"]
     vz["seatright-zcode<br/>ZCode bridge<br/>Antigravity"]
@@ -389,7 +389,7 @@ Prerequisites:
 - Band Desktop 0.4.12 or newer.
 - Docker Sandboxes (`sbx`) 0.46.0 or newer, with KVM.
 - A logged-in Codex CLI.
-- OpenCode, OMP, Grok CLI, ZCode and the Antigravity CLI, each with its provider login.
+- OpenCode, OMP, Grok Build, ZCode and the Antigravity CLI, each with its provider login.
 
 Steps:
 

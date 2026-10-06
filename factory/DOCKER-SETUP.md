@@ -23,7 +23,7 @@ Linux support targets Ubuntu 24.04 or later.
 | Codex coordinator | Host | Codex CLI 0.159.3; `gpt-6.1-sol`, high reasoning |
 | OpenCode implementer | `seatright-opencode` | OpenCode 2.0.21; `opencode-go/muse-spark-1.3-contributor` |
 | OMP implementer | `seatright-omp` | OMP 18.4.8; `opencode-go/muse-spark-1.3-contributor` |
-| Grok frontend implementer | `seatright-grok` | Grok CLI 1.0.46; `grok-4.7` |
+| Grok frontend implementer | `seatright-grok` | Grok Build 1.0.46, `grok-4.7` |
 | ZCode reviewer | `seatright-zcode` | ZCode CLI 0.16.9; ZAI Coding Plan `GLM-5.3-Flash`; Antigravity CLI for the Gemini design critic |
 
 Each worker VM uses the official shell template, with 2 CPUs and 2 GiB of RAM. Each has Docker,

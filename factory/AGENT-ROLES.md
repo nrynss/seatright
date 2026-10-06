@@ -5,7 +5,7 @@
 | Seatright-Codex | Coordinator | Codex CLI 0.159.3 (app-server) | `gpt-6.1-sol`, high reasoning | Host |
 | Seatright-OpenCode | Backend implementer | OpenCode 2.0.21 (ACP) | `opencode-go/muse-spark-1.3-contributor` | Docker sandbox `seatright-opencode` |
 | Seatright-OMP | Backend implementer | OMP 18.4.8 (native ACP) | `opencode-go/muse-spark-1.3-contributor` | Docker sandbox `seatright-omp` |
-| Seatright-Grok | Frontend implementer | Grok CLI 1.0.46 (native ACP) | `grok-4.7` | Docker sandbox `seatright-grok` |
+| Seatright-Grok | Frontend implementer | Grok Build 1.0.46 (native ACP) | `grok-4.7` | Docker sandbox `seatright-grok` |
 | Seatright-ZCode | Reviewer (correctness and design) | ZCode CLI 0.16.9 (ACP bridge) | ZAI Coding Plan `GLM-5.3-Flash`, with Gemini 3.8 Flash as design critic | Docker sandbox `seatright-zcode` |
 
 The mandates in [mandates/](mandates/) define how each seat works. Each seat's setup document

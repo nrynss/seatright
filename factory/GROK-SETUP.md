@@ -4,7 +4,7 @@ Seat: `@rocknarayan/seatright-grok` (Seatright-Grok), scope `seatright-grok`.
 Role: frontend implementer in the `seatright-grok` Docker VM over native ACP.
 Mandate: [mandates/seatright-grok.md](mandates/seatright-grok.md).
 
-Grok CLI 1.0.46 is a single static binary. The host binary
+Grok Build 1.0.46 is a single static binary. The host binary
 (`~/.grok/downloads/grok-1.0.46-linux-x86_64`) is mounted read-only in the VM at
 `/opt/seatright/grok`. The tracked launcher
 [scripts/sandboxes/grok.sh](scripts/sandboxes/grok.sh) runs
