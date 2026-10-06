@@ -192,9 +192,8 @@ harness runner image, the coordinator moved that check to the reviewer's sandbox
 ## The room record
 
 `room.json` is Band Desktop's "Download full session" export of the room ("Seatright
-Redux"), saved unchanged. Band Desktop exports only the messages it has loaded: 800 of the
-room's 6,263, from 2026-10-05 17:22 UTC (late stage 4) to the end, including the operator
-message and the final report. The complete set of text messages (the dispatch, every handoff, report, review, the operator message and
+Redux"), saved unchanged: all 6,263 messages, from the dispatch to the final report. The
+complete set of text messages (the dispatch, every handoff, report, review, the operator message and
 the final report) is in [evidence/room-transcript.md](evidence/room-transcript.md),
 generated after the run from Band's CLI (`band room messages`, all pages): 371 text messages
 of the room's 6,263. Band's room activity feed was off, so tool activity was not mirrored

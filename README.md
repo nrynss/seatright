@@ -16,7 +16,7 @@ and every operator event.
 | [FACTORY.md](FACTORY.md) | The factory: seats, design choices, results, operator events, learnings, how to stand it up |
 | [FINAL-OUTCOME.md](FINAL-OUTCOME.md) | The coordinator's final report: accepted revisions, what review changed, verification |
 | [mandates/](mandates/) | One mandate per seat, named after the seat, each naming its harness and model |
-| `room.json` | The room ("Seatright Redux"), downloaded unchanged from Band Desktop. Band's export holds only the last 800 of the room's 6,263 messages (from late stage 4) |
+| `room.json` | The room ("Seatright Redux"), downloaded unchanged from Band Desktop: all 6,263 messages |
 | [evidence/room-transcript.md](evidence/room-transcript.md) | All 371 text messages in the room, generated from Band's CLI: the dispatch, every handoff, report and review, the operator message and the final report |
 | [stage-1/](stage-1/) … [stage-4/](stage-4/) | One complete service per stage, each extending the last. Build and run with its `RUN.md` |
 | [evidence/](evidence/) | The accepted review trail of each stage, including the design critiques |
