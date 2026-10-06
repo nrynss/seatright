@@ -9,7 +9,6 @@ than drop-in tools.
 |---|---|
 | `health.sh` | Ran in the background in six-hour stretches. Exits, and so alerts the operator, on the first sign that a seat has dropped out: a usage, quota, connection or "turn failed" error in Band's log, any seat in state Failed, or no room message for 45 minutes. It raised all six drop-outs in this run, and the quiet room after the final report. |
 | `watch.sh` | Streams each new text message in the room as one line, and stops when the coordinator sends its final report to the owner |
-| `msgs.sh` | Reads the room's messages through Band's CLI (`band room messages`); used by the two scripts above |
 | `ids.sh` | The room id and each participant's id in this run, written by `new-room.sh` |
 | `gen-transcript.py` | Generated [../evidence/room-transcript.md](../evidence/room-transcript.md) from Band's CLI after the run |
 
