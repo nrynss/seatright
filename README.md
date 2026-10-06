@@ -16,6 +16,8 @@ and every operator event.
 | [FACTORY.md](FACTORY.md) | The factory: seats, design choices, results, operator events, learnings, how to stand it up |
 | [FINAL-OUTCOME.md](FINAL-OUTCOME.md) | The coordinator's final report: accepted revisions, what review changed, verification |
 | [mandates/](mandates/) | One mandate per seat, named after the seat, each naming its harness and model |
+| [factory/AGENT-ROLES.md](factory/AGENT-ROLES.md) | Every seat's role, access and boundaries, with the reason for each |
+| [factory/CODEX-SETUP.md](factory/CODEX-SETUP.md), [OPENCODE](factory/OPENCODE-SETUP.md), [OMP](factory/OMP-SETUP.md), [GROK](factory/GROK-SETUP.md), [ZCODE](factory/ZCODE-SETUP.md) `-SETUP.md` | How each agent is set up: harness, model, sandbox, network, credentials, and what was verified. Antigravity is set up inside ZCODE-SETUP.md |
 | `room.json` | The room ("Seatright Redux"), downloaded unchanged from Band Desktop: all 6,263 messages |
 | [evidence/room-transcript.md](evidence/room-transcript.md) | All 371 text messages in the room, generated from Band's CLI: the dispatch, every handoff, report and review, the operator message and the final report |
 | [stage-1/](stage-1/) … [stage-4/](stage-4/) | One complete service per stage, each extending the last. Build and run with its `RUN.md` |
